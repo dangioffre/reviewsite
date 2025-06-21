@@ -21,7 +21,7 @@
                             <svg class="w-4 h-4 text-[#3F3F46]" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                             </svg>
-                            <span class="text-[#E53E3E] font-medium">Reviews</span>
+                            <span class="text-[#E53E3E] font-medium">Games</span>
                         </div>
                     </nav>
 
@@ -30,16 +30,16 @@
                         <div class="lg:col-span-2">
                             <div class="mb-6">
                                 <span class="inline-block bg-gradient-to-r from-[#E53E3E] to-[#DC2626] text-white text-sm font-['Share_Tech_Mono'] px-4 py-2 rounded-full uppercase tracking-wider mb-4">
-                                    COMPREHENSIVE REVIEWS
+                                    GAME LIBRARY
                                 </span>
                                 <h1 class="text-5xl lg:text-6xl font-bold text-white mb-6 font-['Share_Tech_Mono'] leading-tight">
                                     <span class="block text-transparent bg-clip-text bg-gradient-to-r from-[#E53E3E] to-[#2563EB]">
-                                        Reviews
+                                        Games
                                     </span>
                                 </h1>
                                 <p class="text-xl text-[#A1A1AA] leading-relaxed font-['Inter'] max-w-2xl">
-                                    Discover honest, in-depth reviews from our team and passionate gaming community. 
-                                    From the latest AAA titles to cutting-edge hardware.
+                                    Explore our comprehensive game library with detailed reviews, videos, and community ratings. 
+                                    From indie gems to AAA blockbusters.
                                 </p>
                             </div>
 
@@ -58,13 +58,13 @@
                         <div class="lg:col-span-1">
                             <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl border border-[#3F3F46] p-6 shadow-2xl">
                                 <h3 class="text-lg font-bold text-white mb-6 font-['Share_Tech_Mono'] uppercase tracking-wider">
-                                    Review Stats
+                                    Game Stats
                                 </h3>
                                 <div class="space-y-6">
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <div class="text-2xl font-bold text-white font-['Share_Tech_Mono']">{{ $products->total() ?? 0 }}</div>
-                                            <div class="text-sm text-[#A1A1AA] font-['Inter']">Total Reviews</div>
+                                            <div class="text-sm text-[#A1A1AA] font-['Inter']">Total Games</div>
                                         </div>
                                         <div class="w-12 h-12 bg-[#E53E3E] bg-opacity-20 rounded-lg flex items-center justify-center">
                                             <svg class="w-6 h-6 text-[#E53E3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,7 +125,7 @@
 
         <!-- Enhanced Filter Section -->
         <div class="container mx-auto px-4 py-8">
-            <form method="GET" action="{{ route('reviews.index') }}" class="bg-[#27272A] rounded-lg shadow-md border border-[#3F3F46] overflow-hidden">
+            <form method="GET" action="{{ route('games.index') }}" class="bg-[#27272A] rounded-lg shadow-md border border-[#3F3F46] overflow-hidden">
                 <!-- Category Tabs -->
                 <div class="border-b border-[#3F3F46]">
                     <div class="flex overflow-x-auto">
@@ -205,7 +205,7 @@
                             <input 
                                 type="text" 
                                 name="search" 
-                                placeholder="Search games, hardware, and reviews..." 
+                                placeholder="Search games and reviews..." 
                                 value="{{ request('search') }}"
                                 class="w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-2.5 text-white placeholder-[#A1A1AA] focus:border-[#2563EB] focus:ring-[#2563EB] transition font-['Inter']"
                             >
@@ -217,7 +217,7 @@
                             Search
                         </button>
                         @if(request()->hasAny(['search', 'category', 'sort', 'score_range', 'platform', 'genre']))
-                            <a href="{{ route('reviews.index') }}" class="bg-[#27272A] text-white px-4 py-2.5 rounded-lg border border-[#E53E3E] hover:bg-red-900/50 transition-colors font-['Inter'] flex items-center">
+                            <a href="{{ route('games.index') }}" class="bg-[#27272A] text-white px-4 py-2.5 rounded-lg border border-[#E53E3E] hover:bg-red-900/50 transition-colors font-['Inter'] flex items-center">
                                 Clear Filters
                             </a>
                         @endif
@@ -339,13 +339,13 @@
                                             <!-- Enhanced Action Button -->
                                             <div class="flex items-center gap-4">
                                                 <a 
-                                                    href="{{ route('reviews.show', $product) }}" 
+                                                    href="{{ route('games.show', $product) }}" 
                                                     class="group/btn inline-flex items-center bg-gradient-to-r from-[#E53E3E] to-[#DC2626] hover:from-[#DC2626] hover:to-[#B91C1C] text-white px-8 py-3 rounded-xl font-bold font-['Inter'] shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300"
                                                 >
                                                     <svg class="w-5 h-5 mr-2 transform group-hover/btn:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.01M15 10h1.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
-                                                    Read Full Review
+                                                    View Game
                                                     <svg class="w-4 h-4 ml-2 transform group-hover/btn:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                                     </svg>
@@ -412,10 +412,10 @@
                         
                         <div class="relative">
                             <div class="text-6xl mb-6 animate-bounce">🎮</div>
-                            <h3 class="text-2xl font-bold text-white mb-4 font-['Share_Tech_Mono']">No Reviews Found</h3>
-                            <p class="text-[#A1A1AA] font-['Inter'] text-lg max-w-md mx-auto">Try adjusting your search criteria or check back later for new reviews.</p>
+                            <h3 class="text-2xl font-bold text-white mb-4 font-['Share_Tech_Mono']">No Games Found</h3>
+                            <p class="text-[#A1A1AA] font-['Inter'] text-lg max-w-md mx-auto">Try adjusting your search criteria or check back later for new games.</p>
                             <div class="mt-8">
-                                <a href="{{ route('reviews.index') }}" class="inline-flex items-center bg-gradient-to-r from-[#E53E3E] to-[#DC2626] text-white px-8 py-3 rounded-xl font-bold font-['Inter'] shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300">
+                                <a href="{{ route('games.index') }}" class="inline-flex items-center bg-gradient-to-r from-[#E53E3E] to-[#DC2626] text-white px-8 py-3 rounded-xl font-bold font-['Inter'] shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                     </svg>

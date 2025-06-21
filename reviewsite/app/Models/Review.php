@@ -17,6 +17,10 @@ class Review extends Model
         'is_staff_review',
     ];
 
+    protected $casts = [
+        'is_staff_review' => 'boolean',
+    ];
+
     public function product()
     {
         return $this->belongsTo(Product::class);
@@ -25,5 +29,15 @@ class Review extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function scopeStaff($query)
+    {
+        return $query->where('is_staff_review', true);
+    }
+
+    public function scopeUser($query)
+    {
+        return $query->where('is_staff_review', false);
     }
 }

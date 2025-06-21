@@ -20,9 +20,9 @@
 
             <!-- Navigation Links -->
             <div class="hidden md:flex items-center space-x-8">
-                <a href="{{ route('reviews.index') }}" 
-                   class="text-[#A1A1AA] hover:text-white transition font-medium font-['Inter'] text-base {{ request()->routeIs('reviews*') ? 'text-[#E53E3E]' : '' }}">
-                    Reviews
+                <a href="{{ route('games.index') }}" 
+                   class="text-[#A1A1AA] hover:text-white transition font-medium font-['Inter'] text-base {{ request()->routeIs('games*') ? 'text-[#E53E3E]' : '' }}">
+                    Games
                 </a>
                 <a href="{{ route('posts.index') }}" 
                    class="text-[#A1A1AA] hover:text-white transition font-medium font-['Inter'] text-base {{ request()->routeIs('posts*') ? 'text-[#E53E3E]' : '' }}">
