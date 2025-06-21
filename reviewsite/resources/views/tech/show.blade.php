@@ -77,16 +77,16 @@
                                         <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                                             <path class="text-[#3F3F46]" stroke="currentColor" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
                                             <path class="text-[#E53E3E]" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" 
-                                                  stroke-dasharray="{{ $product->staff_rating * 10 }}, 100" 
+                                                  stroke-dasharray="{{ ($product->staff_rating / 10) * 100 }}, 100" 
                                                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831">
                                             </path>
                                         </svg>
                                         <div class="absolute inset-0 flex items-center justify-center">
-                                            <span class="text-xl font-bold text-white font-['Share_Tech_Mono']">{{ $product->staff_rating }}</span>
+                                            <span class="text-xl font-bold text-white font-['Share_Tech_Mono']">{{ number_format($product->staff_rating, 1) }}</span>
                                         </div>
                                     </div>
                                     <div>
-                                        <div class="text-2xl font-bold text-white font-['Share_Tech_Mono']">{{ $product->staff_rating }}/10</div>
+                                        <div class="text-2xl font-bold text-white font-['Share_Tech_Mono']">{{ number_format($product->staff_rating, 1) }}/10</div>
                                         <div class="flex">
                                             @for($i = 1; $i <= 5; $i++)
                                                 <svg class="w-4 h-4 {{ ($product->staff_rating/2) >= $i ? 'text-[#FFC107]' : 'text-[#3F3F46]' }}" fill="currentColor" viewBox="0 0 20 20">
@@ -94,12 +94,13 @@
                                                 </svg>
                                             @endfor
                                         </div>
+                                        <div class="text-sm text-[#A1A1AA] font-['Inter']">{{ $product->staff_reviews_count }} staff {{ Str::plural('review', $product->staff_reviews_count) }}</div>
                                     </div>
                                 </div>
                             </div>
                             @endif
                             
-                            @if($userReviews->count() > 0)
+                            @if($product->community_rating)
                             <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-xl p-6 border border-[#3F3F46]">
                                 <h3 class="text-lg font-bold text-white mb-4 font-['Share_Tech_Mono']">Community Rating</h3>
                                 <div class="flex items-center gap-4">
@@ -107,17 +108,17 @@
                                         <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                                             <path class="text-[#3F3F46]" stroke="currentColor" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
                                             <path class="text-[#2563EB]" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" 
-                                                  stroke-dasharray="{{ $averageUserRating * 10 }}, 100" 
+                                                  stroke-dasharray="{{ ($product->community_rating / 10) * 100 }}, 100" 
                                                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831">
                                             </path>
                                         </svg>
                                         <div class="absolute inset-0 flex items-center justify-center">
-                                            <span class="text-xl font-bold text-white font-['Share_Tech_Mono']">{{ number_format($averageUserRating, 1) }}</span>
+                                            <span class="text-xl font-bold text-white font-['Share_Tech_Mono']">{{ number_format($product->community_rating, 1) }}</span>
                                         </div>
                                     </div>
                                     <div>
-                                        <div class="text-2xl font-bold text-white font-['Share_Tech_Mono']">{{ number_format($averageUserRating, 1) }}/10</div>
-                                        <div class="text-sm text-[#A1A1AA] font-['Inter']">{{ $userReviews->count() }} {{ Str::plural('review', $userReviews->count()) }}</div>
+                                        <div class="text-2xl font-bold text-white font-['Share_Tech_Mono']">{{ number_format($product->community_rating, 1) }}/10</div>
+                                        <div class="text-sm text-[#A1A1AA] font-['Inter']">{{ $product->community_reviews_count }} community {{ Str::plural('review', $product->community_reviews_count) }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -148,8 +149,8 @@
                     </section>
                     @endif
 
-                    <!-- Staff Review Section -->
-                    @if($product->staff_review)
+                    <!-- Staff Reviews Section -->
+                    @if($staffReviews->count() > 0)
                     <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
                         <div class="flex items-center gap-4 mb-6">
                             <div class="w-12 h-12 bg-[#E53E3E] bg-opacity-20 rounded-lg flex items-center justify-center">
@@ -157,10 +158,38 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                                 </svg>
                             </div>
-                            <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono']">Staff Review</h2>
+                            <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono']">Staff Reviews</h2>
                         </div>
-                        <div class="prose prose-invert max-w-none font-['Inter']">
-                            {!! $product->staff_review !!}
+                        
+                        <div class="space-y-6">
+                            @foreach($staffReviews as $review)
+                                <div class="bg-[#1A1A1B] rounded-xl p-6 border border-[#3F3F46]">
+                                    <div class="flex items-start justify-between mb-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 bg-gradient-to-r from-[#E53E3E] to-[#DC2626] rounded-full flex items-center justify-center">
+                                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <div class="text-white font-semibold font-['Inter']">{{ $review->user->name }} <span class="text-[#E53E3E] text-sm">STAFF</span></div>
+                                                <div class="text-[#A1A1AA] text-sm font-['Inter']">{{ $review->created_at->diffForHumans() }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-white font-bold font-['Share_Tech_Mono']">{{ $review->rating }}/10</span>
+                                            <div class="flex">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <svg class="w-3 h-3 {{ ($review->rating/2) >= $i ? 'text-[#FFC107]' : 'text-[#3F3F46]' }}" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                    </svg>
+                                                @endfor
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="text-[#A1A1AA] leading-relaxed font-['Inter']">{{ $review->review }}</p>
+                                </div>
+                            @endforeach
                         </div>
                     </section>
                     @endif
@@ -217,6 +246,21 @@
                             
                             <form method="POST" action="{{ route('tech.reviews.store', $product) }}" class="space-y-6">
                                 @csrf
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-white mb-3 font-['Inter']">Rating</label>
+                                    <div class="flex items-center gap-2 mb-4">
+                                        <div class="flex" id="star-rating">
+                                            @for($i = 1; $i <= 10; $i++)
+                                                <button type="button" class="star-btn text-2xl text-[#3F3F46] hover:text-[#FFC107] transition-colors duration-200" data-rating="{{ $i }}">
+                                                    ★
+                                                </button>
+                                            @endfor
+                                        </div>
+                                        <span id="rating-text" class="text-[#A1A1AA] font-['Inter'] ml-2">Select a rating</span>
+                                    </div>
+                                    <input type="hidden" name="rating" id="rating-input" required>
+                                </div>
                                 
                                 <div>
                                     <label for="review" class="block text-sm font-medium text-white mb-2 font-['Inter']">Your Review</label>
@@ -305,4 +349,71 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const stars = document.querySelectorAll('.star-btn');
+            const ratingInput = document.getElementById('rating-input');
+            const ratingText = document.getElementById('rating-text');
+            let currentRating = 0;
+
+            stars.forEach((star, index) => {
+                star.addEventListener('click', function() {
+                    currentRating = parseInt(this.dataset.rating);
+                    ratingInput.value = currentRating;
+                    updateStars();
+                    updateRatingText();
+                });
+
+                star.addEventListener('mouseenter', function() {
+                    const hoverRating = parseInt(this.dataset.rating);
+                    highlightStars(hoverRating);
+                });
+            });
+
+            document.getElementById('star-rating').addEventListener('mouseleave', function() {
+                updateStars();
+            });
+
+            function updateStars() {
+                stars.forEach((star, index) => {
+                    if (index < currentRating) {
+                        star.classList.remove('text-[#3F3F46]');
+                        star.classList.add('text-[#FFC107]');
+                    } else {
+                        star.classList.remove('text-[#FFC107]');
+                        star.classList.add('text-[#3F3F46]');
+                    }
+                });
+            }
+
+            function highlightStars(rating) {
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.classList.remove('text-[#3F3F46]');
+                        star.classList.add('text-[#FFC107]');
+                    } else {
+                        star.classList.remove('text-[#FFC107]');
+                        star.classList.add('text-[#3F3F46]');
+                    }
+                });
+            }
+
+            function updateRatingText() {
+                const ratingLabels = {
+                    1: '1/10 - Terrible',
+                    2: '2/10 - Very Poor',
+                    3: '3/10 - Poor',
+                    4: '4/10 - Below Average',
+                    5: '5/10 - Average',
+                    6: '6/10 - Above Average',
+                    7: '7/10 - Good',
+                    8: '8/10 - Very Good',
+                    9: '9/10 - Excellent',
+                    10: '10/10 - Perfect'
+                };
+                ratingText.textContent = ratingLabels[currentRating] || 'Select a rating';
+            }
+        });
+    </script>
 </x-layouts.app> 

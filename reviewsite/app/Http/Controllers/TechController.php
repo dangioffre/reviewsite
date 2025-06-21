@@ -125,7 +125,7 @@ class TechController extends Controller
             'user_id' => Auth::id(),
             'review' => $request->review,
             'rating' => $request->rating,
-            'is_staff_review' => false,
+            'is_staff_review' => Auth::user()->is_admin, // Automatically mark admin reviews as staff
         ]);
 
         return redirect()->route('tech.show', $product)

@@ -97,7 +97,7 @@ class GameController extends Controller
             'user_id' => Auth::id(),
             'review' => $request->review,
             'rating' => $request->rating,
-            'is_staff_review' => false,
+            'is_staff_review' => Auth::user()->is_admin,
         ]);
 
         return redirect()->route('games.show', $product)

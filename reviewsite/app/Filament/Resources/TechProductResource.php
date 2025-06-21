@@ -81,12 +81,6 @@ class TechProductResource extends Resource
                         Forms\Components\TextInput::make('developer')
                             ->label('Manufacturer/Brand')
                             ->maxLength(255),
-                            
-                        Forms\Components\TextInput::make('staff_rating')
-                            ->numeric()
-                            ->minValue(1)
-                            ->maxValue(10)
-                            ->step(0.1),
                     ])
                     ->columns(2),
                 
@@ -94,12 +88,6 @@ class TechProductResource extends Resource
                     ->schema([
                         Forms\Components\Textarea::make('description')
                             ->rows(3)
-                            ->columnSpanFull(),
-                    ]),
-                
-                Forms\Components\Section::make('Staff Review')
-                    ->schema([
-                        Forms\Components\RichEditor::make('staff_review')
                             ->columnSpanFull(),
                     ]),
             ]);
@@ -144,17 +132,6 @@ class TechProductResource extends Resource
                 Tables\Columns\TextColumn::make('developer')
                     ->label('Brand')
                     ->toggleable(),
-                
-                Tables\Columns\TextColumn::make('staff_rating')
-                    ->sortable()
-                    ->badge()
-                    ->color(function ($state) {
-                        if (!$state) return 'gray';
-                        if ($state >= 9) return 'success';
-                        if ($state >= 7) return 'warning';
-                        if ($state >= 5) return 'info';
-                        return 'danger';
-                    }),
                 
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

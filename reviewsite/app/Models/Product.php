@@ -17,8 +17,6 @@ class Product extends Model
         'video_url',
         'release_date',
         'developer',
-        'staff_rating',
-        'staff_review',
         'type',
         'genre_id',
         'platform_id',
@@ -63,6 +61,38 @@ class Product extends Model
     public function userReviews()
     {
         return $this->hasMany(Review::class)->where('is_staff_review', false);
+    }
+
+    /**
+     * Get the staff rating (average of all staff reviews).
+     */
+    public function getStaffRatingAttribute()
+    {
+        return $this->reviews()->where('is_staff_review', true)->avg('rating');
+    }
+
+    /**
+     * Get the community rating (average of all user reviews).
+     */
+    public function getCommunityRatingAttribute()
+    {
+        return $this->reviews()->where('is_staff_review', false)->avg('rating');
+    }
+
+    /**
+     * Get the count of community reviews.
+     */
+    public function getCommunityReviewsCountAttribute()
+    {
+        return $this->reviews()->where('is_staff_review', false)->count();
+    }
+
+    /**
+     * Get the count of staff reviews.
+     */
+    public function getStaffReviewsCountAttribute()
+    {
+        return $this->reviews()->where('is_staff_review', true)->count();
     }
 
     /**
