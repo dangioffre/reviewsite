@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ReviewSite: UI/Theme Guidelines (90s-Inspired)
 Color Palette
