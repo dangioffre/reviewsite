@@ -9,10 +9,4 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateHardware extends CreateRecord
 {
     protected static string $resource = HardwareResource::class;
-
-    protected function mutateFormDataBeforeCreate(array $data): array
-    {
-        $data['type'] = 'hardware';
-        return $data;
-    }
 }

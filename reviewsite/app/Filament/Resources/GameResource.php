@@ -7,6 +7,7 @@ use App\Filament\Resources\GameResource\RelationManagers;
 use App\Models\Product;
 use App\Models\Genre;
 use App\Models\Platform;
+use App\Models\Hardware;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -20,19 +21,29 @@ class GameResource extends Resource
     protected static ?string $model = Product::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-puzzle-piece';
-    protected static ?string $navigationLabel = 'Games';
-    protected static ?string $navigationGroup = 'Review Management';
+    protected static ?string $navigationLabel = 'Products';
+    protected static ?string $navigationGroup = 'Content Management';
+    protected static ?int $navigationSort = 1;
     protected static ?string $slug = 'games';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Game Information')
+                Forms\Components\Section::make('Product Information')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
+                        
+                        Forms\Components\Select::make('type')
+                            ->required()
+                            ->options([
+                                'game' => 'Game',
+                                'hardware' => 'Hardware',
+                                'accessory' => 'Accessory',
+                            ])
+                            ->live(),
                         
                         Forms\Components\Select::make('genre_id')
                             ->label('Genre')
@@ -44,13 +55,27 @@ class GameResource extends Resource
                             ->options(Platform::active()->pluck('name', 'id'))
                             ->searchable(),
                         
+                        Forms\Components\Select::make('hardware_id')
+                            ->label('Hardware (for Accessories)')
+                            ->options(Hardware::active()->pluck('name', 'id'))
+                            ->searchable()
+                            ->visible(fn (Forms\Get $get) => $get('type') === 'accessory')
+                            ->helperText('Select the hardware this accessory is compatible with'),
+                        
                         Forms\Components\TextInput::make('image')
                             ->label('Image URL')
                             ->url(),
                         
-                        Forms\Components\TextInput::make('video')
+                        Forms\Components\TextInput::make('video_url')
                             ->label('Video Embed URL')
                             ->url(),
+                        
+                        Forms\Components\DatePicker::make('release_date')
+                            ->label('Release Date'),
+                        
+                        Forms\Components\TextInput::make('developer')
+                            ->label('Developer/Manufacturer')
+                            ->maxLength(255),
                             
                         Forms\Components\TextInput::make('staff_rating')
                             ->numeric()
@@ -72,9 +97,6 @@ class GameResource extends Resource
                         Forms\Components\RichEditor::make('staff_review')
                             ->columnSpanFull(),
                     ]),
-                
-                Forms\Components\Hidden::make('type')
-                    ->default('game'),
             ]);
     }
 
@@ -90,6 +112,17 @@ class GameResource extends Resource
                     ->searchable()
                     ->sortable(),
                 
+                Tables\Columns\TextColumn::make('type')
+                    ->badge()
+                    ->color(function ($state) {
+                        return match($state) {
+                            'game' => 'success',
+                            'hardware' => 'warning',
+                            'accessory' => 'info',
+                            default => 'gray',
+                        };
+                    }),
+                
                 Tables\Columns\TextColumn::make('genre.name')
                     ->badge()
                     ->color(fn ($record) => $record->genre?->color ?: 'gray'),
@@ -97,6 +130,11 @@ class GameResource extends Resource
                 Tables\Columns\TextColumn::make('platform.name')
                     ->badge()
                     ->color(fn ($record) => $record->platform?->color ?: 'gray'),
+                
+                Tables\Columns\TextColumn::make('hardware.name')
+                    ->badge()
+                    ->color(fn ($record) => $record->hardware?->color ?: 'gray')
+                    ->visible(fn ($record) => $record->type === 'accessory'),
                 
                 Tables\Columns\TextColumn::make('staff_rating')
                     ->sortable()
@@ -114,11 +152,15 @@ class GameResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('genre')
-                    ->relationship('genre', 'name'),
+                Tables\Filters\SelectFilter::make('type')
+                    ->options([
+                        'game' => 'Game',
+                        'hardware' => 'Hardware', 
+                        'accessory' => 'Accessory',
+                    ]),
                 
-                Tables\Filters\SelectFilter::make('platform')
-                    ->relationship('platform', 'name'),
+                Tables\Filters\SelectFilter::make('hardware')
+                    ->relationship('hardware', 'name'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -140,7 +182,7 @@ class GameResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('type', 'game');
+        return parent::getEloquentQuery();
     }
 
     public static function getPages(): array

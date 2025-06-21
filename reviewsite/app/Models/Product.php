@@ -12,14 +12,17 @@ class Product extends Model
 
     protected $fillable = [
         'name',
-        'type',
         'description',
         'image',
-        'video',
-        'staff_review',
+        'video_url',
+        'release_date',
+        'developer',
         'staff_rating',
+        'staff_review',
+        'type',
         'genre_id',
         'platform_id',
+        'hardware_id',
     ];
 
     public function reviews()
@@ -35,6 +38,11 @@ class Product extends Model
     public function platform()
     {
         return $this->belongsTo(Platform::class);
+    }
+
+    public function hardware()
+    {
+        return $this->belongsTo(Hardware::class);
     }
 
     /**
