@@ -11,12 +11,19 @@ class Post extends Model
 {
     use HasFactory, HasSEO;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'title',
         'content',
         'excerpt',
         'author',
         'featured_image',
+        'is_featured',
+        'type',
     ];
 
     /**

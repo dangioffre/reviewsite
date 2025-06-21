@@ -154,6 +154,125 @@
                 background: rgba(229, 62, 62, 0.1);
             }
             
+            /* Slider Section */
+            .slider-section {
+                width: 100%;
+                height: 60vh;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .slider-container {
+                display: flex;
+                height: 100%;
+                transition: transform 0.5s ease-in-out;
+            }
+
+            .slide {
+                min-width: 100%;
+                height: 100%;
+                background-size: cover;
+                background-position: center;
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+            }
+
+            .slide::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.6);
+                z-index: 1;
+            }
+
+            .slide-content {
+                position: relative;
+                z-index: 2;
+                max-width: 800px;
+                padding: 2rem;
+                color: #FFFFFF;
+            }
+
+            .slide-type {
+                display: inline-block;
+                background: #E53E3E;
+                padding: 0.25rem 0.75rem;
+                border-radius: 4px;
+                font-family: 'Share Tech Mono', monospace;
+                font-weight: 700;
+                margin-bottom: 1rem;
+                text-transform: uppercase;
+            }
+
+            .slide-title {
+                font-family: 'Share Tech Mono', monospace;
+                font-size: 2.5rem;
+                margin-bottom: 1rem;
+                text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+            }
+
+            .slide-excerpt {
+                font-size: 1.1rem;
+                color: #A1A1AA;
+                margin-bottom: 2rem;
+            }
+
+            /* Slider Navigation */
+            .slider-nav button {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                background: rgba(0, 0, 0, 0.5);
+                border: 1px solid #3F3F46;
+                color: #FFFFFF;
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                cursor: pointer;
+                z-index: 3;
+                font-size: 1.5rem;
+            }
+
+            .slider-nav .prev-btn {
+                left: 2rem;
+            }
+
+            .slider-nav .next-btn {
+                right: 2rem;
+            }
+            
+            .slider-nav button:hover {
+                background: #E53E3E;
+            }
+
+            .slider-dots {
+                position: absolute;
+                bottom: 1.5rem;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                gap: 0.75rem;
+                z-index: 3;
+            }
+
+            .slider-dots .dot {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background: #3F3F46;
+                cursor: pointer;
+                transition: background 0.3s ease;
+            }
+
+            .slider-dots .dot.active {
+                background: #E53E3E;
+            }
+            
             /* Content Sections */
             .section {
                 padding: 3rem 0;
@@ -261,5 +380,81 @@
                 </div>
             </div>
         </footer>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const sliderContainer = document.querySelector('.slider-container');
+                if (!sliderContainer) return;
+
+                const slides = document.querySelectorAll('.slide');
+                const nextBtn = document.querySelector('.next-btn');
+                const prevBtn = document.querySelector('.prev-btn');
+                const dotsContainer = document.querySelector('.slider-dots');
+                let currentIndex = 0;
+                let slideInterval;
+
+                if (slides.length <= 1) {
+                    if (nextBtn) nextBtn.style.display = 'none';
+                    if (prevBtn) prevBtn.style.display = 'none';
+                    return;
+                }
+
+                function createDots() {
+                    slides.forEach((_, i) => {
+                        const dot = document.createElement('button');
+                        dot.classList.add('dot');
+                        if (i === 0) dot.classList.add('active');
+                        dot.addEventListener('click', () => {
+                            goToSlide(i);
+                            resetInterval();
+                        });
+                        dotsContainer.appendChild(dot);
+                    });
+                }
+
+                function updateDots() {
+                    const dots = document.querySelectorAll('.slider-dots .dot');
+                    dots.forEach((dot, i) => {
+                        dot.classList.toggle('active', i === currentIndex);
+                    });
+                }
+
+                function goToSlide(index) {
+                    currentIndex = (index + slides.length) % slides.length;
+                    sliderContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
+                    updateDots();
+                }
+
+                function nextSlide() {
+                    goToSlide(currentIndex + 1);
+                }
+
+                function prevSlide() {
+                    goToSlide(currentIndex - 1);
+                }
+                
+                function startInterval() {
+                    slideInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
+                }
+
+                function resetInterval() {
+                    clearInterval(slideInterval);
+                    startInterval();
+                }
+
+                nextBtn.addEventListener('click', () => {
+                    nextSlide();
+                    resetInterval();
+                });
+
+                prevBtn.addEventListener('click', () => {
+                    prevSlide();
+                    resetInterval();
+                });
+
+                createDots();
+                startInterval();
+            });
+        </script>
     </body>
 </html> 

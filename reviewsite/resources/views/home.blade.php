@@ -3,17 +3,40 @@
 @section('title', 'Home - Dan & Brian Reviews')
 
 @section('content')
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <h1 style="font-family: 'Share Tech Mono', monospace; font-size: 3rem; margin-bottom: 1rem; color: #E53E3E; text-shadow: 0 0 20px #E53E3E;">WELCOME TO THE ULTIMATE GAMING HUB</h1>
-            <p style="font-size: 1.2rem; color: #A1A1AA; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">Discover honest reviews, epic podcasts, live streams, and in-depth articles from Dan & Brian. Your go-to destination for everything gaming.</p>
-            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                <a href="#" class="btn btn-primary">Explore Reviews</a>
-                <a href="#" class="btn btn-secondary">Watch Streams</a>
+    
+    @if($featuredPosts->isNotEmpty())
+        <section class="slider-section">
+            <div class="slider-container">
+                @foreach($featuredPosts as $post)
+                    <div class="slide" style="background-image: url('{{ $post->featured_image ?? 'https://via.placeholder.com/1200x600/1A1A1B/FFFFFF?text=Featured' }}');">
+                        <div class="slide-content">
+                            <span class="slide-type">{{ $post->type }}</span>
+                            <h2 class="slide-title">{{ $post->title }}</h2>
+                            <p class="slide-excerpt">{{ $post->excerpt }}</p>
+                            <a href="#" class="btn btn-primary">Read More</a>
+                        </div>
+                    </div>
+                @endforeach
             </div>
-        </div>
-    </section>
+            <div class="slider-nav">
+                <button class="prev-btn">&lt;</button>
+                <button class="next-btn">&gt;</button>
+            </div>
+            <div class="slider-dots"></div>
+        </section>
+    @else
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h1 style="font-family: 'Share Tech Mono', monospace; font-size: 3rem; margin-bottom: 1rem; color: #E53E3E; text-shadow: 0 0 20px #E53E3E;">WELCOME TO THE ULTIMATE GAMING HUB</h1>
+                <p style="font-size: 1.2rem; color: #A1A1AA; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">Discover honest reviews, epic podcasts, live streams, and in-depth articles from Dan & Brian. Your go-to destination for everything gaming.</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="#" class="btn btn-primary">Explore Reviews</a>
+                    <a href="#" class="btn btn-secondary">Watch Streams</a>
+                </div>
+            </div>
+        </section>
+    @endif
 
     <!-- Features Section -->
     <section class="section">
