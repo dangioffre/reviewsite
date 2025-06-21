@@ -67,7 +67,7 @@
                                 <option value="">All Platforms</option>
                                 @foreach($platforms as $platform)
                                     <option value="{{ $platform->slug }}" {{ request('platform') == $platform->slug ? 'selected' : '' }}>
-                                        {{ $platform->icon ? $platform->icon . ' ' : '' }}{{ $platform->name }}
+                                        {{ $platform->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -171,7 +171,7 @@
                                                 </span>
                                                 @if($product->platform)
                                                     <span class="inline-block text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wide font-['Share_Tech_Mono']" style="background-color: {{ $product->platform->color }}">
-                                                        {{ $product->platform->icon ? $product->platform->icon . ' ' : '' }}{{ $product->platform->name }}
+                                                        {{ $product->platform->name }}
                                                     </span>
                                                 @endif
                                                 @if($product->genre)

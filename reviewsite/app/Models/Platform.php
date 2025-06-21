@@ -14,7 +14,6 @@ class Platform extends Model
         'name',
         'slug',
         'description',
-        'icon',
         'color',
         'is_active',
     ];

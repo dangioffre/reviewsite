@@ -39,13 +39,13 @@ class GenrePlatformSeeder extends Seeder
 
         // Create Platforms
         $platforms = [
-            ['name' => 'PC', 'icon' => '💻', 'color' => '#2563EB', 'description' => 'Windows, Mac, and Linux computers'],
-            ['name' => 'PlayStation', 'icon' => '🎮', 'color' => '#0070F3', 'description' => 'Sony PlayStation consoles'],
-            ['name' => 'Xbox', 'icon' => '🎯', 'color' => '#107C10', 'description' => 'Microsoft Xbox consoles'],
-            ['name' => 'Nintendo Switch', 'icon' => '🕹️', 'color' => '#E60012', 'description' => 'Nintendo Switch console'],
-            ['name' => 'Mobile', 'icon' => '📱', 'color' => '#FF6B6B', 'description' => 'iOS and Android mobile devices'],
-            ['name' => 'VR', 'icon' => '🥽', 'color' => '#9C27B0', 'description' => 'Virtual Reality headsets'],
-            ['name' => 'Steam Deck', 'icon' => '🚂', 'color' => '#1A9FFF', 'description' => 'Valve Steam Deck handheld'],
+            ['name' => 'PC', 'color' => '#2563EB', 'description' => 'Windows, Mac, and Linux computers'],
+            ['name' => 'PlayStation', 'color' => '#0070F3', 'description' => 'Sony PlayStation consoles'],
+            ['name' => 'Xbox', 'color' => '#107C10', 'description' => 'Microsoft Xbox consoles'],
+            ['name' => 'Nintendo Switch', 'color' => '#E60012', 'description' => 'Nintendo Switch console'],
+            ['name' => 'Mobile', 'color' => '#FF6B6B', 'description' => 'iOS and Android mobile devices'],
+            ['name' => 'VR', 'color' => '#9C27B0', 'description' => 'Virtual Reality headsets'],
+            ['name' => 'Steam Deck', 'color' => '#1A9FFF', 'description' => 'Valve Steam Deck handheld'],
         ];
 
         foreach ($platforms as $platform) {

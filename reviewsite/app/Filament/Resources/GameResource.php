@@ -96,8 +96,7 @@ class GameResource extends Resource
                 
                 Tables\Columns\TextColumn::make('platform.name')
                     ->badge()
-                    ->color(fn ($record) => $record->platform?->color ?: 'gray')
-                    ->formatStateUsing(fn ($record) => ($record->platform?->icon ? $record->platform->icon . ' ' : '') . $record->platform?->name),
+                    ->color(fn ($record) => $record->platform?->color ?: 'gray'),
                 
                 Tables\Columns\TextColumn::make('staff_rating')
                     ->sortable()

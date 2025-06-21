@@ -40,11 +40,6 @@ class PlatformResource extends Resource
                             ->maxLength(255)
                             ->unique(Platform::class, 'slug', ignoreRecord: true),
                         
-                        Forms\Components\TextInput::make('icon')
-                            ->maxLength(255)
-                            ->placeholder('e.g., 🎮, 💻, 📱')
-                            ->helperText('You can use emoji or icon names'),
-                        
                         Forms\Components\ColorPicker::make('color')
                             ->default('#2563EB'),
                         
@@ -73,9 +68,6 @@ class PlatformResource extends Resource
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable()
                     ->sortable(),
-                
-                Tables\Columns\TextColumn::make('icon')
-                    ->label('Icon'),
                 
                 Tables\Columns\ColorColumn::make('color'),
                 
