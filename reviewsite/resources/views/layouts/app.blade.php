@@ -156,7 +156,7 @@
             
             /* Content Sections */
             .section {
-                padding: 4rem 0;
+                padding: 3rem 0;
             }
 
             .hero {
@@ -176,14 +176,14 @@
             
             .features-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 2rem;
-                margin-top: 3rem;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 1.5rem;
+                margin-top: 2rem;
             }
             
             .feature-card {
                 background: #27272A;
-                padding: 2rem;
+                padding: 1.25rem;
                 border-radius: 8px;
                 border: 1px solid #3F3F46;
                 transition: all 0.3s ease;
@@ -196,21 +196,22 @@
             }
             
             .feature-icon {
-                font-size: 2.5rem;
+                font-size: 2rem;
                 color: #E53E3E;
-                margin-bottom: 1rem;
+                margin-bottom: 0.75rem;
             }
             
             .feature-title {
                 font-family: 'Share Tech Mono', monospace;
-                font-size: 1.2rem;
+                font-size: 1rem;
                 color: #FFFFFF;
-                margin-bottom: 1rem;
+                margin-bottom: 0.5rem;
             }
             
             .feature-description {
                 color: #A1A1AA;
-                line-height: 1.6;
+                line-height: 1.5;
+                font-size: 0.9rem;
             }
             
             /* Footer */

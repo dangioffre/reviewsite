@@ -27,18 +27,6 @@
                 </div>
                 
                 <div class="feature-card">
-                    <div class="feature-icon">🎧</div>
-                    <h3 class="feature-title">PODCASTS</h3>
-                    <p class="feature-description">Weekly gaming discussions, industry insights, and hilarious banter. Your commute just got better.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">📺</div>
-                    <h3 class="feature-title">LIVE STREAMS</h3>
-                    <p class="feature-description">Join us live for gaming sessions, reviews in real-time, and interactive community fun.</p>
-                </div>
-                
-                <div class="feature-card">
                     <div class="feature-icon">📝</div>
                     <h3 class="feature-title">ARTICLES</h3>
                     <p class="feature-description">In-depth analysis, gaming news, and thought-provoking content about the industry we love.</p>
@@ -48,12 +36,6 @@
                     <div class="feature-icon">👥</div>
                     <h3 class="feature-title">COMMUNITY</h3>
                     <p class="feature-description">Connect with fellow gamers, share your thoughts, and be part of our growing community.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">⭐</div>
-                    <h3 class="feature-title">RATINGS</h3>
-                    <p class="feature-description">Rate games, see community scores, and discover what's worth your time and money.</p>
                 </div>
             </div>
         </div>
