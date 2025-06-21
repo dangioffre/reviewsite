@@ -18,11 +18,23 @@ class Product extends Model
         'video',
         'staff_review',
         'staff_rating',
+        'genre_id',
+        'platform_id',
     ];
 
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function genre()
+    {
+        return $this->belongsTo(Genre::class);
+    }
+
+    public function platform()
+    {
+        return $this->belongsTo(Platform::class);
     }
 
     /**

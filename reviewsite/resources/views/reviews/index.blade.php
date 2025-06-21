@@ -8,40 +8,145 @@
             </div>
         </div>
 
-        <!-- Filter Section -->
+        <!-- Enhanced Filter Section -->
         <div class="container mx-auto px-4 py-8">
-            <form method="GET" action="{{ route('reviews.index') }}" class="bg-[#27272A] rounded-lg shadow-md p-6 mb-8 border border-[#3F3F46]">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Search Input -->
-                    <div class="lg:col-span-2">
-                        <input 
-                            type="text" 
-                            name="search" 
-                            placeholder="Search games and hardware..." 
-                            value="{{ request('search') }}"
-                            class="w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-2.5 text-white placeholder-[#A1A1AA] focus:border-[#2563EB] focus:ring-[#2563EB] transition font-['Inter']"
-                        >
-                    </div>
-                    
-                    <!-- Type Filter -->
-                    <div>
-                        <select name="type" class="w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-2.5 text-white focus:border-[#2563EB] focus:ring-[#2563EB] transition font-['Inter']">
-                            <option value="">All Types</option>
-                            <option value="game" {{ request('type') == 'game' ? 'selected' : '' }}>Games</option>
-                            <option value="hardware" {{ request('type') == 'hardware' ? 'selected' : '' }}>Hardware</option>
-                        </select>
+            <form method="GET" action="{{ route('reviews.index') }}" class="bg-[#27272A] rounded-lg shadow-md border border-[#3F3F46] overflow-hidden">
+                <!-- Category Tabs -->
+                <div class="border-b border-[#3F3F46]">
+                    <div class="flex overflow-x-auto">
+                        <button type="submit" name="category" value="" 
+                                class="flex-shrink-0 px-6 py-4 text-sm font-['Inter'] font-medium transition-colors
+                                       {{ request('category') == '' ? 'bg-white text-[#151515] border-b-2 border-white' : 'text-[#A1A1AA] hover:text-white hover:bg-[#3F3F46]' }}">
+                            All
+                        </button>
+                        <button type="submit" name="category" value="games" 
+                                class="flex-shrink-0 px-6 py-4 text-sm font-['Inter'] font-medium transition-colors
+                                       {{ request('category') == 'games' ? 'bg-white text-[#151515] border-b-2 border-white' : 'text-[#A1A1AA] hover:text-white hover:bg-[#3F3F46]' }}">
+                            Games
+                        </button>
+                        <button type="submit" name="category" value="hardware" 
+                                class="flex-shrink-0 px-6 py-4 text-sm font-['Inter'] font-medium transition-colors
+                                       {{ request('category') == 'hardware' ? 'bg-white text-[#151515] border-b-2 border-white' : 'text-[#A1A1AA] hover:text-white hover:bg-[#3F3F46]' }}">
+                            Hardware
+                        </button>
+                        <button type="submit" name="category" value="accessories" 
+                                class="flex-shrink-0 px-6 py-4 text-sm font-['Inter'] font-medium transition-colors
+                                       {{ request('category') == 'accessories' ? 'bg-white text-[#151515] border-b-2 border-white' : 'text-[#A1A1AA] hover:text-white hover:bg-[#3F3F46]' }}">
+                            Accessories
+                        </button>
                     </div>
                 </div>
-                
-                <div class="flex justify-end mt-4">
-                    <button type="submit" class="bg-[#E53E3E] text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-semibold font-['Inter']">
-                        Search
-                    </button>
+
+                <!-- Advanced Filters -->
+                <div class="p-6">
+                    <div class="flex flex-wrap items-center gap-4 mb-6">
+                        <!-- Dropdown Filters -->
+                        <div class="flex flex-wrap gap-4">
+                            <!-- Sort By -->
+                            <select name="sort" class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white text-sm font-['Inter'] focus:border-[#2563EB] focus:ring-[#2563EB] min-w-[140px]">
+                                <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Sort by Latest</option>
+                                <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Sort by Oldest</option>
+                                <option value="rating_high" {{ request('sort') == 'rating_high' ? 'selected' : '' }}>Highest Rated</option>
+                                <option value="rating_low" {{ request('sort') == 'rating_low' ? 'selected' : '' }}>Lowest Rated</option>
+                                <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Name A-Z</option>
+                                <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Name Z-A</option>
+                            </select>
+
+                            <!-- Score Range -->
+                            <select name="score_range" class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white text-sm font-['Inter'] focus:border-[#2563EB] focus:ring-[#2563EB] min-w-[120px]">
+                                <option value="">All Scores</option>
+                                <option value="9-10" {{ request('score_range') == '9-10' ? 'selected' : '' }}>9-10 (Excellent)</option>
+                                <option value="7-8" {{ request('score_range') == '7-8' ? 'selected' : '' }}>7-8 (Great)</option>
+                                <option value="5-6" {{ request('score_range') == '5-6' ? 'selected' : '' }}>5-6 (Good)</option>
+                                <option value="3-4" {{ request('score_range') == '3-4' ? 'selected' : '' }}>3-4 (Fair)</option>
+                                <option value="1-2" {{ request('score_range') == '1-2' ? 'selected' : '' }}>1-2 (Poor)</option>
+                            </select>
+
+                            <!-- Platform Filter (for games) -->
+                            <select name="platform" class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white text-sm font-['Inter'] focus:border-[#2563EB] focus:ring-[#2563EB] min-w-[130px]">
+                                <option value="">All Platforms</option>
+                                @foreach($platforms as $platform)
+                                    <option value="{{ $platform->slug }}" {{ request('platform') == $platform->slug ? 'selected' : '' }}>
+                                        {{ $platform->icon ? $platform->icon . ' ' : '' }}{{ $platform->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <!-- Genre Filter -->
+                            <select name="genre" class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white text-sm font-['Inter'] focus:border-[#2563EB] focus:ring-[#2563EB] min-w-[120px]">
+                                <option value="">All Genres</option>
+                                @foreach($genres as $genre)
+                                    <option value="{{ $genre->slug }}" {{ request('genre') == $genre->slug ? 'selected' : '' }}>
+                                        {{ $genre->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Search Bar -->
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <input 
+                                type="text" 
+                                name="search" 
+                                placeholder="Search games, hardware, and reviews..." 
+                                value="{{ request('search') }}"
+                                class="w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-2.5 text-white placeholder-[#A1A1AA] focus:border-[#2563EB] focus:ring-[#2563EB] transition font-['Inter']"
+                            >
+                        </div>
+                        <button type="submit" class="bg-[#E53E3E] text-white px-6 py-2.5 rounded-lg hover:bg-red-700 transition-colors font-semibold font-['Inter'] flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            Search
+                        </button>
+                        @if(request()->hasAny(['search', 'category', 'sort', 'score_range', 'platform', 'genre']))
+                            <a href="{{ route('reviews.index') }}" class="bg-[#27272A] text-white px-4 py-2.5 rounded-lg border border-[#E53E3E] hover:bg-red-900/50 transition-colors font-['Inter'] flex items-center">
+                                Clear Filters
+                            </a>
+                        @endif
+                    </div>
                 </div>
             </form>
 
+            <!-- Active Filters Display -->
+            @if(request()->hasAny(['search', 'category', 'sort', 'score_range', 'platform', 'genre']))
+                <div class="mb-6 mt-4">
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-sm text-[#A1A1AA] font-['Inter'] mr-2">Active filters:</span>
+                        @if(request('search'))
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-['Share_Tech_Mono'] bg-[#E53E3E] text-white">
+                                Search: {{ request('search') }}
+                            </span>
+                        @endif
+                        @if(request('category'))
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-['Share_Tech_Mono'] bg-[#2563EB] text-white">
+                                {{ ucfirst(request('category')) }}
+                            </span>
+                        @endif
+                        @if(request('score_range'))
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-['Share_Tech_Mono'] bg-[#4CAF50] text-white">
+                                Score: {{ request('score_range') }}
+                            </span>
+                        @endif
+                        @if(request('platform'))
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-['Share_Tech_Mono'] bg-[#FFC107] text-[#151515]">
+                                {{ ucfirst(request('platform')) }}
+                            </span>
+                        @endif
+                        @if(request('genre'))
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-['Share_Tech_Mono'] bg-[#27272A] text-white border border-[#3F3F46]">
+                                {{ ucfirst(request('genre')) }}
+                            </span>
+                        @endif
+
+                    </div>
+                </div>
+            @endif
+
             <!-- Results Section -->
-            <div class="space-y-6">
+            <div class="space-y-6 mt-8">
                 @forelse($products as $product)
                     <div class="bg-[#27272A] rounded-lg shadow-md p-4 border border-[#3F3F46] hover:border-[#E53E3E] transition-colors duration-300">
                         <div class="p-6">
@@ -64,6 +169,16 @@
                                                 <span class="inline-block bg-[#E53E3E] text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wide font-['Share_Tech_Mono']">
                                                     {{ $product->type }}
                                                 </span>
+                                                @if($product->platform)
+                                                    <span class="inline-block text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wide font-['Share_Tech_Mono']" style="background-color: {{ $product->platform->color }}">
+                                                        {{ $product->platform->icon ? $product->platform->icon . ' ' : '' }}{{ $product->platform->name }}
+                                                    </span>
+                                                @endif
+                                                @if($product->genre)
+                                                    <span class="inline-block text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wide font-['Share_Tech_Mono']" style="background-color: {{ $product->genre->color }}">
+                                                        {{ $product->genre->name }}
+                                                    </span>
+                                                @endif
                                             </div>
                                             <p class="text-[#A1A1AA] leading-relaxed font-['Inter']">
                                                 {{ Str::limit($product->description ?? 'No description available.', 200) }}
