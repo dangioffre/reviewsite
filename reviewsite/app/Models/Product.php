@@ -25,6 +25,10 @@ class Product extends Model
         'hardware_id',
     ];
 
+    protected $casts = [
+        'release_date' => 'date',
+    ];
+
     public function reviews()
     {
         return $this->hasMany(Review::class);

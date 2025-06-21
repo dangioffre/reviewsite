@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\GameResource\Pages;
-use App\Filament\Resources\GameResource\RelationManagers;
+use App\Filament\Resources\TechProductResource\Pages;
+use App\Filament\Resources\TechProductResource\RelationManagers;
 use App\Models\Product;
 use App\Models\Genre;
 use App\Models\Platform;
@@ -16,49 +16,70 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class GameResource extends Resource
+class TechProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-puzzle-piece';
-    protected static ?string $navigationLabel = 'Games';
-    protected static ?string $navigationGroup = 'Games Management';
+    protected static ?string $navigationIcon = 'heroicon-o-cpu-chip';
+    
+    protected static ?string $navigationLabel = 'Tech Products';
+    
+    protected static ?string $navigationGroup = 'Tech Management';
+    
     protected static ?int $navigationSort = 1;
-    protected static ?string $slug = 'games';
+    
+    protected static ?string $slug = 'tech-products';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Game Information')
+                Forms\Components\Section::make('Product Information')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
                         
+                        Forms\Components\Select::make('type')
+                            ->required()
+                            ->options([
+                                'hardware' => 'Hardware',
+                                'accessory' => 'Accessory',
+                            ])
+                            ->live(),
+                        
                         Forms\Components\Select::make('genre_id')
-                            ->label('Genre')
+                            ->label('Category')
                             ->options(Genre::active()->pluck('name', 'id'))
-                            ->searchable(),
+                            ->searchable()
+                            ->helperText('Use genres to categorize your tech products'),
                         
                         Forms\Components\Select::make('platform_id')
-                            ->label('Platform')
+                            ->label('Platform Compatibility')
                             ->options(Platform::active()->pluck('name', 'id'))
-                            ->searchable(),
+                            ->searchable()
+                            ->helperText('Which platform is this compatible with?'),
+                        
+                        Forms\Components\Select::make('hardware_id')
+                            ->label('Hardware (for Accessories)')
+                            ->options(Hardware::active()->pluck('name', 'id'))
+                            ->searchable()
+                            ->visible(fn (Forms\Get $get) => $get('type') === 'accessory')
+                            ->helperText('Select the hardware this accessory is compatible with'),
                         
                         Forms\Components\TextInput::make('image')
                             ->label('Image URL')
                             ->url(),
                         
                         Forms\Components\TextInput::make('video_url')
-                            ->label('Video Embed URL')
+                            ->label('Video URL')
                             ->url(),
                         
                         Forms\Components\DatePicker::make('release_date')
                             ->label('Release Date'),
                         
                         Forms\Components\TextInput::make('developer')
-                            ->label('Developer')
+                            ->label('Manufacturer/Brand')
                             ->maxLength(255),
                             
                         Forms\Components\TextInput::make('staff_rating')
@@ -81,9 +102,6 @@ class GameResource extends Resource
                         Forms\Components\RichEditor::make('staff_review')
                             ->columnSpanFull(),
                     ]),
-                
-                Forms\Components\Hidden::make('type')
-                    ->default('game'),
             ]);
     }
 
@@ -99,7 +117,18 @@ class GameResource extends Resource
                     ->searchable()
                     ->sortable(),
                 
+                Tables\Columns\TextColumn::make('type')
+                    ->badge()
+                    ->color(function ($state) {
+                        return match($state) {
+                            'hardware' => 'warning',
+                            'accessory' => 'info',
+                            default => 'gray',
+                        };
+                    }),
+                
                 Tables\Columns\TextColumn::make('genre.name')
+                    ->label('Category')
                     ->badge()
                     ->color(fn ($record) => $record->genre?->color ?: 'gray'),
                 
@@ -107,7 +136,13 @@ class GameResource extends Resource
                     ->badge()
                     ->color(fn ($record) => $record->platform?->color ?: 'gray'),
                 
+                Tables\Columns\TextColumn::make('hardware.name')
+                    ->badge()
+                    ->color(fn ($record) => $record->hardware?->color ?: 'gray')
+                    ->placeholder('N/A'),
+                
                 Tables\Columns\TextColumn::make('developer')
+                    ->label('Brand')
                     ->toggleable(),
                 
                 Tables\Columns\TextColumn::make('staff_rating')
@@ -127,11 +162,21 @@ class GameResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('type')
+                    ->options([
+                        'hardware' => 'Hardware',
+                        'accessory' => 'Accessory',
+                    ]),
+                
                 Tables\Filters\SelectFilter::make('genre')
-                    ->relationship('genre', 'name'),
+                    ->relationship('genre', 'name')
+                    ->label('Category'),
                 
                 Tables\Filters\SelectFilter::make('platform')
                     ->relationship('platform', 'name'),
+                
+                Tables\Filters\SelectFilter::make('hardware')
+                    ->relationship('hardware', 'name'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -153,15 +198,15 @@ class GameResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('type', 'game');
+        return parent::getEloquentQuery()->whereIn('type', ['hardware', 'accessory']);
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListGames::route('/'),
-            'create' => Pages\CreateGame::route('/create'),
-            'edit' => Pages\EditGame::route('/{record}/edit'),
+            'index' => Pages\ListTechProducts::route('/'),
+            'create' => Pages\CreateTechProduct::route('/create'),
+            'edit' => Pages\EditTechProduct::route('/{record}/edit'),
         ];
     }
 }
