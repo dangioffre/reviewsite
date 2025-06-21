@@ -8,7 +8,7 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono:wght@400&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
         
         <style>
             * {
@@ -18,12 +18,13 @@
             }
             
             body {
-                background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
-                font-family: 'Orbitron', monospace;
-                color: #00ff41;
+                background: #1A1A1B;
+                font-family: 'Inter', sans-serif;
+                color: #FFFFFF;
                 overflow-x: hidden;
                 min-height: 100vh;
                 position: relative;
+                font-size: 16px;
             }
             
             body::before {
@@ -34,9 +35,9 @@
                 width: 100%;
                 height: 100%;
                 background: 
-                    radial-gradient(circle at 20% 80%, rgba(0, 255, 65, 0.1) 0%, transparent 50%),
-                    radial-gradient(circle at 80% 20%, rgba(0, 255, 65, 0.1) 0%, transparent 50%),
-                    radial-gradient(circle at 40% 40%, rgba(0, 255, 65, 0.05) 0%, transparent 50%);
+                    radial-gradient(circle at 20% 80%, rgba(229, 62, 62, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 40%, rgba(229, 62, 62, 0.05) 0%, transparent 50%);
                 pointer-events: none;
                 z-index: 1;
             }
@@ -58,15 +59,16 @@
             }
             
             .title {
-                font-family: 'Press Start 2P', cursive;
+                font-family: 'Share Tech Mono', monospace;
                 font-size: clamp(1.5rem, 5vw, 3rem);
                 text-align: center;
                 text-shadow: 
-                    0 0 10px #00ff41,
-                    0 0 20px #00ff41,
-                    0 0 30px #00ff41;
+                    0 0 10px #E53E3E,
+                    0 0 20px #E53E3E,
+                    0 0 30px #E53E3E;
                 animation: glow 2s ease-in-out infinite alternate;
                 position: relative;
+                color: #FFFFFF;
             }
             
             .title::before,
@@ -82,45 +84,46 @@
             
             .title::before {
                 animation: glitch 3s infinite;
-                color: #ff0066;
+                color: #2563EB;
                 z-index: -1;
             }
             
             .title::after {
                 animation: glitch 2s infinite reverse;
-                color: #0066ff;
+                color: #4CAF50;
                 z-index: -2;
             }
             
             .subtitle {
-                font-family: 'Orbitron', monospace;
+                font-family: 'Inter', sans-serif;
                 font-size: clamp(0.8rem, 2vw, 1.2rem);
                 text-align: center;
                 margin-bottom: 2rem;
-                color: #00cc33;
-                text-shadow: 0 0 5px #00cc33;
+                color: #A1A1AA;
+                text-shadow: 0 0 5px #A1A1AA;
                 animation: pulse 2s ease-in-out infinite;
             }
             
             .coming-soon {
-                font-family: 'Press Start 2P', cursive;
+                font-family: 'Share Tech Mono', monospace;
                 font-size: clamp(0.6rem, 1.5vw, 1rem);
                 text-align: center;
-                color: #ff6600;
-                text-shadow: 0 0 10px #ff6600;
+                color: #E53E3E;
+                text-shadow: 0 0 10px #E53E3E;
                 margin-bottom: 3rem;
                 animation: blink 1.5s infinite;
             }
             
             .pixel-border {
-                border: 3px solid #00ff41;
+                border: 3px solid #E53E3E;
                 padding: 2rem;
                 position: relative;
-                background: rgba(0, 0, 0, 0.3);
+                background: #27272A;
                 backdrop-filter: blur(10px);
                 box-shadow: 
-                    0 0 20px rgba(0, 255, 65, 0.3),
-                    inset 0 0 20px rgba(0, 255, 65, 0.1);
+                    0 0 20px rgba(229, 62, 62, 0.3),
+                    inset 0 0 20px rgba(229, 62, 62, 0.1);
+                border-radius: 8px;
             }
             
             .pixel-border::before {
@@ -130,27 +133,29 @@
                 left: -5px;
                 right: -5px;
                 bottom: -5px;
-                background: linear-gradient(45deg, #00ff41, #00cc33, #00ff41);
+                background: linear-gradient(45deg, #E53E3E, #DC2626, #E53E3E);
                 z-index: -1;
                 animation: borderGlow 3s ease-in-out infinite;
+                border-radius: 12px;
             }
             
             .loading-bar {
                 width: 300px;
                 height: 20px;
-                background: rgba(0, 0, 0, 0.5);
-                border: 2px solid #00ff41;
+                background: #1A1A1B;
+                border: 2px solid #E53E3E;
                 margin: 2rem auto;
                 position: relative;
                 overflow: hidden;
+                border-radius: 4px;
             }
             
             .loading-fill {
                 height: 100%;
-                background: linear-gradient(90deg, #00ff41, #00cc33, #00ff41);
+                background: linear-gradient(90deg, #E53E3E, #DC2626, #E53E3E);
                 width: 0%;
                 animation: loading 3s ease-in-out infinite;
-                box-shadow: 0 0 10px #00ff41;
+                box-shadow: 0 0 10px #E53E3E;
             }
             
             .pixel-art {
@@ -164,8 +169,9 @@
             .pixel {
                 width: 8px;
                 height: 8px;
-                background: #00ff41;
+                background: #E53E3E;
                 animation: pixelGlow 2s ease-in-out infinite;
+                border-radius: 2px;
             }
             
             .pixel:nth-child(odd) {
@@ -181,8 +187,8 @@
             }
             
             @keyframes glow {
-                from { text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41, 0 0 30px #00ff41; }
-                to { text-shadow: 0 0 20px #00ff41, 0 0 30px #00ff41, 0 0 40px #00ff41; }
+                from { text-shadow: 0 0 10px #E53E3E, 0 0 20px #E53E3E, 0 0 30px #E53E3E; }
+                to { text-shadow: 0 0 20px #E53E3E, 0 0 30px #E53E3E, 0 0 40px #E53E3E; }
             }
             
             @keyframes glitch {
@@ -227,7 +233,7 @@
                 height: 100%;
                 background: linear-gradient(
                     transparent 50%,
-                    rgba(0, 255, 65, 0.02) 50%
+                    rgba(229, 62, 62, 0.02) 50%
                 );
                 background-size: 100% 4px;
                 pointer-events: none;
@@ -284,6 +290,7 @@
                 <p class="coming-soon">COMING SOON</p>
                 
                 <div class="pixel-art">
+                    <div class="pixel"></div>
                     <div class="pixel"></div>
                     <div class="pixel"></div>
                     <div class="pixel"></div>
