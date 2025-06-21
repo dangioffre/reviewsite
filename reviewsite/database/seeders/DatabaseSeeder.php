@@ -2,9 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Product;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,13 +11,22 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(10)->create();
-        Product::factory(10)->create();
-
         $this->call([
-            AdminSeeder::class,
-            PostSeeder::class,
+            // Core data first
             RolesAndPermissionsSeeder::class,
+            GenrePlatformSeeder::class,
+            HardwareSeeder::class,
+            
+            // Users (both admin and regular)
+            AdminSeeder::class,
+            UserSeeder::class,
+            
+            // Content
+            PostSeeder::class,
+            
+            // Reviews (after users and products exist)
+            StaffReviewSeeder::class,
+            CommunityReviewSeeder::class,
         ]);
     }
 }
