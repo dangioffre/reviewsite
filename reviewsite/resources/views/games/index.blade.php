@@ -126,32 +126,6 @@
         <!-- Enhanced Filter Section -->
         <div class="container mx-auto px-4 py-8">
             <form method="GET" action="{{ route('games.index') }}" class="bg-[#27272A] rounded-lg shadow-md border border-[#3F3F46] overflow-hidden">
-                <!-- Category Tabs -->
-                <div class="border-b border-[#3F3F46]">
-                    <div class="flex overflow-x-auto">
-                        <button type="submit" name="category" value="" 
-                                class="flex-shrink-0 px-6 py-4 text-sm font-['Inter'] font-medium transition-colors
-                                       {{ request('category') == '' ? 'bg-white text-[#151515] border-b-2 border-white' : 'text-[#A1A1AA] hover:text-white hover:bg-[#3F3F46]' }}">
-                            All
-                        </button>
-                        <button type="submit" name="category" value="games" 
-                                class="flex-shrink-0 px-6 py-4 text-sm font-['Inter'] font-medium transition-colors
-                                       {{ request('category') == 'games' ? 'bg-white text-[#151515] border-b-2 border-white' : 'text-[#A1A1AA] hover:text-white hover:bg-[#3F3F46]' }}">
-                            Games
-                        </button>
-                        <button type="submit" name="category" value="hardware" 
-                                class="flex-shrink-0 px-6 py-4 text-sm font-['Inter'] font-medium transition-colors
-                                       {{ request('category') == 'hardware' ? 'bg-white text-[#151515] border-b-2 border-white' : 'text-[#A1A1AA] hover:text-white hover:bg-[#3F3F46]' }}">
-                            Hardware
-                        </button>
-                        <button type="submit" name="category" value="accessories" 
-                                class="flex-shrink-0 px-6 py-4 text-sm font-['Inter'] font-medium transition-colors
-                                       {{ request('category') == 'accessories' ? 'bg-white text-[#151515] border-b-2 border-white' : 'text-[#A1A1AA] hover:text-white hover:bg-[#3F3F46]' }}">
-                            Accessories
-                        </button>
-                    </div>
-                </div>
-
                 <!-- Advanced Filters -->
                 <div class="p-6">
                     <div class="flex flex-wrap items-center gap-4 mb-6">
@@ -216,7 +190,7 @@
                             </svg>
                             Search
                         </button>
-                        @if(request()->hasAny(['search', 'category', 'sort', 'score_range', 'platform', 'genre']))
+                        @if(request()->hasAny(['search', 'sort', 'score_range', 'platform', 'genre']))
                             <a href="{{ route('games.index') }}" class="bg-[#27272A] text-white px-4 py-2.5 rounded-lg border border-[#E53E3E] hover:bg-red-900/50 transition-colors font-['Inter'] flex items-center">
                                 Clear Filters
                             </a>
@@ -226,18 +200,13 @@
             </form>
 
             <!-- Active Filters Display -->
-            @if(request()->hasAny(['search', 'category', 'sort', 'score_range', 'platform', 'genre']))
+            @if(request()->hasAny(['search', 'sort', 'score_range', 'platform', 'genre']))
                 <div class="mb-6 mt-4">
                     <div class="flex flex-wrap gap-2">
                         <span class="text-sm text-[#A1A1AA] font-['Inter'] mr-2">Active filters:</span>
                         @if(request('search'))
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-['Share_Tech_Mono'] bg-[#E53E3E] text-white">
                                 Search: {{ request('search') }}
-                            </span>
-                        @endif
-                        @if(request('category'))
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-['Share_Tech_Mono'] bg-[#2563EB] text-white">
-                                {{ ucfirst(request('category')) }}
                             </span>
                         @endif
                         @if(request('score_range'))

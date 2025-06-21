@@ -22,17 +22,6 @@ class GameController extends Controller
                   ->orWhere('description', 'like', '%' . $request->search . '%');
         }
 
-        // Category filter
-        if ($request->filled('category')) {
-            if ($request->category === 'games') {
-                $query->where('type', 'game');
-            } elseif ($request->category === 'hardware') {
-                $query->where('type', 'hardware');
-            } elseif ($request->category === 'accessories') {
-                $query->where('type', 'accessory');
-            }
-        }
-
         // Genre filter
         if ($request->filled('genre')) {
             $query->whereHas('genre', function ($q) use ($request) {
