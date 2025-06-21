@@ -379,40 +379,102 @@
                                         </div>
                                         
                                         <!-- Enhanced Rating Section -->
-                                        @if($product->staff_rating)
+                                        @if($product->staff_rating || $product->community_rating)
                                             <div class="flex-shrink-0">
-                                                <div class="relative">
-                                                    <!-- Rating Circle with Gradient -->
-                                                    <div class="relative w-24 h-24 mx-auto">
-                                                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                                            <!-- Background Circle -->
-                                                            <path class="text-[#3F3F46]" stroke="currentColor" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
-                                                            <!-- Progress Circle -->
-                                                            <path class="text-[#E53E3E]" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" 
-                                                                  stroke-dasharray="{{ $product->staff_rating * 10 }}, 100" 
-                                                                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831">
-                                                            </path>
-                                                        </svg>
-                                                        <!-- Rating Number -->
-                                                        <div class="absolute inset-0 flex items-center justify-center">
-                                                            <div class="text-center">
-                                                                <div class="text-2xl font-bold text-white font-['Share_Tech_Mono']">{{ $product->staff_rating }}</div>
-                                                                <div class="text-xs text-[#A1A1AA] font-['Inter']">/ 10</div>
+                                                @if($product->staff_rating && $product->community_rating)
+                                                    <!-- Dual Rating Layout -->
+                                                    <div class="flex items-center gap-4">
+                                                        <!-- Staff Rating -->
+                                                        <div class="text-center">
+                                                            <div class="relative w-20 h-20 mx-auto">
+                                                                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                                                    <path class="text-[#3F3F46]" stroke="currentColor" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                                                                    <path class="text-[#E53E3E]" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" 
+                                                                          stroke-dasharray="{{ ($product->staff_rating / 10) * 100 }}, 100" 
+                                                                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831">
+                                                                    </path>
+                                                                </svg>
+                                                                <div class="absolute inset-0 flex items-center justify-center">
+                                                                    <div class="text-center">
+                                                                        <div class="text-lg font-bold text-white font-['Share_Tech_Mono']">{{ number_format($product->staff_rating, 1) }}</div>
+                                                                        <div class="text-xs text-[#A1A1AA] font-['Inter']">/ 10</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="mt-2">
+                                                                <div class="text-xs font-semibold text-white font-['Inter']">Staff Rating</div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Community Rating -->
+                                                        <div class="text-center">
+                                                            <div class="relative w-20 h-20 mx-auto">
+                                                                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                                                    <path class="text-[#3F3F46]" stroke="currentColor" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                                                                    <path class="text-[#2563EB]" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" 
+                                                                          stroke-dasharray="{{ ($product->community_rating / 10) * 100 }}, 100" 
+                                                                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831">
+                                                                    </path>
+                                                                </svg>
+                                                                <div class="absolute inset-0 flex items-center justify-center">
+                                                                    <div class="text-center">
+                                                                        <div class="text-lg font-bold text-white font-['Share_Tech_Mono']">{{ number_format($product->community_rating, 1) }}</div>
+                                                                        <div class="text-xs text-[#A1A1AA] font-['Inter']">/ 10</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="mt-2">
+                                                                <div class="text-xs font-semibold text-white font-['Inter']">Community</div>
+                                                                <div class="text-xs text-[#A1A1AA] font-['Inter']">{{ $product->community_reviews_count }} reviews</div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="text-center mt-3">
-                                                        <div class="text-sm font-semibold text-white font-['Inter']">Staff Rating</div>
-                                                        <!-- Star Rating -->
-                                                        <div class="flex justify-center mt-1">
-                                                            @for($i = 1; $i <= 5; $i++)
-                                                                <svg class="w-3 h-3 {{ ($product->staff_rating/2) >= $i ? 'text-[#FFC107]' : 'text-[#3F3F46]' }}" fill="currentColor" viewBox="0 0 20 20">
-                                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                                </svg>
-                                                            @endfor
+                                                @elseif($product->staff_rating)
+                                                    <!-- Single Staff Rating -->
+                                                    <div class="text-center">
+                                                        <div class="relative w-24 h-24 mx-auto">
+                                                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                                                <path class="text-[#3F3F46]" stroke="currentColor" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                                                                <path class="text-[#E53E3E]" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" 
+                                                                      stroke-dasharray="{{ ($product->staff_rating / 10) * 100 }}, 100" 
+                                                                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831">
+                                                                </path>
+                                                            </svg>
+                                                            <div class="absolute inset-0 flex items-center justify-center">
+                                                                <div class="text-center">
+                                                                    <div class="text-xl font-bold text-white font-['Share_Tech_Mono']">{{ number_format($product->staff_rating, 1) }}</div>
+                                                                    <div class="text-xs text-[#A1A1AA] font-['Inter']">/ 10</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mt-3">
+                                                            <div class="text-sm font-semibold text-white font-['Inter']">Staff Rating</div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                @elseif($product->community_rating)
+                                                    <!-- Single Community Rating -->
+                                                    <div class="text-center">
+                                                        <div class="relative w-24 h-24 mx-auto">
+                                                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                                                <path class="text-[#3F3F46]" stroke="currentColor" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                                                                <path class="text-[#2563EB]" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" 
+                                                                      stroke-dasharray="{{ ($product->community_rating / 10) * 100 }}, 100" 
+                                                                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831">
+                                                                </path>
+                                                            </svg>
+                                                            <div class="absolute inset-0 flex items-center justify-center">
+                                                                <div class="text-center">
+                                                                    <div class="text-xl font-bold text-white font-['Share_Tech_Mono']">{{ number_format($product->community_rating, 1) }}</div>
+                                                                    <div class="text-xs text-[#A1A1AA] font-['Inter']">/ 10</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mt-3">
+                                                            <div class="text-sm font-semibold text-white font-['Inter']">Community</div>
+                                                            <div class="text-sm text-[#A1A1AA] font-['Inter']">{{ $product->community_reviews_count }} reviews</div>
+                                                        </div>
+                                                    </div>
+                                                @endif
                                             </div>
                                         @endif
                                     </div>
