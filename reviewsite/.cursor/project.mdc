@@ -1,0 +1,97 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+ReviewSite: Project Master Document
+Project Overview
+ReviewSite is a community-driven platform where users can discover, discuss, and create content related to video games and gaming culture. The site allows users to post game reviews, submit and share their own podcasts, host personalized streamer pages, and write articles. It is built with a focus on community interaction, content moderation, and providing creators with a hub for their content.
+
+REQUIRED RULES
+Before creating ANY file, search to ensure that it hasn't already been created, including migrations. Never create a new migration until you've searched if one exists for that table.
+Any new migrations should occur AFTER all other migrations as this site is now in production.
+Do not over-complicate code. Go for the simplest route first, then slowly add more if the solution does not work.
+Core Features
+Game Reviews & Ratings: Users can rate and write detailed reviews for games.
+Podcast Hosting: Users can submit an RSS feed for their podcast, which will be displayed on the site.
+Customizable Streamer Pages: Users can create a personalized page to embed their Twitch or YouTube stream and display their content.
+Article System: A platform for users to write and publish long-form articles.
+Advanced User Management: Secure authentication via Laravel Jetstream, including Two-Factor Authentication and optional social logins.
+Content Moderation ("Cursor Rules"): A system to ensure content quality and adherence to community guidelines through automated checks and a manual review queue.
+Technical Stack
+Backend: Laravel 11+, PHP 8.2+
+Frontend: Laravel Livewire 3+, Tailwind CSS, Alpine.js
+Authentication: Laravel Jetstream, Laravel Socialite (via Socialstream)
+Admin Panel: Filament
+Database: PostgreSQL 
+Caching: Redis 
+Queue Processing: Laravel Horizon 
+API Integration: Twitch API, YouTube API, OpenAI Moderation API
+Architecture
+A standard Laravel directory structure will be used, emphasizing a clean separation of concerns.
+
+app/
+├── Actions/              # Single responsibility business logic
+├── Http/                 # Controllers, Livewire Components, Form Requests
+├── Models/               # Eloquent models
+├── Providers/
+├── View/                 # View Models and Blade Components
+└── ...                   # Other standard Laravel directories
+URL Structure
+Reviews: /reviews/{id}/{slug?}
+Games: /games/{slug}
+Podcasts: /podcasts/{id}/{slug?}
+Streamer Pages: /streams/{page_slug}
+Articles: /articles/{id}/{slug?}
+User Profiles: /users/{username}
+Content Moderation System ("Cursor Rules")
+User Submission: New content (reviews, articles, etc.) is saved with a status of PENDING.
+Automated Checks: The submission is scanned by automated systems (AI moderation, keyword filters) for immediate rejection of clear violations.
+Moderator Review (via Filament):
+Approved: The content's status is changed to APPROVED and it becomes publicly visible.
+Rejected: The status is changed to REJECTED and the content remains hidden.
+Code Style Guide
+PHP: Follow PSR-12 coding standards. Use strict typing (declare(strict_types=1);).
+Blade: Format Blade files consistently.
+Naming: PascalCase for classes, camelCase for methods/variables, snake_case for database columns and view files.
+Patterns: Utilize Action Classes for single-purpose logic, Service Classes for more complex business logic, and Form Request classes for validation.
+Storage System
+A dual-disk storage strategy is recommended to separate public assets from private files.
+
+Public Disk (public): For publicly accessible files like game cover art, user avatars, podcast artwork, and streamer page banners.
+Private Disk (private): For sensitive files, such as content pending moderation or user-uploaded documents.
+Image Storage Structure
+Game Art: /uploads/games/{game_id}/{filename}
+User Avatars: /uploads/users/{user_id}/{filename} (Handled by Jetstream)
+Podcast Artwork: /uploads/podcasts/{podcast_id}/{filename}
+Article Images: /uploads/articles/{article_id}/{filename}
+Testing Guidelines
+Follow standard Laravel testing practices using Pest or PHPUnit.
+Use Model Factories to generate test data.
+Aim for high test coverage on critical application logic.
+Use feature tests to cover user-facing functionality and user stories.
+UI/Theme Guidelines (90s-Inspired)
+This is the formalized "Cursor Rule" for the site's theme.
+
+Color Palette
+Primary Background: #1A1A1B (Near-black)
+Secondary Background: #27272A (Dark gray for cards/modals)
+Primary Text: #FFFFFF (Pure white)
+Secondary Text: #A1A1AA (Muted gray)
+Primary Accent: #E53E3E (Bold Red)
+Secondary Accent (Highlight): #2563EB (Vibrant Blue for focus/active states)
+Success: #4CAF50 (Green)
+Warning: #FFC107 (Yellow)
+Error: #E53E3E (Primary Accent Red)
+Typography
+Primary (Headings): Share Tech Mono
+Secondary (Body Text): Inter
+Minimum body font size: 16px.
+Components
+Primary Button: bg-[#E53E3E] text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors
+Secondary Button: bg-[#27272A] text-white px-4 py-2 rounded-lg border border-[#E53E3E] hover:bg-red-900/50 transition-colors
+Card: bg-[#27272A] rounded-lg shadow-md p-4
+Form Input: w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-2.5 text-white placeholder-[#A1A1AA] focus:border-[#2563EB] focus:ring-[#2563EB]
+Layout & Spacing
+
+The excellent and detailed rules for Spacing, Grid, Responsive Breakpoints, and Accessibility from your VerseDB example should be adopted directly. They represent solid best practices.

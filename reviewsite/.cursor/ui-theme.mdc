@@ -1,0 +1,52 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+ReviewSite: UI/Theme Guidelines (90s-Inspired)
+Color Palette
+This palette is based on the "90s-inspired" concept, featuring a high-contrast dark theme with a bold red primary accent.
+
+Base Colors
+Primary Background: #1A1A1B (Near-black)
+Secondary Background: #27272A (Dark gray for cards/modals)
+Primary Text: #FFFFFF (Pure white)
+Secondary Text: #A1A1AA (Muted gray)
+Accent Colors
+Primary Accent: #E53E3E (Bold Red)
+Secondary Accent (Highlight): #2563EB (Vibrant Blue for focus/active states)
+Success: #4CAF50 (Green)
+Warning: #FFC107 (Yellow)
+Error: #E53E3E (Uses the Primary Accent Red for consistency)
+Borders
+Standard: #3F3F46 (A slightly lighter gray than the secondary background)
+Highlight: #2563EB (Matches the secondary accent color)
+Typography
+To capture the "modern layout, retro colors" feel, we'll pair a clean, modern font for body text with a mono-spaced, tech-inspired font for headings. Both are available from Google Fonts.
+
+Fonts
+Primary (Headings): Share Tech Mono
+Regular (400)
+Secondary (Body Text): Inter
+Regular (400)
+Semi-bold (600)
+Bold (700)
+Body size font in all areas should be a minimum of 16px.
+
+Components
+Here are the base Tailwind CSS classes for key components, using our new color palette.
+
+Common Classes
+Primary Button: bg-[#E53E3E] text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors
+Secondary Button: bg-[#27272A] text-white px-4 py-2 rounded-lg border border-[#E53E3E] hover:bg-red-900/50 transition-colors
+Card: bg-[#27272A] rounded-lg shadow-md p-4
+Form Input: w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-2.5 text-white placeholder-[#A1A1AA] focus:border-[#2563EB] focus:ring-[#2563EB]
+... (We can continue defining other form elements as needed).
+Action Bar
+Your x-action-bar component is an excellent idea and we will implement it. We'll adapt the hover colors to fit the new theme:
+
+edit: Pencil icon, blue hover (hover:bg-blue-500/30).
+view: Book icon, gray hover (hover:bg-gray-500/30).
+remove / delete: Trash icon, red hover (hover:bg-red-500/30).
+
+add: Plus icon, green hover (hover:bg-green-500/30).
