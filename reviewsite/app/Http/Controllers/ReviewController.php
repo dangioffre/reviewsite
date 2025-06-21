@@ -12,15 +12,22 @@ class ReviewController extends Controller
     // Show the review index page with search and browse
     public function index(Request $request)
     {
+        $search = $request->input('search');
+        $type = $request->input('type');
+
+        // Simple, reliable query
         $query = Product::query();
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where('name', 'like', "%{$search}%");
+
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%');
         }
-        if ($request->filled('type')) {
-            $query->where('type', $request->input('type'));
+
+        if ($type) {
+            $query->where('type', $type);
         }
-        $products = $query->orderBy('name')->paginate(12);
+
+        $products = $query->latest()->paginate(12);
+
         return view('reviews.index', compact('products'));
     }
 

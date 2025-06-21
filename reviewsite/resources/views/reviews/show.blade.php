@@ -1,8 +1,5 @@
-@extends('layouts.app')
-
-@section('title', $product->name . ' Reviews')
-
-@section('content')
+<x-layouts.app>
+    <x-slot name="title">{{ $product->name }} Reviews</x-slot>
 <div class="container mx-auto py-8">
     <div class="flex flex-col md:flex-row gap-8 mb-8">
         <div class="md:w-1/2">
@@ -74,4 +71,4 @@
         <div class="text-zinc-400 font-mono mb-8">Please <a href="{{ route('login') }}" class="text-red-600 underline">log in</a> to leave a review.</div>
     @endauth
 </div>
-@endsection 
+</x-layouts.app> 
