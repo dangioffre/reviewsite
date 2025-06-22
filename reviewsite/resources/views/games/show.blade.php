@@ -178,53 +178,83 @@
 
         <!-- Reviews Content -->
         <div class="container mx-auto px-4 py-12">
-            <div class="grid lg:grid-cols-3 gap-12">
-                <!-- Left Column: Reviews -->
-                <div class="lg:col-span-2 space-y-12">
-
-                    <!-- Staff Reviews Section -->
-                    @if($staffReviews->count() > 0)
-                    <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
-                        <div class="flex items-center gap-4 mb-6">
-                            <div class="w-12 h-12 bg-[#E53E3E] bg-opacity-20 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-[#E53E3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                                </svg>
-                            </div>
-                            <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono']">Staff Reviews</h2>
+            <div class="space-y-12">
+                <!-- Staff Reviews Section -->
+                @if($staffReviews->count() > 0)
+                <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 bg-[#E53E3E] bg-opacity-20 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-[#E53E3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                            </svg>
                         </div>
-                        
+                        <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono']">Staff Reviews</h2>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        @foreach($staffReviews as $review)
+                            <div class="bg-[#1A1A1B] rounded-xl p-6 border border-[#3F3F46]">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-gradient-to-r from-[#E53E3E] to-[#DC2626] rounded-full flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <div class="text-white font-semibold font-['Inter']">{{ $review->user->name }} <span class="text-[#E53E3E] text-sm">STAFF</span></div>
+                                            <div class="text-[#A1A1AA] text-sm font-['Inter']">{{ $review->created_at->diffForHumans() }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-[#E53E3E] text-white font-bold font-['Share_Tech_Mono'] px-3 py-1 rounded-lg">{{ $review->rating }}/10</span>
+                                    </div>
+                                </div>
+                                <div class="text-[#A1A1AA] leading-relaxed font-['Inter']">
+                                    @if($review->content)
+                                        <p>{{ Str::limit($review->content, 200) }}</p>
+                                        @if(strlen($review->content) > 200 && $review->slug)
+                                            <a href="{{ route('games.reviews.show', [$product, $review]) }}" class="text-[#E53E3E] hover:text-red-400 font-semibold mt-2 inline-block">
+                                                Read Full Review →
+                                            </a>
+                                        @endif
+                                    @else
+                                        <p>{{ $review->review ?? 'No review content available.' }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </section>
+                @endif
+
+                <!-- User Reviews Section -->
+                <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                    <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Community Reviews</h2>
+                    
+                    @if($userReviews->count() > 0)
                         <div class="space-y-6">
-                            @foreach($staffReviews as $review)
+                            @foreach($userReviews as $review)
                                 <div class="bg-[#1A1A1B] rounded-xl p-6 border border-[#3F3F46]">
                                     <div class="flex items-start justify-between mb-4">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 bg-gradient-to-r from-[#E53E3E] to-[#DC2626] rounded-full flex items-center justify-center">
-                                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                                                </svg>
+                                            <div class="w-10 h-10 bg-gradient-to-r from-[#E53E3E] to-[#2563EB] rounded-full flex items-center justify-center">
+                                                <span class="text-white font-bold font-['Share_Tech_Mono']">{{ substr($review->user->name, 0, 1) }}</span>
                                             </div>
                                             <div>
-                                                <div class="text-white font-semibold font-['Inter']">{{ $review->user->name }} <span class="text-[#E53E3E] text-sm">STAFF</span></div>
+                                                <div class="text-white font-semibold font-['Inter']">{{ $review->user->name }}</div>
                                                 <div class="text-[#A1A1AA] text-sm font-['Inter']">{{ $review->created_at->diffForHumans() }}</div>
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-2">
-                                            <span class="text-white font-bold font-['Share_Tech_Mono']">{{ $review->rating }}/10</span>
-                                            <div class="flex">
-                                                @for($i = 1; $i <= 5; $i++)
-                                                    <svg class="w-3 h-3 {{ ($review->rating/2) >= $i ? 'text-[#FFC107]' : 'text-[#3F3F46]' }}" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                    </svg>
-                                                @endfor
-                                            </div>
+                                            <span class="bg-[#2563EB] text-white font-bold font-['Share_Tech_Mono'] px-3 py-1 rounded-lg">{{ $review->rating }}/10</span>
                                         </div>
                                     </div>
                                     <div class="text-[#A1A1AA] leading-relaxed font-['Inter']">
                                         @if($review->content)
-                                            <p>{{ Str::limit($review->content, 200) }}</p>
-                                            @if(strlen($review->content) > 200 && $review->slug)
-                                                <a href="{{ route('games.reviews.show', [$product, $review]) }}" class="text-[#E53E3E] hover:text-red-400 font-semibold mt-2 inline-block">
+                                            <p>{{ Str::limit($review->content, 150) }}</p>
+                                            @if(strlen($review->content) > 150 && $review->slug)
+                                                <a href="{{ route('games.reviews.show', [$product, $review]) }}" class="text-[#2563EB] hover:text-blue-400 font-semibold mt-2 inline-block">
                                                     Read Full Review →
                                                 </a>
                                             @endif
@@ -235,90 +265,14 @@
                                 </div>
                             @endforeach
                         </div>
-                    </section>
+                    @else
+                        <div class="text-center py-12">
+                            <div class="text-6xl mb-4">💬</div>
+                            <h3 class="text-xl font-bold text-white mb-2 font-['Share_Tech_Mono']">No Community Reviews Yet</h3>
+                            <p class="text-[#A1A1AA] font-['Inter']">Be the first to share your thoughts on this game!</p>
+                        </div>
                     @endif
-
-                    <!-- User Reviews Section -->
-                    <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
-                        <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Community Reviews</h2>
-                        
-                        @if($userReviews->count() > 0)
-                            <div class="space-y-6">
-                                @foreach($userReviews as $review)
-                                    <div class="bg-[#1A1A1B] rounded-xl p-6 border border-[#3F3F46]">
-                                        <div class="flex items-start justify-between mb-4">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 bg-gradient-to-r from-[#E53E3E] to-[#2563EB] rounded-full flex items-center justify-center">
-                                                    <span class="text-white font-bold font-['Share_Tech_Mono']">{{ substr($review->user->name, 0, 1) }}</span>
-                                                </div>
-                                                <div>
-                                                    <div class="text-white font-semibold font-['Inter']">{{ $review->user->name }}</div>
-                                                    <div class="text-[#A1A1AA] text-sm font-['Inter']">{{ $review->created_at->diffForHumans() }}</div>
-                                                </div>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-white font-bold font-['Share_Tech_Mono']">{{ $review->rating }}/10</span>
-                                                <div class="flex">
-                                                    @for($i = 1; $i <= 5; $i++)
-                                                        <svg class="w-3 h-3 {{ ($review->rating/2) >= $i ? 'text-[#FFC107]' : 'text-[#3F3F46]' }}" fill="currentColor" viewBox="0 0 20 20">
-                                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                        </svg>
-                                                    @endfor
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="text-[#A1A1AA] leading-relaxed font-['Inter']">
-                                            @if($review->content)
-                                                <p>{{ Str::limit($review->content, 150) }}</p>
-                                                @if(strlen($review->content) > 150 && $review->slug)
-                                                    <a href="{{ route('games.reviews.show', [$product, $review]) }}" class="text-[#2563EB] hover:text-blue-400 font-semibold mt-2 inline-block">
-                                                        Read Full Review →
-                                                    </a>
-                                                @endif
-                                            @else
-                                                <p>{{ $review->review ?? 'No review content available.' }}</p>
-                                            @endif
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <div class="text-center py-12">
-                                <div class="text-6xl mb-4">💬</div>
-                                <h3 class="text-xl font-bold text-white mb-2 font-['Share_Tech_Mono']">No Community Reviews Yet</h3>
-                                <p class="text-[#A1A1AA] font-['Inter']">Be the first to share your thoughts on this game!</p>
-                            </div>
-                        @endif
-                    </section>
-                </div>
-
-                <!-- Right Column: Review Form -->
-                <div class="lg:col-span-1">
-                    <div class="sticky top-8">
-                                                @auth
-                        <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl text-center">
-                            <div class="text-4xl mb-4">✍️</div>
-                            <h3 class="text-xl font-bold text-white mb-4 font-['Share_Tech_Mono']">Share Your Review</h3>
-                            <p class="text-[#A1A1AA] mb-6 font-['Inter']">Write a detailed review with your thoughts, ratings, and more.</p>
-                            <a href="{{ route('games.reviews.create', $product) }}" class="inline-flex items-center bg-gradient-to-r from-[#E53E3E] to-[#DC2626] text-white px-6 py-3 rounded-xl font-bold font-['Inter'] shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                                Write Review
-                            </a>
-                        </div>
-                        @else
-                        <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl text-center">
-                            <div class="text-4xl mb-4">🔐</div>
-                            <h3 class="text-xl font-bold text-white mb-4 font-['Share_Tech_Mono']">Login to Review</h3>
-                            <p class="text-[#A1A1AA] mb-6 font-['Inter']">Sign in to share your thoughts and rate this game.</p>
-                            <a href="{{ route('login') }}" class="inline-flex items-center bg-gradient-to-r from-[#E53E3E] to-[#DC2626] text-white px-6 py-3 rounded-xl font-bold font-['Inter'] shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300">
-                                Sign In
-                            </a>
-                        </div>
-                        @endauth
-                    </div>
-                </div>
+                </section>
             </div>
         </div>
     </div>
