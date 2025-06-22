@@ -82,6 +82,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                \App\Http\Middleware\AdminMiddleware::class,
             ])
             ->navigationGroups([
                 'Games Management',

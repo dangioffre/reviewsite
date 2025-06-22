@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\GameController;
@@ -41,3 +42,72 @@ Route::get('/tech/{product}/{review}/report', [ReportController::class, 'show'])
 Route::post('/tech/{product}/{review}/report', [ReportController::class, 'store'])->name('tech.reviews.report.store');
 
 // Authentication Routes
+use Illuminate\Support\Facades\Auth;
+
+// Regular user authentication (separate from admin)
+Route::get('/login', function () {
+    if (Auth::check()) {
+        // If user is already logged in, redirect based on admin status
+        if (Auth::user()->is_admin) {
+            return redirect('/admin');
+        }
+        return redirect('/');
+    }
+    return view('auth.login');
+})->name('login');
+
+Route::post('/login', function (Illuminate\Http\Request $request) {
+    $credentials = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
+
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+        
+        // Redirect based on user type
+        if (Auth::user()->is_admin) {
+            return redirect()->intended('/admin');
+        }
+        
+        return redirect()->intended('/');
+    }
+
+    return back()->withErrors([
+        'email' => 'The provided credentials do not match our records.',
+    ]);
+})->name('login.post');
+
+Route::post('/logout', function (Illuminate\Http\Request $request) {
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect('/');
+})->name('logout');
+
+// Register routes for new users
+Route::get('/register', function () {
+    if (Auth::check()) {
+        return redirect('/');
+    }
+    return view('auth.register');
+})->name('register');
+
+Route::post('/register', function (Illuminate\Http\Request $request) {
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:8|confirmed',
+    ]);
+
+    $user = App\Models\User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'is_admin' => false, // Regular users are not admin by default
+    ]);
+
+    Auth::login($user);
+
+    return redirect('/');
+})->name('register.post');

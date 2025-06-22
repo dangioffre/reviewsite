@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - ReviewSite</title>
+    <title>Register - ReviewSite</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -25,7 +25,7 @@
             justify-content: center;
         }
 
-        .login-container {
+        .register-container {
             background: #1A1A1A;
             border: 2px solid #E53E3E;
             border-radius: 8px;
@@ -35,12 +35,12 @@
             box-shadow: 0 0 20px rgba(229, 62, 62, 0.3);
         }
 
-        .login-header {
+        .register-header {
             text-align: center;
             margin-bottom: 2rem;
         }
 
-        .login-header h1 {
+        .register-header h1 {
             font-family: 'Share Tech Mono', monospace;
             color: #E53E3E;
             font-size: 2rem;
@@ -48,7 +48,7 @@
             margin-bottom: 0.5rem;
         }
 
-        .login-header p {
+        .register-header p {
             color: #A0AEC0;
         }
 
@@ -120,10 +120,10 @@
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-header">
-            <h1>LOGIN</h1>
-            <p>Sign in to your ReviewSite account</p>
+    <div class="register-container">
+        <div class="register-header">
+            <h1>REGISTER</h1>
+            <p>Create your ReviewSite account</p>
         </div>
 
         @if($errors->any())
@@ -134,8 +134,13 @@
             </div>
         @endif
 
-        <form action="{{ route('login.post') }}" method="POST">
+        <form action="{{ route('register.post') }}" method="POST">
             @csrf
+            <div class="form-group">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" id="name" name="name" class="form-input" value="{{ old('name') }}" required>
+            </div>
+
             <div class="form-group">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" id="email" name="email" class="form-input" value="{{ old('email') }}" required>
@@ -146,11 +151,16 @@
                 <input type="password" id="password" name="password" class="form-input" required>
             </div>
 
-            <button type="submit" class="btn btn-primary">Login</button>
+            <div class="form-group">
+                <label for="password_confirmation" class="form-label">Confirm Password</label>
+                <input type="password" id="password_confirmation" name="password_confirmation" class="form-input" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Register</button>
         </form>
 
         <div class="back-link">
-            <a href="{{ route('register') }}">Don't have an account? Register</a>
+            <a href="{{ route('login') }}">Already have an account? Login</a>
         </div>
         
         <div class="back-link">

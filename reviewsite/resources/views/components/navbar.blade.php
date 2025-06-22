@@ -45,14 +45,28 @@
             <!-- Auth Actions -->
             <div class="flex items-center space-x-4">
                 @auth
-                    <a href="/admin" 
-                       class="bg-[#E53E3E] hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors font-['Inter'] text-base">
-                        Dashboard
-                    </a>
+                    @if(auth()->user()->is_admin)
+                        <a href="/admin" 
+                           class="bg-[#E53E3E] hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors font-['Inter'] text-base">
+                            Admin Dashboard
+                        </a>
+                    @endif
+                    <span class="text-[#A1A1AA] font-['Inter']">Welcome, {{ auth()->user()->name }}</span>
+                    <form action="{{ route('logout') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" 
+                                class="bg-[#27272A] text-white px-4 py-2 rounded-lg border border-[#E53E3E] hover:bg-red-900/50 transition-colors font-medium font-['Inter'] text-base">
+                            Logout
+                        </button>
+                    </form>
                 @else
-                    <a href="/admin/login" 
+                    <a href="{{ route('login') }}" 
                        class="bg-[#27272A] text-white px-4 py-2 rounded-lg border border-[#E53E3E] hover:bg-red-900/50 transition-colors font-medium font-['Inter'] text-base">
                         Login
+                    </a>
+                    <a href="{{ route('register') }}" 
+                       class="bg-[#E53E3E] hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors font-['Inter'] text-base">
+                        Register
                     </a>
                 @endauth
                 

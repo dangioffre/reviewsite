@@ -268,7 +268,7 @@
                             <div class="text-4xl mb-4">🔐</div>
                             <h3 class="text-xl font-bold text-white mb-4 font-['Share_Tech_Mono']">Login to Review</h3>
                             <p class="text-[#A1A1AA] mb-6 font-['Inter']">Sign in to share your thoughts and rate this game.</p>
-                            <a href="/admin/login" class="inline-flex items-center bg-gradient-to-r from-[#E53E3E] to-[#DC2626] text-white px-6 py-3 rounded-xl font-bold font-['Inter'] shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300">
+                            <a href="{{ route('login') }}" class="inline-flex items-center bg-gradient-to-r from-[#E53E3E] to-[#DC2626] text-white px-6 py-3 rounded-xl font-bold font-['Inter'] shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300">
                                 Sign In
                             </a>
                         </div>
