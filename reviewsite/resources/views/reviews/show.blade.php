@@ -102,7 +102,13 @@
                         <div class="p-8 lg:p-12">
                             <div class="prose prose-invert prose-lg max-w-none">
                                 <div class="text-[#FFFFFF] font-['Inter'] text-lg leading-relaxed space-y-6">
-                                    {!! @markdown($review->content) !!}
+                                    @php
+                                        $converter = new \League\CommonMark\CommonMarkConverter([
+                                            'html_input' => 'escape',
+                                            'allow_unsafe_links' => false,
+                                        ]);
+                                    @endphp
+                                    {!! $converter->convert($review->content)->getContent() !!}
                                 </div>
                             </div>
                         </div>
