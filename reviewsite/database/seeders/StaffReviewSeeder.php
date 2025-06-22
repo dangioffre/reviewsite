@@ -172,10 +172,28 @@ class StaffReviewSeeder extends Seeder
                 }
             }
 
+            // Generate a title based on rating and product
+            $titleTemplates = [
+                10 => ['A Masterpiece', 'Absolutely Perfect', 'Gaming Perfection', 'Flawless Experience'],
+                9 => ['Outstanding Quality', 'Highly Recommended', 'Exceptional Work', 'Nearly Perfect'],
+                8 => ['Great Experience', 'Solid Choice', 'Well Worth It', 'Good Quality'],
+                7 => ['Decent Product', 'Worth Considering', 'Mixed Results', 'Has Potential'],
+                6 => ['Below Average', 'Disappointing', 'Needs Work', 'Could Be Better'],
+                5 => ['Barely Acceptable', 'Major Issues', 'Not Recommended', 'Problematic'],
+                4 => ['Poor Quality', 'Serious Problems', 'Avoid This', 'Broken Experience'],
+                3 => ['Terrible Product', 'Complete Failure', 'Waste of Time', 'Fundamentally Flawed'],
+                2 => ['Absolutely Awful', 'Completely Broken', 'Total Disaster', 'Unplayable Mess'],
+                1 => ['Worst Ever', 'Complete Garbage', 'Avoid at All Costs', 'Catastrophic Failure']
+            ];
+
+            $titleOptions = $titleTemplates[$selectedRating] ?? $titleTemplates[7];
+            $reviewTitle = $titleOptions[array_rand($titleOptions)] . ' - ' . $product->name;
+
             // Create the review
             Review::create([
                 'product_id' => $product->id,
                 'user_id' => $staffUser->id,
+                'title' => $reviewTitle,
                 'content' => $selectedTemplate,
                 'rating' => $selectedRating,
                 'is_staff_review' => true,

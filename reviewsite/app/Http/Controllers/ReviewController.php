@@ -80,7 +80,7 @@ class ReviewController extends Controller
         
         $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required|string|min:100',
+            'content' => 'required|string|min:50',
             'rating' => 'required|integer|min:1|max:10',
             'positive_points' => 'nullable|string',
             'negative_points' => 'nullable|string',
@@ -143,7 +143,7 @@ class ReviewController extends Controller
         
         $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required|string|min:100',
+            'content' => 'required|string|min:50',
             'rating' => 'required|integer|min:1|max:10',
             'positive_points' => 'nullable|string',
             'negative_points' => 'nullable|string',

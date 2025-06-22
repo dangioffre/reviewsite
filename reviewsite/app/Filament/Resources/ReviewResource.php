@@ -110,7 +110,7 @@ class ReviewResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->url(fn ($record) => route('reviews.show', $record))
+                    ->url(fn ($record) => route($record->product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show', [$record->product, $record]))
                     ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

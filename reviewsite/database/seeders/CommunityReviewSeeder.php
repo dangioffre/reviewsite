@@ -185,10 +185,28 @@ class CommunityReviewSeeder extends Seeder
                 }
             }
 
+            // Generate a casual title based on rating and product
+            $titleTemplates = [
+                10 => ['AMAZING!', 'Love it!', 'Perfect!', 'Best ever!', 'Incredible!'],
+                9 => ['Really good!', 'Awesome!', 'Great stuff!', 'Highly recommend!', 'Fantastic!'],
+                8 => ['Pretty good', 'Nice!', 'Good game', 'Solid choice', 'Worth it'],
+                7 => ['Decent', 'Not bad', 'OK game', 'Could be better', 'It\'s alright'],
+                6 => ['Meh...', 'Disappointing', 'Expected more', 'Not great', 'Below average'],
+                5 => ['Not good', 'Has issues', 'Broken', 'Don\'t buy', 'Waste of money'],
+                4 => ['Pretty bad', 'Lots of problems', 'Buggy mess', 'Avoid', 'Terrible'],
+                3 => ['Awful', 'Complete trash', 'Don\'t waste your time', 'Broken garbage', 'Horrible'],
+                2 => ['Worst game ever', 'Completely broken', 'Total waste', 'Unplayable', 'Garbage'],
+                1 => ['AVOID!', 'Complete disaster', 'Worst purchase ever', 'Broken beyond repair', 'Trash']
+            ];
+
+            $titleOptions = $titleTemplates[$selectedRating] ?? $titleTemplates[7];
+            $reviewTitle = $titleOptions[array_rand($titleOptions)];
+
             // Create the review with random timestamps over the past 60 days
             Review::create([
                 'product_id' => $product->id,
                 'user_id' => $regularUser->id,
+                'title' => $reviewTitle,
                 'content' => $selectedTemplate,
                 'rating' => $selectedRating,
                 'is_staff_review' => false,
