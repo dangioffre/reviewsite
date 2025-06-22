@@ -78,7 +78,6 @@ class ReviewController extends Controller
             'positive_points' => 'nullable|string',
             'negative_points' => 'nullable|string',
             'platform_played_on' => 'nullable|string',
-            'game_status' => 'nullable|in:want,playing,played',
         ]);
 
         $review = new Review();
@@ -90,7 +89,6 @@ class ReviewController extends Controller
         $review->positive_points = $request->positive_points ? array_filter(explode("\n", $request->positive_points)) : [];
         $review->negative_points = $request->negative_points ? array_filter(explode("\n", $request->negative_points)) : [];
         $review->platform_played_on = $request->platform_played_on;
-        $review->game_status = $request->game_status;
         $review->is_staff_review = Auth::user()->is_admin;
         $review->is_published = true;
         $review->save();
@@ -133,7 +131,6 @@ class ReviewController extends Controller
             'positive_points' => 'nullable|string',
             'negative_points' => 'nullable|string',
             'platform_played_on' => 'nullable|string',
-            'game_status' => 'nullable|in:want,playing,played',
         ]);
 
         $review->title = $request->title;
@@ -142,7 +139,6 @@ class ReviewController extends Controller
         $review->positive_points = $request->positive_points ? array_filter(explode("\n", $request->positive_points)) : [];
         $review->negative_points = $request->negative_points ? array_filter(explode("\n", $request->negative_points)) : [];
         $review->platform_played_on = $request->platform_played_on;
-        $review->game_status = $request->game_status;
         $review->save();
 
         return redirect()->route('reviews.show', $review)

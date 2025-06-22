@@ -20,7 +20,6 @@ class Review extends Model
         'positive_points',
         'negative_points',
         'platform_played_on',
-        'game_status',
         'is_staff_review',
         'is_published',
     ];

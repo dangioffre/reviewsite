@@ -59,13 +59,6 @@ class ReviewResource extends Resource
                     })
                     ->searchable()
                     ->helperText('Platform the reviewer played on'),
-                Forms\Components\Select::make('game_status')
-                    ->options([
-                        'want' => 'Want to Play',
-                        'playing' => 'Currently Playing',
-                        'played' => 'Completed',
-                    ])
-                    ->helperText('Only applicable for games'),
                 Forms\Components\Toggle::make('is_staff_review')
                     ->label('Is Staff Review?'),
                 Forms\Components\Toggle::make('is_published')
@@ -95,14 +88,6 @@ class ReviewResource extends Resource
                         $state >= 8 => 'success',
                         $state >= 6 => 'warning',
                         default => 'danger',
-                    }),
-                Tables\Columns\TextColumn::make('game_status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'want' => 'gray',
-                        'playing' => 'warning',
-                        'played' => 'success',
-                        default => 'gray',
                     }),
                 Tables\Columns\IconColumn::make('is_staff_review')
                     ->boolean()

@@ -61,11 +61,6 @@
                                 <div class="bg-[#27272A]/80 backdrop-blur-sm rounded-full px-4 py-2 border border-[#3F3F46]">
                                     <span class="font-['Inter'] text-white">{{ $review->created_at->format('M j, Y') }}</span>
                                 </div>
-                                @if($review->game_status)
-                                    <div class="bg-[#2563EB]/80 backdrop-blur-sm rounded-full px-4 py-2 border border-blue-500/30">
-                                        <span class="text-white font-['Share_Tech_Mono'] text-sm font-bold uppercase tracking-wider">{{ $review->game_status }}</span>
-                                    </div>
-                                @endif
                             </div>
                         </div>
 

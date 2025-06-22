@@ -92,26 +92,8 @@
                             @enderror
                         </div>
 
-                        @if($product->type === 'game')
-                            <!-- Game Status -->
-                            <div>
-                                <label for="game_status" class="block text-sm font-medium text-white mb-2 font-['Inter']">Game Status</label>
-                                <select id="game_status" 
-                                        name="game_status" 
-                                        class="w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-3 text-white focus:border-[#E53E3E] focus:ring-[#E53E3E] transition font-['Inter']">
-                                    <option value="">Select status</option>
-                                    <option value="want" {{ old('game_status') === 'want' ? 'selected' : '' }}>Want to Play</option>
-                                    <option value="playing" {{ old('game_status') === 'playing' ? 'selected' : '' }}>Currently Playing</option>
-                                    <option value="played" {{ old('game_status') === 'played' ? 'selected' : '' }}>Completed</option>
-                                </select>
-                                @error('game_status')
-                                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        @endif
-
                         <!-- Platform Played On -->
-                        <div class="{{ $product->type === 'game' ? '' : 'md:col-span-2' }}">
+                        <div>
                             <label for="platform_played_on" class="block text-sm font-medium text-white mb-2 font-['Inter']">Platform Played On</label>
                             <select id="platform_played_on" 
                                     name="platform_played_on" 
