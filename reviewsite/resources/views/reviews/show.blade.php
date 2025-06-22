@@ -102,7 +102,7 @@
                         <div class="p-8 lg:p-12">
                             <div class="prose prose-invert prose-lg max-w-none">
                                 <div class="text-[#FFFFFF] font-['Inter'] text-lg leading-relaxed space-y-6">
-                                    {!! nl2br(e($review->content)) !!}
+                                    {!! @markdown($review->content) !!}
                                 </div>
                             </div>
                         </div>

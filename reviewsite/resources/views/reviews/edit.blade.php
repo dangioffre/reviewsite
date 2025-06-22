@@ -110,15 +110,25 @@
                     <div>
                         <label for="content" class="block text-sm font-medium text-white mb-2 font-['Inter']">Review Content *</label>
                         <div class="mb-2">
-                            <p class="text-xs text-[#A1A1AA] font-['Inter']">
-                                Write your detailed review here. You can use line breaks for paragraphs. Minimum 100 characters.
+                            <p class="text-xs text-[#A1A1AA] font-['Inter'] mb-2">
+                                Write your detailed review here. <strong>Markdown is supported</strong> - you can use **bold**, *italic*, `code`, lists, and more. Minimum 50 characters.
                             </p>
+                            <div class="flex items-center justify-between">
+                                <div class="text-xs text-[#A1A1AA] font-['Inter']">
+                                    Markdown examples: **bold** | *italic* | `code` | # Heading | - List item
+                                </div>
+                                <div class="text-xs font-['Inter']" id="char-counter">
+                                    <span id="char-count" class="text-[#A1A1AA]">0</span>
+                                    <span class="text-[#A1A1AA]"> / </span>
+                                    <span class="text-[#A1A1AA]">50 min</span>
+                                </div>
+                            </div>
                         </div>
                         <textarea id="content" 
                                   name="content" 
                                   rows="12"
                                   class="w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-4 text-white placeholder-[#A1A1AA] focus:border-[#E53E3E] focus:ring-[#E53E3E] transition font-['Inter'] resize-y"
-                                  placeholder="Share your detailed thoughts about this {{ $review->product->type }}. What did you like? What could be improved? How was the experience overall?"
+                                  placeholder="Share your detailed thoughts about this {{ $review->product->type }}. You can use **markdown** formatting for *emphasis*, `code snippets`, and more!"
                                   required>{{ old('content', $review->content) }}</textarea>
                         @error('content')
                             <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
@@ -191,4 +201,42 @@
             </form>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const contentTextarea = document.getElementById('content');
+            const charCountSpan = document.getElementById('char-count');
+            const charCounter = document.getElementById('char-counter');
+            
+            function updateCharCount() {
+                const count = contentTextarea.value.length;
+                charCountSpan.textContent = count;
+                
+                // Update color based on character count
+                if (count < 50) {
+                    charCountSpan.className = 'text-red-400';
+                } else if (count < 100) {
+                    charCountSpan.className = 'text-yellow-400';
+                } else {
+                    charCountSpan.className = 'text-green-400';
+                }
+                
+                // Update minimum indicator
+                const minIndicator = charCounter.querySelector('span:last-child');
+                if (count >= 50) {
+                    minIndicator.textContent = '✓ minimum reached';
+                    minIndicator.className = 'text-green-400';
+                } else {
+                    minIndicator.textContent = '50 min';
+                    minIndicator.className = 'text-[#A1A1AA]';
+                }
+            }
+            
+            // Update on input
+            contentTextarea.addEventListener('input', updateCharCount);
+            
+            // Initial update for pre-filled content
+            updateCharCount();
+        });
+    </script>
 </x-layouts.app> 
