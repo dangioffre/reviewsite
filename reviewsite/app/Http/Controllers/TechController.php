@@ -106,7 +106,67 @@ class TechController extends Controller
         // Calculate average user rating
         $averageUserRating = $userReviews->avg('rating');
         
-        return view('tech.show', compact('product', 'staffReviews', 'userReviews', 'averageUserRating'));
+        // Check if current user has already rated this product
+        $userRating = null;
+        if (Auth::check()) {
+            $userRating = $product->reviews()
+                ->where('user_id', Auth::id())
+                ->where('is_staff_review', false)
+                ->value('rating');
+        }
+        
+        return view('tech.show', compact('product', 'staffReviews', 'userReviews', 'averageUserRating', 'userRating'));
+    }
+
+    public function rate(Request $request, Product $product)
+    {
+        if (!Auth::check()) {
+            return response()->json(['error' => 'Please login to rate this product'], 401);
+        }
+
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:10',
+        ]);
+
+        // Check if user already has a rating for this product
+        $existingReview = Review::where('product_id', $product->id)
+            ->where('user_id', Auth::id())
+            ->where('is_staff_review', false)
+            ->first();
+
+        if ($existingReview) {
+            // Update existing rating
+            $existingReview->rating = $request->rating;
+            $existingReview->save();
+        } else {
+            // Create new rating (simple review with just rating)
+            Review::create([
+                'product_id' => $product->id,
+                'user_id' => Auth::id(),
+                'title' => 'Quick Rating',
+                'content' => 'User rating via star system',
+                'rating' => $request->rating,
+                'is_staff_review' => false,
+                'is_published' => true,
+            ]);
+        }
+
+        // Recalculate the community rating
+        $communityRating = $product->reviews()
+            ->where('is_staff_review', false)
+            ->avg('rating');
+
+        $communityCount = $product->reviews()
+            ->where('is_staff_review', false)
+            ->count();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Rating submitted successfully!',
+            'communityRating' => round($communityRating, 1),
+            'communityCount' => $communityCount,
+            'userRating' => $request->rating
+        ]);
     }
 
 

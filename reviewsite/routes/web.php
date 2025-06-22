@@ -16,6 +16,7 @@ Route::resource('posts', PostController::class);
 // Game system (replacing review system)
 Route::get('/games', [GameController::class, 'index'])->name('games.index');
 Route::get('/games/{product}', [GameController::class, 'show'])->name('games.show');
+Route::post('/games/{product}/rate', [GameController::class, 'rate'])->name('games.rate');
 Route::get('/games/{product}/reviews/create', [ReviewController::class, 'create'])->name('games.reviews.create');
 Route::post('/games/{product}/reviews', [ReviewController::class, 'store'])->name('games.reviews.store');
 Route::get('/games/{product}/{review}', [ReviewController::class, 'show'])->name('games.reviews.show');
@@ -30,6 +31,7 @@ Route::post('/games/{product}/{review}/report', [ReportController::class, 'store
 // Tech system (hardware and accessories)
 Route::get('/tech', [TechController::class, 'index'])->name('tech.index');
 Route::get('/tech/{product}', [TechController::class, 'show'])->name('tech.show');
+Route::post('/tech/{product}/rate', [TechController::class, 'rate'])->name('tech.rate');
 Route::get('/tech/{product}/reviews/create', [ReviewController::class, 'create'])->name('tech.reviews.create');
 Route::post('/tech/{product}/reviews', [ReviewController::class, 'store'])->name('tech.reviews.store');
 Route::get('/tech/{product}/{review}', [ReviewController::class, 'show'])->name('tech.reviews.show');

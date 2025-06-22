@@ -22,8 +22,20 @@
                         </a>
                     @endif
                 </div>
-                <h1 class="text-4xl font-bold text-white mb-4 font-['Share_Tech_Mono']">Write a Review</h1>
-                <p class="text-[#A1A1AA] font-['Inter']">Share your thoughts about {{ $product->name }}</p>
+                <h1 class="text-4xl font-bold text-white mb-4 font-['Share_Tech_Mono']">
+                    @if(isset($existingReview))
+                        Upgrade Your Rating to Full Review
+                    @else
+                        Write a Review
+                    @endif
+                </h1>
+                <p class="text-[#A1A1AA] font-['Inter']">
+                    @if(isset($existingReview))
+                        You've already rated this {{ $product->type }} with stars. Now add your detailed thoughts to create a full review!
+                    @else
+                        Share your thoughts about {{ $product->name }}
+                    @endif
+                </p>
             </div>
 
             <!-- Product Info -->
@@ -76,13 +88,18 @@
                         <!-- Rating -->
                         <div>
                             <label for="rating" class="block text-sm font-medium text-white mb-2 font-['Inter']">Rating *</label>
+                            @if(isset($existingReview))
+                                <div class="mb-2 p-3 bg-blue-600/20 border border-blue-500/30 rounded-lg">
+                                    <p class="text-sm text-blue-200">You previously rated this {{ $product->type }} {{ $existingReview->rating }}/10 with stars. You can change this rating below.</p>
+                                </div>
+                            @endif
                             <select id="rating" 
                                     name="rating" 
                                     class="w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-3 text-white focus:border-[#E53E3E] focus:ring-[#E53E3E] transition font-['Inter']"
                                     required>
                                 <option value="">Select a rating</option>
                                 @for($i = 10; $i >= 1; $i--)
-                                    <option value="{{ $i }}" {{ old('rating') == $i ? 'selected' : '' }}>
+                                    <option value="{{ $i }}" {{ (old('rating') == $i) || (isset($existingReview) && $existingReview->rating == $i && !old('rating')) ? 'selected' : '' }}>
                                         {{ $i }}/10 - {{ $i >= 9 ? 'Masterpiece' : ($i >= 8 ? 'Excellent' : ($i >= 7 ? 'Great' : ($i >= 6 ? 'Good' : ($i >= 5 ? 'Average' : ($i >= 4 ? 'Below Average' : ($i >= 3 ? 'Poor' : ($i >= 2 ? 'Bad' : 'Terrible'))))))) }}
                                     </option>
                                 @endfor

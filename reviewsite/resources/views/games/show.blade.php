@@ -23,131 +23,164 @@
                     </div>
                 </nav>
 
-                <!-- Game Info Header -->
-                <div class="grid lg:grid-cols-3 gap-12 items-start">
-                    <!-- Game Image -->
-                    <div class="lg:col-span-1">
-                        <div class="relative overflow-hidden rounded-2xl border border-[#3F3F46] shadow-2xl">
-                            <img 
-                                src="{{ $product->image ?? 'https://via.placeholder.com/400x300/27272A/A1A1AA?text=No+Image' }}" 
-                                alt="{{ $product->name }}"
-                                class="w-full h-96 object-cover"
-                            >
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+                <!-- Game Title -->
+                <div class="mb-8">
+                    <h1 class="text-4xl lg:text-6xl font-bold text-white mb-4 font-['Share_Tech_Mono'] leading-tight">
+                        {{ $product->name }}
+                    </h1>
+                    
+                    <!-- Tags -->
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="inline-flex items-center bg-gradient-to-r from-[#E53E3E] to-[#DC2626] text-white text-sm font-bold px-4 py-2 rounded-full uppercase tracking-wider font-['Share_Tech_Mono']">
+                            {{ $product->type }}
+                        </span>
+                        @if($product->platform)
+                            <span class="inline-flex items-center text-white text-sm font-bold px-4 py-2 rounded-full uppercase tracking-wider font-['Share_Tech_Mono']" style="background: linear-gradient(135deg, {{ $product->platform->color ?? '#2563EB' }}, {{ $product->platform->color ?? '#2563EB' }}dd);">
+                                {{ $product->platform->name }}
+                            </span>
+                        @endif
+                        @if($product->genre)
+                            <span class="inline-flex items-center text-white text-sm font-bold px-4 py-2 rounded-full uppercase tracking-wider font-['Share_Tech_Mono']" style="background: linear-gradient(135deg, {{ $product->genre->color ?? '#10B981' }}, {{ $product->genre->color ?? '#10B981' }}dd);">
+                                {{ $product->genre->name }}
+                            </span>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Clean Media Section -->
+                <div class="grid lg:grid-cols-12 gap-3 items-start mb-12">
+                    <!-- Left Side: Photo and Video -->
+                    <div class="lg:col-span-9">
+                        <div class="flex flex-col lg:flex-row gap-2 items-start">
+                            <!-- Game Poster -->
+                            <div class="flex-shrink-0">
+                                <div class="bg-[#1A1A1B] rounded-xl overflow-hidden border border-[#3F3F46]/20 max-w-[264px] mx-auto lg:mx-0">
+                                    <img 
+                                        src="{{ $product->image ?? 'https://via.placeholder.com/264x352/27272A/A1A1AA?text=No+Image' }}" 
+                                        alt="{{ $product->name }}"
+                                        class="w-full h-auto object-cover"
+                                        style="aspect-ratio: 264/352;"
+                                    >
+                                </div>
+                            </div>
+                            
+                            <!-- YouTube Video -->
+                            <div class="flex-1">
+                                @if($product->video)
+                                    <div class="bg-[#1A1A1B] rounded-xl overflow-hidden border border-[#3F3F46]/20 aspect-video">
+                                        <iframe 
+                                            src="{{ $product->video }}" 
+                                            class="w-full h-full"
+                                            frameborder="0" 
+                                            allowfullscreen
+                                            title="{{ $product->name }} - Gameplay Video"
+                                        ></iframe>
+                                    </div>
+                                @else
+                                    <div class="bg-[#1A1A1B] rounded-xl border border-[#3F3F46]/20 aspect-video flex items-center justify-center">
+                                        <div class="text-center">
+                                            <div class="text-4xl mb-3 opacity-50">🎮</div>
+                                            <h3 class="text-lg font-semibold text-white mb-1 font-['Inter']">No Video Available</h3>
+                                            <p class="text-sm text-[#A1A1AA] font-['Inter']">Gameplay video coming soon</p>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     </div>
                     
-                    <!-- Game Details -->
-                    <div class="lg:col-span-2">
-                        <div class="mb-6">
-                            <h1 class="text-4xl lg:text-5xl font-bold text-white mb-4 font-['Share_Tech_Mono'] leading-tight">
-                                {{ $product->name }}
-                            </h1>
-                            
-                            <!-- Tags -->
-                            <div class="flex flex-wrap items-center gap-3 mb-6">
-                                <span class="inline-flex items-center bg-gradient-to-r from-[#E53E3E] to-[#DC2626] text-white text-sm font-bold px-4 py-2 rounded-full uppercase tracking-wider font-['Share_Tech_Mono']">
-                                    {{ $product->type }}
-                                </span>
-                                @if($product->platform)
-                                    <span class="inline-flex items-center text-white text-sm font-bold px-4 py-2 rounded-full uppercase tracking-wider font-['Share_Tech_Mono']" style="background: linear-gradient(135deg, {{ $product->platform->color }}, {{ $product->platform->color }}dd);">
-                                        {{ $product->platform->name }}
-                                    </span>
-                                @endif
-                                @if($product->genre)
-                                    <span class="inline-flex items-center text-white text-sm font-bold px-4 py-2 rounded-full uppercase tracking-wider font-['Share_Tech_Mono']" style="background: linear-gradient(135deg, {{ $product->genre->color }}, {{ $product->genre->color }}dd);">
-                                        {{ $product->genre->name }}
-                                    </span>
-                                @endif
-                            </div>
-                            
-                            <!-- Description -->
-                            <p class="text-xl text-[#A1A1AA] leading-relaxed font-['Inter'] mb-8">
-                                {{ $product->description ?? 'No description available.' }}
-                            </p>
-                        </div>
-                        
-                        <!-- Rating Summary -->
-                        <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Right Side: Ratings Section -->
+                    <div class="lg:col-span-3">
+                        <div class="bg-[#1A1A1B] border border-[#3F3F46]/20 rounded-xl p-6">
+                            <!-- Staff Rating -->
                             @if($product->staff_rating)
-                            <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-xl p-6 border border-[#3F3F46]">
-                                <h3 class="text-lg font-bold text-white mb-4 font-['Share_Tech_Mono']">Staff Rating</h3>
-                                <div class="flex items-center gap-4">
-                                    <div class="relative w-16 h-16">
-                                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                            <path class="text-[#3F3F46]" stroke="currentColor" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
-                                            <path class="text-[#E53E3E]" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" 
-                                                  stroke-dasharray="{{ ($product->staff_rating / 10) * 100 }}, 100" 
-                                                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831">
-                                            </path>
-                                        </svg>
-                                        <div class="absolute inset-0 flex items-center justify-center">
-                                            <span class="text-xl font-bold text-white font-['Share_Tech_Mono']">{{ number_format($product->staff_rating, 1) }}</span>
-                                        </div>
-                                    </div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center">
+                                    <div class="bg-green-500 text-black text-lg font-bold px-2 py-1 rounded mr-3">{{ number_format($product->staff_rating, 1) }}</div>
                                     <div>
-                                        <div class="text-2xl font-bold text-white font-['Share_Tech_Mono']">{{ number_format($product->staff_rating, 1) }}/10</div>
-                                        <div class="flex">
-                                            @for($i = 1; $i <= 5; $i++)
-                                                <svg class="w-4 h-4 {{ ($product->staff_rating/2) >= $i ? 'text-[#FFC107]' : 'text-[#3F3F46]' }}" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
-                                            @endfor
-                                        </div>
-                                        <div class="text-sm text-[#A1A1AA] font-['Inter']">{{ $product->staff_reviews_count }} staff {{ Str::plural('review', $product->staff_reviews_count) }}</div>
+                                        <div class="text-white font-semibold text-sm">Staff Rating</div>
+                                        <div class="text-[#A1A1AA] text-xs">{{ $product->staff_reviews_count }} staff {{ Str::plural('rating', $product->staff_reviews_count) }}</div>
                                     </div>
                                 </div>
                             </div>
                             @endif
                             
-                            @if($product->community_rating)
-                            <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-xl p-6 border border-[#3F3F46]">
-                                <h3 class="text-lg font-bold text-white mb-4 font-['Share_Tech_Mono']">Community Rating</h3>
-                                <div class="flex items-center gap-4">
-                                    <div class="relative w-16 h-16">
-                                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                            <path class="text-[#3F3F46]" stroke="currentColor" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
-                                            <path class="text-[#2563EB]" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" 
-                                                  stroke-dasharray="{{ ($product->community_rating / 10) * 100 }}, 100" 
-                                                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831">
-                                            </path>
-                                        </svg>
-                                        <div class="absolute inset-0 flex items-center justify-center">
-                                            <span class="text-xl font-bold text-white font-['Share_Tech_Mono']">{{ number_format($product->community_rating, 1) }}</span>
-                                        </div>
+                            <!-- Community Rating -->
+                            <div class="flex items-center justify-between mb-4" id="community-rating-display">
+                                <div class="flex items-center">
+                                    <div class="bg-green-500 text-black text-lg font-bold px-2 py-1 rounded mr-3">
+                                        <span id="community-rating-value">{{ $product->community_rating ? number_format($product->community_rating, 1) : '0.0' }}</span>
                                     </div>
                                     <div>
-                                        <div class="text-2xl font-bold text-white font-['Share_Tech_Mono']">{{ number_format($product->community_rating, 1) }}/10</div>
-                                        <div class="text-sm text-[#A1A1AA] font-['Inter']">{{ $product->community_reviews_count }} community {{ Str::plural('review', $product->community_reviews_count) }}</div>
+                                        <div class="text-white font-semibold text-sm">User Rating</div>
+                                        <div class="text-[#A1A1AA] text-xs">
+                                            <span id="community-rating-count">{{ $product->community_reviews_count ?? 0 }}</span> 
+                                            user <span id="community-rating-plural">{{ Str::plural('rating', $product->community_reviews_count ?? 0) }}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            @endif
+                            
+                            <!-- Star Rating Display -->
+                            <div class="flex justify-center mb-4" id="star-rating-container">
+                                @for($i = 1; $i <= 10; $i++)
+                                    <button 
+                                        class="star-rating text-2xl mx-1 transition-colors duration-200 cursor-pointer {{ ($userRating && $userRating >= $i) || (!$userRating && $product->community_rating && $product->community_rating >= $i) ? 'text-yellow-400' : 'text-gray-600 hover:text-yellow-300' }}"
+                                        data-rating="{{ $i }}"
+                                        @guest onclick="showLoginPrompt()" @endguest
+                                        @auth onclick="rateGame({{ $i }})" @endauth
+                                    >
+                                        ★
+                                    </button>
+                                @endfor
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="space-y-3">
+                                <!-- Add to Lists Button -->
+                                <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-colors duration-200 flex items-center justify-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    Add to lists
+                                </button>
+                                
+                                <!-- Write Review Button -->
+                                @auth
+                                <a href="{{ route('games.reviews.create', $product) }}" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-colors duration-200 flex items-center justify-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                    </svg>
+                                    Write a review
+                                </a>
+                                @else
+                                <button onclick="showLoginPrompt()" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-colors duration-200 flex items-center justify-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                    </svg>
+                                    Write a review
+                                </button>
+                                @endauth
+                            </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Simple Description Section -->
+                <div class="mb-12">
+                    <h2 class="text-2xl font-bold text-white mb-4 font-['Share_Tech_Mono']">Description</h2>
+                    <p class="text-[#A1A1AA] leading-relaxed font-['Inter'] text-lg">
+                        {{ $product->description ?? 'No description available for this game.' }}
+                    </p>
                 </div>
             </div>
         </div>
 
-        <!-- Main Content -->
+        <!-- Reviews Content -->
         <div class="container mx-auto px-4 py-12">
             <div class="grid lg:grid-cols-3 gap-12">
-                <!-- Left Column: Video & Staff Review -->
+                <!-- Left Column: Reviews -->
                 <div class="lg:col-span-2 space-y-12">
-                    <!-- Video Section -->
-                    @if($product->video)
-                    <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
-                        <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Gameplay Video</h2>
-                        <div class="relative aspect-video rounded-xl overflow-hidden border border-[#3F3F46]">
-                            <iframe 
-                                src="{{ $product->video }}" 
-                                class="w-full h-full"
-                                frameborder="0" 
-                                allowfullscreen
-                            ></iframe>
-                        </div>
-                    </section>
-                    @endif
 
                     <!-- Staff Reviews Section -->
                     @if($staffReviews->count() > 0)
@@ -284,38 +317,120 @@
                             </a>
                         </div>
                         @endauth
-                        
-                        <!-- Game Info Sidebar -->
-                        <div class="mt-8 bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
-                            <h3 class="text-xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Game Info</h3>
-                            <div class="space-y-4">
-                                @if($product->genre)
-                                <div class="flex justify-between items-center">
-                                    <span class="text-[#A1A1AA] font-['Inter']">Genre</span>
-                                    <span class="text-white font-semibold font-['Inter']">{{ $product->genre->name }}</span>
-                                </div>
-                                @endif
-                                @if($product->platform)
-                                <div class="flex justify-between items-center">
-                                    <span class="text-[#A1A1AA] font-['Inter']">Platform</span>
-                                    <span class="text-white font-semibold font-['Inter']">{{ $product->platform->name }}</span>
-                                </div>
-                                @endif
-                                <div class="flex justify-between items-center">
-                                    <span class="text-[#A1A1AA] font-['Inter']">Reviews</span>
-                                    <span class="text-white font-semibold font-['Inter']">{{ $userReviews->count() }}</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-[#A1A1AA] font-['Inter']">Added</span>
-                                    <span class="text-white font-semibold font-['Inter']">{{ $product->created_at->format('M Y') }}</span>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Login Prompt Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-[#1A1A1B] border border-[#3F3F46] rounded-xl p-6 max-w-md w-full mx-4">
+            <div class="text-center">
+                <div class="text-4xl mb-4">🔐</div>
+                <h3 class="text-xl font-bold text-white mb-2">Login Required</h3>
+                <p class="text-[#A1A1AA] mb-6">You need to be logged in to rate games and write reviews.</p>
+                <div class="flex space-x-3">
+                    <a href="{{ route('login') }}" class="flex-1 bg-[#E53E3E] hover:bg-[#DC2626] text-white py-2 px-4 rounded-lg font-semibold transition-colors duration-200">
+                        Login
+                    </a>
+                    <a href="{{ route('register') }}" class="flex-1 bg-[#3F3F46] hover:bg-[#4B5563] text-white py-2 px-4 rounded-lg font-semibold transition-colors duration-200">
+                        Register
+                    </a>
+                </div>
+                <button onclick="closeLoginPrompt()" class="mt-4 text-[#A1A1AA] hover:text-white text-sm">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showLoginPrompt() {
+            document.getElementById('loginModal').classList.remove('hidden');
+        }
+
+        function closeLoginPrompt() {
+            document.getElementById('loginModal').classList.add('hidden');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('loginModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLoginPrompt();
+            }
+        });
+
+        @auth
+        function rateGame(rating) {
+            // Show loading state
+            const stars = document.querySelectorAll('.star-rating');
+            stars.forEach(star => star.style.pointerEvents = 'none');
+
+            // Submit rating via AJAX
+            fetch('{{ route('games.rate', $product) }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    rating: rating
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the rating display
+                    document.getElementById('community-rating-value').textContent = data.communityRating;
+                    document.getElementById('community-rating-count').textContent = data.communityCount;
+                    document.getElementById('community-rating-plural').textContent = data.communityCount === 1 ? 'rating' : 'ratings';
+                    
+                    // Update star display to show user's rating
+                    updateStarDisplay(data.userRating);
+                    
+                    // Show success message
+                    showNotification(data.message, 'success');
+                } else {
+                    showNotification(data.error || 'Failed to submit rating', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Failed to submit rating. Please try again.', 'error');
+            })
+            .finally(() => {
+                // Re-enable stars
+                stars.forEach(star => star.style.pointerEvents = 'auto');
+            });
+        }
+
+        function updateStarDisplay(userRating) {
+            const stars = document.querySelectorAll('.star-rating');
+            stars.forEach((star, index) => {
+                const starRating = parseInt(star.dataset.rating);
+                if (starRating <= userRating) {
+                    star.className = 'star-rating text-2xl mx-1 transition-colors duration-200 cursor-pointer text-yellow-400';
+                } else {
+                    star.className = 'star-rating text-2xl mx-1 transition-colors duration-200 cursor-pointer text-gray-600 hover:text-yellow-300';
+                }
+            });
+        }
+
+        function showNotification(message, type) {
+            // Create a simple notification
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg text-white font-semibold ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        @endauth
+    </script>
 
 </x-layouts.app> 

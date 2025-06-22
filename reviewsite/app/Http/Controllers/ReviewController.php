@@ -48,9 +48,17 @@ class ReviewController extends Controller
             ->first();
             
         if ($existingReview) {
-            $editRoute = $product->type === 'game' ? 'games.reviews.edit' : 'tech.reviews.edit';
-            return redirect()->route($editRoute, [$product, $existingReview])
-                ->with('info', 'You already have a review for this product. You can edit it here.');
+            // If it's just a quick rating (star rating), allow them to upgrade to full review
+            if ($existingReview->title === 'Quick Rating' && $existingReview->content === 'User rating via star system') {
+                // Pre-populate the form with existing rating
+                $hardware = Hardware::active()->get();
+                return view('reviews.create', compact('product', 'hardware', 'existingReview'));
+            } else {
+                // If it's already a full review, redirect to edit
+                $editRoute = $product->type === 'game' ? 'games.reviews.edit' : 'tech.reviews.edit';
+                return redirect()->route($editRoute, [$product, $existingReview])
+                    ->with('info', 'You already have a review for this product. You can edit it here.');
+            }
         }
         
         $hardware = Hardware::active()->get();
@@ -72,12 +80,6 @@ class ReviewController extends Controller
             ->where('user_id', Auth::id())
             ->first();
             
-        if ($existingReview) {
-            $editRoute = $product->type === 'game' ? 'games.reviews.edit' : 'tech.reviews.edit';
-            return redirect()->route($editRoute, [$product, $existingReview])
-                ->with('error', 'You already have a review for this product.');
-        }
-        
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string|min:50',
@@ -87,6 +89,30 @@ class ReviewController extends Controller
             'platform_played_on' => 'nullable|string',
         ]);
 
+        if ($existingReview && $existingReview->title === 'Quick Rating' && $existingReview->content === 'User rating via star system') {
+            // Update the existing quick rating to a full review
+            $existingReview->title = $request->title;
+            $existingReview->content = $request->content;
+            $existingReview->rating = $request->rating;
+            $existingReview->positive_points = $request->positive_points ? array_filter(explode("\n", $request->positive_points)) : [];
+            $existingReview->negative_points = $request->negative_points ? array_filter(explode("\n", $request->negative_points)) : [];
+            $existingReview->platform_played_on = $request->platform_played_on;
+            $existingReview->is_staff_review = Auth::user()->is_admin;
+            $existingReview->is_published = true;
+            $existingReview->save();
+            
+            $showRoute = $product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show';
+            
+            return redirect()->route($showRoute, [$product, $existingReview])
+                ->with('success', 'Your review has been published successfully!');
+        } elseif ($existingReview) {
+            // If they already have a full review, redirect to edit
+            $editRoute = $product->type === 'game' ? 'games.reviews.edit' : 'tech.reviews.edit';
+            return redirect()->route($editRoute, [$product, $existingReview])
+                ->with('error', 'You already have a review for this product.');
+        }
+
+        // Create new review
         $review = new Review();
         $review->product_id = $product->id;
         $review->user_id = Auth::id();
