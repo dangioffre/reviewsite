@@ -14,8 +14,13 @@ class ReviewController extends Controller
     /**
      * Display the specified review.
      */
-    public function show(Review $review)
+    public function show(Product $product, Review $review)
     {
+        // Verify the review belongs to the product
+        if ($review->product_id !== $product->id) {
+            abort(404);
+        }
+        
         // Load relationships
         $review->load(['user', 'product.genre', 'product.platform']);
         
@@ -24,7 +29,7 @@ class ReviewController extends Controller
             abort(404);
         }
         
-        return view('reviews.show', compact('review'));
+        return view('reviews.show', compact('review', 'product'));
     }
 
     /**
@@ -43,7 +48,8 @@ class ReviewController extends Controller
             ->first();
             
         if ($existingReview) {
-            return redirect()->route('reviews.edit', $existingReview)
+            $editRoute = $product->type === 'game' ? 'games.reviews.edit' : 'tech.reviews.edit';
+            return redirect()->route($editRoute, [$product, $existingReview])
                 ->with('info', 'You already have a review for this product. You can edit it here.');
         }
         
@@ -67,7 +73,8 @@ class ReviewController extends Controller
             ->first();
             
         if ($existingReview) {
-            return redirect()->route('reviews.edit', $existingReview)
+            $editRoute = $product->type === 'game' ? 'games.reviews.edit' : 'tech.reviews.edit';
+            return redirect()->route($editRoute, [$product, $existingReview])
                 ->with('error', 'You already have a review for this product.');
         }
         
@@ -93,17 +100,22 @@ class ReviewController extends Controller
         $review->is_published = true;
         $review->save();
 
-        $redirectRoute = $product->type === 'game' ? 'games.show' : 'tech.show';
+        $showRoute = $product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show';
         
-        return redirect()->route($redirectRoute, $product)
+        return redirect()->route($showRoute, [$product, $review])
             ->with('success', 'Your review has been published successfully!');
     }
 
     /**
      * Show the form for editing the specified review.
      */
-    public function edit(Review $review)
+    public function edit(Product $product, Review $review)
     {
+        // Verify the review belongs to the product
+        if ($review->product_id !== $product->id) {
+            abort(404);
+        }
+        
         // Check if user can edit this review
         if (!Auth::check() || (Auth::id() !== $review->user_id && !Auth::user()->is_admin)) {
             abort(403);
@@ -111,14 +123,19 @@ class ReviewController extends Controller
         
         $hardware = Hardware::active()->get();
         
-        return view('reviews.edit', compact('review', 'hardware'));
+        return view('reviews.edit', compact('review', 'product', 'hardware'));
     }
 
     /**
      * Update the specified review in storage.
      */
-    public function update(Request $request, Review $review)
+    public function update(Request $request, Product $product, Review $review)
     {
+        // Verify the review belongs to the product
+        if ($review->product_id !== $product->id) {
+            abort(404);
+        }
+        
         // Check if user can edit this review
         if (!Auth::check() || (Auth::id() !== $review->user_id && !Auth::user()->is_admin)) {
             abort(403);
@@ -141,21 +158,27 @@ class ReviewController extends Controller
         $review->platform_played_on = $request->platform_played_on;
         $review->save();
 
-        return redirect()->route('reviews.show', $review)
+        $showRoute = $product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show';
+        
+        return redirect()->route($showRoute, [$product, $review])
             ->with('success', 'Your review has been updated successfully!');
     }
 
     /**
      * Remove the specified review from storage.
      */
-    public function destroy(Review $review)
+    public function destroy(Product $product, Review $review)
     {
+        // Verify the review belongs to the product
+        if ($review->product_id !== $product->id) {
+            abort(404);
+        }
+        
         // Check if user can delete this review
         if (!Auth::check() || (Auth::id() !== $review->user_id && !Auth::user()->is_admin)) {
             abort(403);
         }
         
-        $product = $review->product;
         $review->delete();
         
         $redirectRoute = $product->type === 'game' ? 'games.show' : 'tech.show';

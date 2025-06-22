@@ -4,7 +4,10 @@
             <!-- Header -->
             <div class="mb-8">
                 <div class="flex items-center gap-4 mb-4">
-                    <a href="{{ route('reviews.show', $review) }}" 
+                    @php
+                        $showRoute = $review->product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show';
+                    @endphp
+                    <a href="{{ route($showRoute, [$review->product, $review]) }}" 
                        class="inline-flex items-center text-[#A1A1AA] hover:text-[#E53E3E] transition-colors">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -40,7 +43,7 @@
             </div>
 
             <!-- Review Form -->
-            <form action="{{ route('reviews.update', $review) }}" method="POST" class="space-y-8">
+            <form action="{{ route($review->product->type === 'game' ? 'games.reviews.update' : 'tech.reviews.update', [$review->product, $review]) }}" method="POST" class="space-y-8">
                 @csrf
                 @method('PUT')
 
@@ -189,7 +192,7 @@
 
                 <!-- Submit -->
                 <div class="flex justify-end gap-4">
-                    <a href="{{ route('reviews.show', $review) }}" 
+                    <a href="{{ route($showRoute, [$review->product, $review]) }}" 
                        class="px-6 py-3 bg-[#27272A] text-white rounded-lg border border-[#3F3F46] hover:bg-[#3F3F46] transition-colors font-['Inter']">
                         Cancel
                     </a>

@@ -50,7 +50,7 @@
             </div>
 
             <!-- Review Form -->
-            <form action="{{ route('reviews.store', $product) }}" method="POST" class="space-y-8">
+            <form action="{{ route($product->type === 'game' ? 'games.reviews.store' : 'tech.reviews.store', $product) }}" method="POST" class="space-y-8">
                 @csrf
 
                 <!-- Basic Info -->

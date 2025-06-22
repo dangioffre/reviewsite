@@ -86,9 +86,5 @@ class GameController extends Controller
         return view('games.show', compact('product', 'staffReviews', 'userReviews', 'averageUserRating'));
     }
 
-    public function storeReview(Request $request, Product $product)
-    {
-        // Redirect to new review creation system
-        return redirect()->route('reviews.create', $product);
-    }
+
 } 

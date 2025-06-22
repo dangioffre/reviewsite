@@ -34,7 +34,20 @@ class GameResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function (string $operation, $state, Forms\Set $set) {
+                                if ($operation !== 'create') {
+                                    return;
+                                }
+                                $set('slug', \Illuminate\Support\Str::slug($state));
+                            }),
+                        
+                        Forms\Components\TextInput::make('slug')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(Product::class, 'slug', ignoreRecord: true)
+                            ->rules(['alpha_dash']),
                         
                         Forms\Components\Select::make('genre_id')
                             ->label('Genre')
@@ -98,6 +111,11 @@ class GameResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
+                
+                Tables\Columns\TextColumn::make('slug')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->copyable(),
                 
                 Tables\Columns\TextColumn::make('genre.name')
                     ->badge()

@@ -256,14 +256,18 @@
                             <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] p-6">
                                 <h3 class="text-lg font-bold text-white mb-4 font-['Share_Tech_Mono']">Review Actions</h3>
                                 <div class="space-y-3">
-                                    <a href="{{ route('reviews.edit', $review) }}" 
+                                    @php
+                                        $editRoute = $review->product->type === 'game' ? 'games.reviews.edit' : 'tech.reviews.edit';
+                                        $deleteRoute = $review->product->type === 'game' ? 'games.reviews.destroy' : 'tech.reviews.destroy';
+                                    @endphp
+                                    <a href="{{ route($editRoute, [$review->product, $review]) }}" 
                                        class="w-full inline-flex items-center justify-center px-4 py-3 bg-[#2563EB] text-white rounded-xl hover:bg-blue-700 transition-colors font-['Inter'] font-semibold">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                         Edit Review
                                     </a>
-                                    <form action="{{ route('reviews.destroy', $review) }}" method="POST" 
+                                    <form action="{{ route($deleteRoute, [$review->product, $review]) }}" method="POST" 
                                           onsubmit="return confirm('Are you sure you want to delete this review?')">
                                         @csrf
                                         @method('DELETE')

@@ -109,14 +109,5 @@ class TechController extends Controller
         return view('tech.show', compact('product', 'staffReviews', 'userReviews', 'averageUserRating'));
     }
 
-    public function storeReview(Request $request, Product $product)
-    {
-        // Ensure the product is hardware or accessory
-        if (!in_array($product->type, ['hardware', 'accessory'])) {
-            abort(404);
-        }
 
-        // Redirect to new review creation system
-        return redirect()->route('reviews.create', $product);
-    }
 } 

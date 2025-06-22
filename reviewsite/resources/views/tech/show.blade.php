@@ -227,7 +227,7 @@
                                             @if($review->content)
                                                 <p>{{ Str::limit($review->content, 150) }}</p>
                                                 @if(strlen($review->content) > 150 && $review->slug)
-                                                    <a href="{{ route('reviews.show', $review) }}" class="text-[#2563EB] hover:text-blue-400 font-semibold mt-2 inline-block">
+                                                    <a href="{{ route('tech.reviews.show', [$product, $review]) }}" class="text-[#2563EB] hover:text-blue-400 font-semibold mt-2 inline-block">
                                                         Read Full Review →
                                                     </a>
                                                 @endif
@@ -256,7 +256,7 @@
                             <div class="text-4xl mb-4">✍️</div>
                             <h3 class="text-xl font-bold text-white mb-4 font-['Share_Tech_Mono']">Share Your Review</h3>
                             <p class="text-[#A1A1AA] mb-6 font-['Inter']">Write a detailed review with your thoughts, ratings, and more.</p>
-                            <a href="{{ route('reviews.create', $product) }}" class="inline-flex items-center bg-gradient-to-r from-[#E53E3E] to-[#DC2626] text-white px-6 py-3 rounded-xl font-bold font-['Inter'] shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300">
+                            <a href="{{ route('tech.reviews.create', $product) }}" class="inline-flex items-center bg-gradient-to-r from-[#E53E3E] to-[#DC2626] text-white px-6 py-3 rounded-xl font-bold font-['Inter'] shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
