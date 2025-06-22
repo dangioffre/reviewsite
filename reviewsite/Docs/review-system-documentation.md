@@ -2,1128 +2,1276 @@
 
 ## Overview
 
-The Review System allows users to write detailed reviews for games and tech products with rich markdown formatting support. The system features nested URL structures, individual review pages, character counting, positive/negative points tracking, platform compatibility, and SEO-friendly URLs organized under their respective products.
+The Review System is a comprehensive platform that allows users to write detailed reviews for games and tech products with rich markdown formatting support, interactive rating systems, and advanced media management. The system features separate user and admin authentication, professional rating interfaces, comprehensive admin panel management, clickable tag filtering, and a robust database structure with proper relationships.
+
+## Recent Major Updates (2025)
+
+### 🔐 Dual Authentication System
+- **Separate User & Admin Authentication**: Independent login systems for regular users and administrators
+- **Role-Based Access Control**: Proper permission management with middleware protection
+- **User Registration**: Complete registration system for new users with email validation
+- **Secure Admin Panel**: Protected admin interface accessible only to authorized administrators
+
+### ⭐ Interactive Rating System
+- **10-Star Rating Interface**: Professional clickable star rating system (1-10 scale)
+- **Real-time Feedback**: Visual star updates and AJAX submission without page reload
+- **Community Ratings**: Aggregate rating calculations with live updates
+- **Guest User Handling**: Login modal for non-authenticated users attempting to rate
+
+### 🎮 Enhanced Game & Tech Product Management
+- **Professional Game Pages**: Modern layout with media sections, rating displays, and review management
+- **Tabbed Admin Interface**: Organized admin forms with Basic Info, Media, and Content tabs
+- **Advanced Media Management**: Support for multiple photos and videos with metadata and captions
+- **Rich Content Support**: Story sections with rich text editors and markdown support
+
+### 🏷️ Clickable Tag System
+- **Filterable Tags**: All genres, platforms, developers, publishers, and themes are clickable
+- **Dynamic Filtering**: Real-time filtering by any attribute with URL-based filters
+- **Clear Filter Indicators**: Visual filter banners with easy removal options
+- **Multi-value Support**: Products can have multiple developers, publishers, themes, etc.
+
+### 🗄️ Advanced Database Structure
+- **Proper Relationships**: Many-to-many relationships for developers, publishers, themes, and game modes
+- **Normalized Data**: Separate tables for all entities with proper foreign keys and constraints
+- **Admin Management**: Full CRUD operations for all relationship entities with color-coded displays
+- **Data Consistency**: Proper constraints, validation, and automatic slug generation
+
+### 📱 Modern UI/UX Improvements
+- **Responsive Design**: Mobile-first approach with optimized layouts for all devices
+- **Interactive Elements**: Hover effects, smooth transitions, and visual feedback
+- **Modal Systems**: Image galleries, login prompts, and confirmation dialogs
+- **Professional Styling**: Dark theme with red accents and consistent color schemes
+
+## System Architecture
+
+### Authentication Flow
+
+The platform implements a dual authentication system that separates regular users from administrators:
+
+#### User Authentication
+```
+/login          → User login page
+/register       → User registration page
+/logout         → User logout (POST)
+```
+
+#### Admin Authentication
+```
+/admin/login    → Admin login page (Filament)
+/admin          → Admin dashboard (protected)
+```
+
+#### Middleware Protection
+```php
+// AdminMiddleware ensures only admins can access admin routes
+class AdminMiddleware
+{
+    public function handle(Request $request, Closure $next)
+    {
+        if (!Auth::check() || !Auth::user()->is_admin) {
+            return redirect('/admin/login');
+        }
+        return $next($request);
+    }
+}
+```
+
+### Database Schema
+
+#### Core Tables
+```sql
+-- Users table with admin flag
+users (
+    id, name, email, password, is_admin, email_verified_at, created_at, updated_at
+)
+
+-- Products table (games and tech products)
+products (
+    id, name, slug, description, story, image, video_url, photos, videos,
+    release_date, type, genre_id, platform_id, hardware_id, created_at, updated_at
+)
+
+-- Reviews with enhanced features
+reviews (
+    id, user_id, product_id, title, slug, content, rating, positive_points,
+    negative_points, platform_played_on, is_staff_review, is_published,
+    created_at, updated_at
+)
+```
+
+#### Relationship Tables
+```sql
+-- Game modes
+game_modes (
+    id, name, slug, description, color, is_active, created_at, updated_at
+)
+
+-- Developers
+developers (
+    id, name, slug, description, website, country, color, is_active,
+    created_at, updated_at
+)
+
+-- Publishers
+publishers (
+    id, name, slug, description, website, country, color, is_active,
+    created_at, updated_at
+)
+
+-- Themes
+themes (
+    id, name, slug, description, color, is_active, created_at, updated_at
+)
+
+-- Pivot tables for many-to-many relationships
+developer_product (id, product_id, developer_id, created_at, updated_at)
+game_mode_product (id, product_id, game_mode_id, created_at, updated_at)
+product_publisher (id, product_id, publisher_id, created_at, updated_at)
+product_theme (id, product_id, theme_id, created_at, updated_at)
+```
+
+### Model Relationships
+
+#### Product Model
+```php
+class Product extends Model
+{
+    // Many-to-many relationships
+    public function gameModes()
+    {
+        return $this->belongsToMany(GameMode::class, 'game_mode_product');
+    }
+
+    public function developers()
+    {
+        return $this->belongsToMany(Developer::class, 'developer_product');
+    }
+
+    public function publishers()
+    {
+        return $this->belongsToMany(Publisher::class, 'product_publisher');
+    }
+
+    public function themes()
+    {
+        return $this->belongsToMany(Theme::class, 'product_theme');
+    }
+    
+    // Rating calculations
+    public function getCommunityRatingAttribute()
+    {
+        return $this->reviews()->where('is_staff_review', false)->avg('rating');
+    }
+
+    public function getCommunityReviewsCountAttribute()
+    {
+        return $this->reviews()->where('is_staff_review', false)->count();
+    }
+}
+```
+
+#### Relationship Models
+```php
+class Developer extends Model
+{
+    protected $fillable = [
+        'name', 'slug', 'description', 'website', 'country', 'color', 'is_active'
+    ];
+    
+    protected $casts = ['is_active' => 'boolean'];
+    
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'developer_product');
+    }
+    
+    // Auto-slug generation
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($developer) {
+            if (empty($developer->slug)) {
+                $developer->slug = static::generateUniqueSlug($developer->name);
+            }
+        });
+    }
+}
+```
 
 ## Implementation Details
 
 ### Core Components
 
-#### 1. Review Model (`App\Models\Review`)
-The primary review model that handles:
+#### 1. Authentication System
 
-1. **Content Management**: Rich text content with markdown support
-2. **Metadata**: Title, slug, rating, platform information
-3. **Structured Feedback**: JSON-based positive/negative points
-4. **Publishing Control**: Draft and published states
-5. **User Relationships**: Staff vs community reviews
-6. **SEO Optimization**: Auto-generated slugs for friendly URLs
-7. **Product Association**: Reviews belong to games or tech products
+##### Dual Login System
+The platform now features separate authentication flows for regular users and administrators:
 
-#### 2. Review Controller (`App\Http\Controllers\ReviewController`)
-Handles all review CRUD operations with nested routing:
-- Create, read, update, delete reviews under product context
-- Form validation and data processing
-- Markdown content processing
-- Review association with products
-- Authentication and authorization
-- Product-review relationship validation
+**User Authentication Routes:**
+```php
+// Regular user authentication
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-#### 3. Markdown Processing System
-Integrated CommonMark converter with security features:
-- HTML input escaping for security
-- Unsafe link prevention
-- Consistent rendering across the platform
-- Performance optimization through singleton pattern
-
-### Database Structure
-
-The review system uses the following enhanced table structure:
-
-```sql
--- Enhanced reviews table
-CREATE TABLE reviews (
-    id BIGINT UNSIGNED PRIMARY KEY,
-    user_id BIGINT UNSIGNED,
-    product_id BIGINT UNSIGNED,
-    title VARCHAR(255) NOT NULL,
-    slug VARCHAR(255) UNIQUE NOT NULL,
-    content TEXT NOT NULL,
-    rating INTEGER NOT NULL,
-    positive_points JSON,
-    negative_points JSON,
-    platform_played_on VARCHAR(255),
-    game_status ENUM('want', 'playing', 'played'),
-    is_staff_review BOOLEAN DEFAULT FALSE,
-    is_published BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP,
-    
-    INDEX idx_reviews_user_id (user_id),
-    INDEX idx_reviews_product_id (product_id),
-    INDEX idx_reviews_slug (slug),
-    INDEX idx_reviews_published (is_published),
-    INDEX idx_reviews_staff (is_staff_review),
-    
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
-);
+// Admin authentication (Filament)
+Route::get('/admin/login', [FilamentAuthController::class, 'login']);
 ```
 
-### Nested Routing Structure
-
-The review system now uses a nested URL structure that organizes reviews under their respective products:
-
-#### Web Routes - Nested Structure
+**Admin Middleware Protection:**
 ```php
-// Game Reviews (nested under games)
-Route::get('/games/{product}/reviews/create', [ReviewController::class, 'create'])->name('games.reviews.create');
-Route::post('/games/{product}/reviews', [ReviewController::class, 'store'])->name('games.reviews.store');
-Route::get('/games/{product}/{review}', [ReviewController::class, 'show'])->name('games.reviews.show');
-Route::get('/games/{product}/{review}/edit', [ReviewController::class, 'edit'])->name('games.reviews.edit');
-Route::put('/games/{product}/{review}', [ReviewController::class, 'update'])->name('games.reviews.update');
-Route::delete('/games/{product}/{review}', [ReviewController::class, 'destroy'])->name('games.reviews.destroy');
-
-// Tech Reviews (nested under tech products)
-Route::get('/tech/{product}/reviews/create', [ReviewController::class, 'create'])->name('tech.reviews.create');
-Route::post('/tech/{product}/reviews', [ReviewController::class, 'store'])->name('tech.reviews.store');
-Route::get('/tech/{product}/{review}', [ReviewController::class, 'show'])->name('tech.reviews.show');
-Route::get('/tech/{product}/{review}/edit', [ReviewController::class, 'edit'])->name('tech.reviews.edit');
-Route::put('/tech/{product}/{review}', [ReviewController::class, 'update'])->name('tech.reviews.update');
-Route::delete('/tech/{product}/{review}', [ReviewController::class, 'destroy'])->name('tech.reviews.destroy');
-```
-
-#### URL Examples
-**Before (Old Structure):**
-- `http://localhost:8000/reviews/review-for-super-mario-64-6`
-
-**After (New Nested Structure):**
-- `http://localhost:8000/games/super-mario-64/review-for-super-mario-64-6`
-- `http://localhost:8000/tech/playstation-5-controller/review-for-ps5-controller-3`
-
-### Enhanced Controller Implementation
-
-#### 1. Product-Review Validation
-All controller methods now validate that reviews belong to the correct product:
-
-```php
-public function show(Product $product, Review $review)
+class AdminMiddleware
 {
-    // Verify the review belongs to the product
-    if ($review->product_id !== $product->id) {
-        abort(404);
-    }
-    
-    // Load relationships and continue...
-}
-```
-
-#### 2. Dynamic Route Handling
-Controllers automatically determine correct routes based on product type:
-
-```php
-public function store(Request $request, Product $product)
-{
-    // ... validation and creation logic ...
-    
-    $showRoute = $product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show';
-    
-    return redirect()->route($showRoute, [$product, $review])
-        ->with('success', 'Your review has been published successfully!');
-}
-```
-
-### Markdown Support Implementation
-
-#### 1. Backend Processing
-The system uses League CommonMark for secure markdown processing:
-
-```php
-// AppServiceProvider.php - Markdown service registration
-$this->app->singleton('markdown', function () {
-    return new CommonMarkConverter([
-        'html_input' => 'escape',
-        'allow_unsafe_links' => false,
-    ]);
-});
-```
-
-#### 2. Frontend Integration
-Markdown is rendered in review display with proper styling:
-
-```php
-// Review content rendering
-@php
-    $converter = new \League\CommonMark\CommonMarkConverter([
-        'html_input' => 'escape',
-        'allow_unsafe_links' => false,
-    ]);
-@endphp
-{!! $converter->convert($review->content)->getContent() !!}
-```
-
-#### 3. Supported Markdown Features
-- **Bold text** with `**text**`
-- *Italic text* with `*text*`
-- `Code snippets` with backticks
-- Headers with `#`, `##`, `###`
-- Lists with `-` or `*`
-- Blockquotes with `>`
-- Line breaks for paragraphs
-
-### Character Counter System
-
-#### 1. Real-time Counting
-JavaScript implementation with visual feedback:
-
-```javascript
-function updateCharCount() {
-    const count = contentTextarea.value.length;
-    charCountSpan.textContent = count;
-    
-    // Color-coded feedback
-    if (count < 50) {
-        charCountSpan.className = 'text-red-400';      // Below minimum
-    } else if (count < 100) {
-        charCountSpan.className = 'text-yellow-400';   // Meeting minimum
-    } else {
-        charCountSpan.className = 'text-green-400';    // Good length
-    }
-    
-    // Dynamic status indicator
-    const minIndicator = charCounter.querySelector('span:last-child');
-    if (count >= 50) {
-        minIndicator.textContent = '✓ minimum reached';
-        minIndicator.className = 'text-green-400';
-    } else {
-        minIndicator.textContent = '50 min';
-        minIndicator.className = 'text-[#A1A1AA]';
-    }
-}
-```
-
-#### 2. Visual Feedback System
-- **Red (< 50 chars)**: Below minimum requirement
-- **Yellow (50-100 chars)**: Meeting minimum requirement
-- **Green (100+ chars)**: Optimal length
-- **Status Text**: "50 min" vs "✓ minimum reached"
-
-### Advanced Features
-
-#### 1. Structured Feedback System
-Reviews include organized positive and negative points:
-
-```php
-// Model accessors for points handling
-public function getPositivePointsListAttribute()
-{
-    return is_string($this->positive_points) 
-        ? array_filter(explode("\n", $this->positive_points))
-        : ($this->positive_points ?? []);
-}
-
-public function getNegativePointsListAttribute()
-{
-    return is_string($this->negative_points)
-        ? array_filter(explode("\n", $this->negative_points))
-        : ($this->negative_points ?? []);
-}
-```
-
-#### 2. Platform Compatibility Tracking
-- **Hardware Selection**: Users specify platform played on
-- **Compatibility Display**: Color-coded hardware badges
-- **Cross-platform Reviews**: Support for multiple hardware platforms
-
-#### 3. SEO-Friendly Nested URLs
-Automatic slug generation with nested structure for better search engine optimization:
-
-```php
-// Review model slug generation
-protected static function boot()
-{
-    parent::boot();
-    
-    static::creating(function ($review) {
-        $review->slug = Str::slug($review->title);
-        
-        // Ensure uniqueness
-        $originalSlug = $review->slug;
-        $count = 1;
-        while (static::where('slug', $review->slug)->exists()) {
-            $review->slug = $originalSlug . '-' . $count++;
+    public function handle(Request $request, Closure $next)
+    {
+        if (!Auth::check() || !Auth::user()->is_admin) {
+            return redirect('/admin/login');
         }
+        return $next($request);
+    }
+}
+```
+
+**User Registration System:**
+```php
+public function register(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:8|confirmed',
+    ]);
+
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'is_admin' => false, // Regular users are not admins
+    ]);
+
+    Auth::login($user);
+    return redirect()->intended('/');
+}
+```
+
+#### 2. Interactive Rating System
+
+##### 10-Star Rating Interface
+Professional rating system with visual feedback:
+
+**Frontend Rating Component:**
+```javascript
+function initializeRating() {
+    const stars = document.querySelectorAll('.rating-star');
+    const ratingValue = document.getElementById('rating-value');
+    
+    stars.forEach((star, index) => {
+        star.addEventListener('click', function() {
+            const rating = index + 1;
+            ratingValue.textContent = rating;
+            
+            // Update visual state
+            stars.forEach((s, i) => {
+                if (i < rating) {
+                    s.classList.add('text-yellow-400');
+                    s.classList.remove('text-gray-400');
+                } else {
+                    s.classList.add('text-gray-400');
+                    s.classList.remove('text-yellow-400');
+                }
+            });
+            
+            // Submit rating via AJAX
+            submitRating(productId, rating);
+        });
     });
 }
 ```
 
-#### 4. Review Status Management
-- **Draft System**: Users can save reviews as drafts
-- **Publishing Control**: Reviews can be published/unpublished
-- **Staff Reviews**: Distinguished from community reviews
-- **Game Status Tracking**: Want/Playing/Played status for games
+**AJAX Rating Submission:**
+```javascript
+async function submitRating(productId, rating) {
+    try {
+        const response = await fetch(`/games/${productId}/rate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ rating: rating })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            updateCommunityRating(data.communityRating, data.totalRatings);
+        }
+    } catch (error) {
+        console.error('Rating submission failed:', error);
+    }
+}
+```
 
-#### 5. Smart View Integration
-Views automatically adapt to product types with dynamic route selection:
+**Backend Rating Controller:**
+```php
+public function rate(Request $request, Product $product)
+{
+    $request->validate([
+        'rating' => 'required|integer|min:1|max:10'
+    ]);
+
+    $user = Auth::user();
+    
+    // Create or update user's rating
+    $review = Review::updateOrCreate(
+        [
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'is_staff_review' => false
+        ],
+        [
+            'rating' => $request->rating,
+            'title' => 'Quick Rating',
+            'content' => 'User rating without detailed review',
+            'is_published' => true
+        ]
+    );
+
+    // Calculate new community rating
+    $communityRating = $product->getCommunityRatingAttribute();
+    $totalRatings = $product->getCommunityReviewsCountAttribute();
+
+    return response()->json([
+        'success' => true,
+        'communityRating' => round($communityRating, 1),
+        'totalRatings' => $totalRatings
+    ]);
+}
+```
+
+#### 3. Enhanced Database Structure
+
+##### Relationship Models
+The system now uses proper many-to-many relationships instead of simple text arrays:
+
+**GameMode Model:**
+```php
+class GameMode extends Model
+{
+    protected $fillable = ['name', 'slug', 'description', 'color', 'is_active'];
+    
+    protected $casts = ['is_active' => 'boolean'];
+    
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'game_mode_product');
+    }
+    
+    public static function generateUniqueSlug($name, $excludeId = null)
+    {
+        $slug = Str::slug($name);
+        $originalSlug = $slug;
+        $count = 1;
+
+        while (static::where('slug', $slug)
+            ->when($excludeId, function ($query, $excludeId) {
+                return $query->where('id', '!=', $excludeId);
+            })
+            ->exists()) {
+            $slug = $originalSlug . '-' . $count++;
+        }
+
+        return $slug;
+    }
+}
+```
+
+**Developer Model:**
+```php
+class Developer extends Model
+{
+    protected $fillable = [
+        'name', 'slug', 'description', 'website', 'country', 'color', 'is_active'
+    ];
+    
+    protected $casts = ['is_active' => 'boolean'];
+    
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'developer_product');
+    }
+}
+```
+
+**Enhanced Product Model:**
+```php
+class Product extends Model
+{
+    // Many-to-many relationships
+    public function gameModes()
+    {
+        return $this->belongsToMany(GameMode::class, 'game_mode_product');
+    }
+
+    public function developers()
+    {
+        return $this->belongsToMany(Developer::class, 'developer_product');
+    }
+
+    public function publishers()
+    {
+        return $this->belongsToMany(Publisher::class, 'product_publisher');
+    }
+
+    public function themes()
+    {
+        return $this->belongsToMany(Theme::class, 'product_theme');
+    }
+    
+    // Rating calculations
+    public function getCommunityRatingAttribute()
+    {
+        return $this->reviews()->where('is_staff_review', false)->avg('rating');
+    }
+
+    public function getCommunityReviewsCountAttribute()
+    {
+        return $this->reviews()->where('is_staff_review', false)->count();
+    }
+}
+```
+
+#### 4. Advanced Admin Panel
+
+##### Tabbed Interface System
+The admin panel now features organized tabbed interfaces for better UX:
+
+**GameResource with Tabs:**
+```php
+public static function form(Form $form): Form
+{
+    return $form->schema([
+        Forms\Components\Tabs::make('Game Information')
+            ->tabs([
+                Forms\Components\Tabs\Tab::make('Basic Info')
+                    ->icon('heroicon-m-information-circle')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')->required(),
+                        Forms\Components\TextInput::make('slug')->required(),
+                        Forms\Components\Select::make('genre_ids')
+                            ->multiple()
+                            ->relationship('genres', 'name')
+                            ->searchable()
+                            ->preload(),
+                        Forms\Components\Select::make('platform_ids')
+                            ->multiple()
+                            ->relationship('platforms', 'name')
+                            ->searchable()
+                            ->preload(),
+                    ]),
+                    
+                Forms\Components\Tabs\Tab::make('Media')
+                    ->icon('heroicon-m-photo')
+                    ->schema([
+                        Forms\Components\TextInput::make('image')->url(),
+                        Forms\Components\TextInput::make('video_url')->url(),
+                        Forms\Components\Repeater::make('photos')
+                            ->schema([
+                                Forms\Components\TextInput::make('url')->url()->required(),
+                                Forms\Components\TextInput::make('caption'),
+                                Forms\Components\Select::make('type')
+                                    ->options([
+                                        'screenshot' => 'Screenshot',
+                                        'artwork' => 'Artwork',
+                                        'poster' => 'Poster',
+                                    ]),
+                            ]),
+                    ]),
+                    
+                Forms\Components\Tabs\Tab::make('Content')
+                    ->icon('heroicon-m-document-text')
+                    ->schema([
+                        Forms\Components\Textarea::make('description'),
+                        Forms\Components\RichEditor::make('story'),
+                    ]),
+            ])
+    ]);
+}
+```
+
+##### Relationship Management Resources
+Each relationship entity has its own dedicated admin resource:
+
+**DeveloperResource:**
+```php
+class DeveloperResource extends Resource
+{
+    protected static ?string $navigationGroup = 'Product Management';
+    protected static ?string $navigationIcon = 'heroicon-o-code-bracket';
+    
+    public static function form(Form $form): Form
+    {
+        return $form->schema([
+            Forms\Components\TextInput::make('name')->required(),
+            Forms\Components\TextInput::make('slug')->required(),
+            Forms\Components\Textarea::make('description'),
+            Forms\Components\TextInput::make('website')->url(),
+            Forms\Components\TextInput::make('country'),
+            Forms\Components\ColorPicker::make('color')->default('#F59E0B'),
+            Forms\Components\Toggle::make('is_active')->default(true),
+        ]);
+    }
+    
+    public static function table(Table $table): Table
+    {
+        return $table->columns([
+            Tables\Columns\TextColumn::make('name')->searchable(),
+            Tables\Columns\TextColumn::make('country')->badge(),
+            Tables\Columns\ColorColumn::make('color'),
+            Tables\Columns\IconColumn::make('is_active')->boolean(),
+            Tables\Columns\TextColumn::make('products_count')
+                ->counts('products')
+                ->badge()
+                ->color('success'),
+        ]);
+    }
+}
+```
+
+#### 5. Clickable Tag System
+
+##### Frontend Tag Implementation
+All tags are now clickable and lead to filtered views:
+
+**Clickable Tag Component:**
+```php
+<!-- Game Show Page Tags -->
+@if($product->developers && count($product->developers) > 0)
+    <div class="flex flex-wrap gap-2">
+        @foreach($product->developers as $developer)
+            <a href="{{ route('games.filter.developer', urlencode($developer->name)) }}" 
+               class="inline-block bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-sm hover:bg-yellow-500/30 transition-colors">
+                {{ $developer->name }}
+            </a>
+        @endforeach
+    </div>
+@endif
+```
+
+**Filter Controller Methods:**
+```php
+public function filterByDeveloper($developer)
+{
+    $products = Product::where('type', 'game')
+        ->whereHas('developers', function ($query) use ($developer) {
+            $query->where('name', urldecode($developer));
+        })
+        ->with(['genre', 'platform', 'developers', 'publishers'])
+        ->paginate(12);
+        
+    return view('games.index', [
+        'products' => $products,
+        'filter' => "Developer: " . urldecode($developer),
+        'filterType' => 'developer'
+    ]);
+}
+```
+
+##### Filter Display System
+Clear filter indicators with removal options:
 
 ```php
-// Dynamic route selection in views
-@php
-    $showRoute = $review->product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show';
-    $editRoute = $review->product->type === 'game' ? 'games.reviews.edit' : 'tech.reviews.edit';
-@endphp
+<!-- Filter Banner -->
+@if(isset($filter))
+    <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+                </svg>
+                <span class="text-red-400 font-medium">Filtered by: {{ $filter }}</span>
+            </div>
+            <a href="{{ route('games.index') }}" class="text-red-400 hover:text-red-300 transition-colors">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </a>
+        </div>
+    </div>
+@endif
+```
 
-<a href="{{ route($showRoute, [$review->product, $review]) }}">View Review</a>
-<a href="{{ route($editRoute, [$review->product, $review]) }}">Edit Review</a>
+#### 6. Media Management System
+
+##### Advanced Photo Management
+Support for multiple photos with metadata:
+
+**Photo Repeater in Admin:**
+```php
+Forms\Components\Repeater::make('photos')
+    ->label('Game Screenshots & Photos')
+    ->schema([
+        Forms\Components\TextInput::make('url')->url()->required(),
+        Forms\Components\TextInput::make('caption')->maxLength(255),
+        Forms\Components\Select::make('type')
+            ->options([
+                'screenshot' => 'Screenshot',
+                'artwork' => 'Artwork',
+                'poster' => 'Poster',
+                'other' => 'Other',
+            ])
+            ->default('screenshot'),
+    ])
+    ->columns(3)
+    ->addActionLabel('Add Photo')
+    ->columnSpanFull(),
+```
+
+**Frontend Photo Gallery:**
+```php
+<!-- Photos Grid -->
+@if($product->photos && count($product->photos) > 0)
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        @foreach($product->photos as $photo)
+            <div class="bg-[#2A2A2A] rounded-lg overflow-hidden">
+                <img src="{{ $photo['url'] }}" 
+                     alt="{{ $photo['caption'] ?? 'Game screenshot' }}"
+                     class="w-full h-48 object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                     onclick="openImageModal('{{ $photo['url'] }}', '{{ $photo['caption'] ?? '' }}')">
+                @if(isset($photo['caption']) && $photo['caption'])
+                    <div class="p-3">
+                        <p class="text-sm text-[#A1A1AA]">{{ $photo['caption'] }}</p>
+                    </div>
+                @endif
+            </div>
+        @endforeach
+    </div>
+@endif
+```
+
+**Image Modal System:**
+```javascript
+function openImageModal(imageUrl, caption) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const modalCaption = document.getElementById('modalCaption');
+    
+    modalImage.src = imageUrl;
+    modalCaption.textContent = caption || '';
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    modal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+```
+
+### Database Migrations
+
+#### New Relationship Tables
+```sql
+-- Game Modes Table
+CREATE TABLE game_modes (
+    id BIGINT UNSIGNED PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) UNIQUE NOT NULL,
+    description TEXT,
+    color VARCHAR(7) DEFAULT '#6B7280',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+-- Developers Table
+CREATE TABLE developers (
+    id BIGINT UNSIGNED PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) UNIQUE NOT NULL,
+    description TEXT,
+    website VARCHAR(255),
+    country VARCHAR(255),
+    color VARCHAR(7) DEFAULT '#F59E0B',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+-- Publishers Table
+CREATE TABLE publishers (
+    id BIGINT UNSIGNED PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) UNIQUE NOT NULL,
+    description TEXT,
+    website VARCHAR(255),
+    country VARCHAR(255),
+    color VARCHAR(7) DEFAULT '#3B82F6',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+-- Themes Table
+CREATE TABLE themes (
+    id BIGINT UNSIGNED PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) UNIQUE NOT NULL,
+    description TEXT,
+    color VARCHAR(7) DEFAULT '#8B5CF6',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+-- Pivot Tables
+CREATE TABLE developer_product (
+    id BIGINT UNSIGNED PRIMARY KEY,
+    product_id BIGINT UNSIGNED,
+    developer_id BIGINT UNSIGNED,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE KEY unique_product_developer (product_id, developer_id),
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (developer_id) REFERENCES developers(id) ON DELETE CASCADE
+);
+
+CREATE TABLE game_mode_product (
+    id BIGINT UNSIGNED PRIMARY KEY,
+    product_id BIGINT UNSIGNED,
+    game_mode_id BIGINT UNSIGNED,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE KEY unique_product_game_mode (product_id, game_mode_id),
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (game_mode_id) REFERENCES game_modes(id) ON DELETE CASCADE
+);
+
+CREATE TABLE product_publisher (
+    id BIGINT UNSIGNED PRIMARY KEY,
+    product_id BIGINT UNSIGNED,
+    publisher_id BIGINT UNSIGNED,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE KEY unique_product_publisher (product_id, publisher_id),
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (publisher_id) REFERENCES publishers(id) ON DELETE CASCADE
+);
+
+CREATE TABLE product_theme (
+    id BIGINT UNSIGNED PRIMARY KEY,
+    product_id BIGINT UNSIGNED,
+    theme_id BIGINT UNSIGNED,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    UNIQUE KEY unique_product_theme (product_id, theme_id),
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (theme_id) REFERENCES themes(id) ON DELETE CASCADE
+);
+```
+
+#### Enhanced Products Table
+```sql
+-- Additional fields for enhanced media management
+ALTER TABLE products ADD COLUMN photos JSON;
+ALTER TABLE products ADD COLUMN videos JSON;
+ALTER TABLE products ADD COLUMN story TEXT;
+ALTER TABLE products ADD COLUMN publisher VARCHAR(255);
+ALTER TABLE products ADD COLUMN game_modes VARCHAR(255);
+ALTER TABLE products ADD COLUMN theme VARCHAR(255);
+```
+
+### Seeding System
+
+#### Relationship Data Seeders
+```php
+// GameModeSeeder
+$gameModes = [
+    ['name' => 'Single-player', 'description' => 'Games designed for one player', 'color' => '#3B82F6'],
+    ['name' => 'Multiplayer', 'description' => 'Games that support multiple players', 'color' => '#10B981'],
+    ['name' => 'Co-op', 'description' => 'Cooperative gameplay with other players', 'color' => '#F59E0B'],
+    ['name' => 'Competitive', 'description' => 'Player vs Player competitive gameplay', 'color' => '#EF4444'],
+    ['name' => 'Online', 'description' => 'Online multiplayer functionality', 'color' => '#8B5CF6'],
+    // ... more game modes
+];
+
+// DeveloperSeeder
+$developers = [
+    ['name' => 'Nintendo', 'website' => 'https://www.nintendo.com', 'country' => 'Japan', 'color' => '#E60012'],
+    ['name' => 'Sony Interactive Entertainment', 'website' => 'https://www.playstation.com', 'country' => 'Japan', 'color' => '#003087'],
+    ['name' => 'Microsoft Game Studios', 'website' => 'https://www.xbox.com', 'country' => 'United States', 'color' => '#107C10'],
+    // ... more developers
+];
+```
+
+### URL Structure
+
+#### Authentication Routes
+```
+/login                          - User login page
+/register                       - User registration page
+/logout                         - User logout (POST)
+/admin/login                    - Admin login page
+/admin                          - Admin dashboard
+```
+
+#### Game & Tech Product Routes
+```
+/games                          - Games listing
+/games/{slug}                   - Individual game page
+/games/{slug}/rate              - Rate a game (POST)
+/games/filter/genre/{genre}     - Filter by genre
+/games/filter/developer/{dev}   - Filter by developer
+/games/filter/publisher/{pub}   - Filter by publisher
+/games/filter/theme/{theme}     - Filter by theme
+/games/filter/platform/{plat}   - Filter by platform
+
+/tech                           - Tech products listing
+/tech/{slug}                    - Individual tech product page
+/tech/{slug}/rate               - Rate a tech product (POST)
+/tech/filter/genre/{genre}      - Filter by category
+/tech/filter/developer/{dev}    - Filter by brand
+```
+
+### Frontend Components
+
+#### Rating Display Component
+```php
+<!-- Staff Rating Display -->
+@if($product->staffReview && $product->staffReview->rating)
+    <div class="bg-[#2A2A2A] rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-white mb-4">Staff Rating</h3>
+        <div class="flex items-center space-x-4">
+            <div class="bg-green-500 text-white px-4 py-2 rounded-lg font-bold text-xl">
+                {{ $product->staffReview->rating }}/10
+            </div>
+            <div class="text-[#A1A1AA]">
+                Professional Review Score
+            </div>
+        </div>
+    </div>
+@endif
+
+<!-- Community Rating Display -->
+@if($product->community_rating)
+    <div class="bg-[#2A2A2A] rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-white mb-4">User Rating</h3>
+        <div class="flex items-center space-x-4">
+            <div class="bg-blue-500 text-white px-4 py-2 rounded-lg font-bold text-xl">
+                {{ number_format($product->community_rating, 1) }}/10
+            </div>
+            <div class="text-[#A1A1AA]">
+                Based on {{ $product->community_reviews_count }} {{ Str::plural('rating', $product->community_reviews_count) }}
+            </div>
+        </div>
+    </div>
+@endif
+```
+
+#### Interactive Rating Component
+```php
+<!-- Interactive Rating Stars -->
+<div class="bg-[#2A2A2A] rounded-lg p-6">
+    <h3 class="text-lg font-semibold text-white mb-4">Rate This Game</h3>
+    @auth
+        <div class="flex items-center space-x-2 mb-4">
+            @for($i = 1; $i <= 10; $i++)
+                <button class="rating-star text-2xl text-gray-400 hover:text-yellow-400 transition-colors cursor-pointer"
+                        data-rating="{{ $i }}">
+                    ★
+                </button>
+            @endfor
+        </div>
+        <div class="text-[#A1A1AA] text-sm">
+            Your rating: <span id="rating-value">0</span>/10
+        </div>
+    @else
+        <div class="text-[#A1A1AA]">
+            <a href="#" onclick="openLoginModal()" class="text-red-400 hover:text-red-300">
+                Login to rate this game
+            </a>
+        </div>
+    @endauth
+</div>
+```
+
+#### Login Modal Component
+```php
+<!-- Login Modal -->
+<div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-[#1A1A1A] rounded-lg p-8 max-w-md w-full">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-white">Login Required</h2>
+            <button onclick="closeLoginModal()" class="text-[#A1A1AA] hover:text-white">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+        <p class="text-[#A1A1AA] mb-6">Please login or register to rate games and write reviews.</p>
+        <div class="space-y-4">
+            <a href="{{ route('login') }}" class="block w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-lg text-center transition-colors">
+                Login
+            </a>
+            <a href="{{ route('register') }}" class="block w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-lg text-center transition-colors">
+                Register
+            </a>
+        </div>
+    </div>
+</div>
+```
+
+### Performance Optimizations
+
+#### Database Query Optimization
+```php
+// Efficient loading with relationships
+$products = Product::with([
+    'genre', 
+    'platform', 
+    'hardware',
+    'developers', 
+    'publishers', 
+    'themes', 
+    'gameModes',
+    'reviews' => function($query) {
+        $query->where('is_published', true);
+    }
+])
+->where('type', 'game')
+->paginate(12);
+```
+
+#### Eager Loading for Admin
+```php
+// Admin table with relationship counts
+public static function table(Table $table): Table
+{
+    return $table
+        ->columns([
+            Tables\Columns\TextColumn::make('developers.name')
+                ->badge()
+                ->separator(',')
+                ->color('warning'),
+            Tables\Columns\TextColumn::make('publishers.name')
+                ->badge()
+                ->separator(',')
+                ->color('info'),
+        ])
+        ->with(['developers', 'publishers', 'themes', 'gameModes']);
+}
+```
+
+### Security Enhancements
+
+#### CSRF Protection
+```php
+// All forms include CSRF tokens
+<form method="POST" action="{{ route('games.rate', $product) }}">
+    @csrf
+    <input type="hidden" name="rating" id="rating-input" value="0">
+    <!-- Rating interface -->
+</form>
+```
+
+#### Input Validation
+```php
+// Rating validation
+$request->validate([
+    'rating' => 'required|integer|min:1|max:10'
+]);
+
+// Admin form validation
+$request->validate([
+    'name' => 'required|string|max:255',
+    'slug' => 'required|string|max:255|unique:developers,slug,' . $developer->id,
+    'website' => 'nullable|url',
+    'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
+]);
+```
+
+#### Authorization Middleware
+```php
+// Admin routes protection
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin', [AdminController::class, 'dashboard']);
+    // Other admin routes...
+});
+
+// User authentication for rating
+Route::middleware('auth')->group(function () {
+    Route::post('/games/{product}/rate', [GameController::class, 'rate']);
+    Route::post('/tech/{product}/rate', [TechController::class, 'rate']);
+});
 ```
 
 ## Usage Examples
 
-### Creating a Review with Nested URLs
+### Creating a Game with Relationships
 
 ```php
-// Store a new review with nested routing
-$review = Review::create([
-    'user_id' => auth()->id(),
-    'product_id' => $product->id,
-    'title' => 'Amazing Game with Great Graphics',
-    'content' => '# Outstanding Experience\n\nThis game delivers **exceptional** graphics and *smooth* gameplay. The story is engaging and the mechanics are `well-polished`.\n\n## Gameplay\n- Intuitive controls\n- Smooth performance\n- Great level design',
-    'rating' => 9,
-    'positive_points' => "Stunning visuals\nGreat storyline\nSmooth gameplay\nExcellent sound design",
-    'negative_points' => "Long loading times\nSome minor bugs\nLimited customization",
-    'platform_played_on' => 'ps5',
-    'game_status' => 'played',
-    'is_published' => true
+// In admin panel or seeder
+$game = Product::create([
+    'name' => 'The Legend of Zelda: Breath of the Wild',
+    'slug' => 'legend-of-zelda-breath-of-the-wild',
+    'description' => 'An open-world action-adventure game.',
+    'story' => '<h2>Epic Adventure</h2><p>Explore the vast kingdom of Hyrule...</p>',
+    'type' => 'game',
+    'release_date' => '2017-03-03',
+    'image' => 'https://example.com/zelda-botw.jpg',
+    'video_url' => 'https://www.youtube.com/embed/zw47_q9wbBE',
+    'photos' => [
+        ['url' => 'https://example.com/screenshot1.jpg', 'caption' => 'Link exploring Hyrule', 'type' => 'screenshot'],
+        ['url' => 'https://example.com/artwork1.jpg', 'caption' => 'Official artwork', 'type' => 'artwork'],
+    ],
+    'videos' => [
+        ['url' => 'https://www.youtube.com/embed/abc123', 'title' => 'Gameplay Trailer', 'type' => 'trailer'],
+    ]
 ]);
 
-// Redirect to nested review URL
-$showRoute = $product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show';
-return redirect()->route($showRoute, [$product, $review]);
+// Attach relationships
+$nintendo = Developer::where('name', 'Nintendo')->first();
+$actionAdventure = Theme::where('name', 'Adventure')->first();
+$singlePlayer = GameMode::where('name', 'Single-player')->first();
+
+$game->developers()->attach($nintendo);
+$game->themes()->attach($actionAdventure);
+$game->gameModes()->attach($singlePlayer);
 ```
 
-### Accessing Reviews via Nested URLs
+### User Rating Submission
 
 ```php
-// Controller method with product-review validation
-public function show(Product $product, Review $review)
+// User rates a game
+public function rate(Request $request, Product $product)
 {
-    // Verify the review belongs to the product
-    if ($review->product_id !== $product->id) {
-        abort(404);
-    }
+    $request->validate(['rating' => 'required|integer|min:1|max:10']);
     
-    // Load relationships
-    $review->load(['user', 'product.genre', 'product.platform']);
+    $user = Auth::user();
     
-    // Check if review is published or user owns it
-    if (!$review->is_published && (!Auth::check() || Auth::id() !== $review->user_id)) {
-        abort(404);
-    }
+    // Update or create user's rating
+    $review = Review::updateOrCreate(
+        [
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'is_staff_review' => false
+        ],
+        [
+            'rating' => $request->rating,
+            'title' => 'Quick Rating by ' . $user->name,
+            'content' => 'User provided a rating without detailed review.',
+            'is_published' => true,
+            'slug' => Str::slug('rating-' . $product->slug . '-' . $user->id)
+        ]
+    );
     
-    return view('reviews.show', compact('review', 'product'));
+    // Return updated community rating
+    return response()->json([
+        'success' => true,
+        'message' => 'Thank you for rating this game!',
+        'communityRating' => round($product->getCommunityRatingAttribute(), 1),
+        'totalRatings' => $product->getCommunityReviewsCountAttribute()
+    ]);
 }
 ```
 
-### Updating Review Content with Nested Routes
+### Filtering Products by Tags
 
 ```php
-// Update review with proper nested routing
-public function update(Request $request, Product $product, Review $review)
+// Filter games by developer
+public function filterByDeveloper($developer)
 {
-    // Verify the review belongs to the product
-    if ($review->product_id !== $product->id) {
-        abort(404);
-    }
+    $decodedDeveloper = urldecode($developer);
     
-    // Update logic...
-    $review->update($validatedData);
-    
-    // Redirect to nested review URL
-    $showRoute = $product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show';
-    return redirect()->route($showRoute, [$product, $review])
-        ->with('success', 'Your review has been updated successfully!');
+    $products = Product::where('type', 'game')
+        ->whereHas('developers', function ($query) use ($decodedDeveloper) {
+            $query->where('name', $decodedDeveloper);
+        })
+        ->with(['genre', 'platform', 'developers', 'publishers', 'themes', 'gameModes'])
+        ->paginate(12);
+        
+    return view('games.index', [
+        'products' => $products,
+        'filter' => "Developer: " . $decodedDeveloper,
+        'filterType' => 'developer',
+        'clearUrl' => route('games.index')
+    ]);
 }
 ```
 
-### Displaying Reviews with Nested Navigation
+### Admin Resource with Relationships
 
 ```php
-// In Blade templates with nested breadcrumbs
-<nav class="mb-8">
-    <div class="flex items-center space-x-2 text-sm text-[#A1A1AA]">
-        <a href="{{ route('home') }}" class="hover:text-[#E53E3E] transition-colors">Home</a>
-        <span>/</span>
-        @if($review->product->type === 'game')
-            <a href="{{ route('games.index') }}" class="hover:text-[#E53E3E] transition-colors">Games</a>
-        @else
-            <a href="{{ route('tech.index') }}" class="hover:text-[#E53E3E] transition-colors">Tech</a>
-        @endif
-        <span>/</span>
-        @if($review->product->type === 'game')
-            <a href="{{ route('games.show', $review->product) }}" class="hover:text-[#E53E3E] transition-colors">{{ $review->product->name }}</a>
-        @else
-            <a href="{{ route('tech.show', $review->product) }}" class="hover:text-[#E53E3E] transition-colors">{{ $review->product->name }}</a>
-        @endif
-        <span>/</span>
-        <span class="text-white">Review</span>
+// GameResource form with relationship selects
+Forms\Components\Select::make('developer_ids')
+    ->label('Developers')
+    ->multiple()
+    ->relationship('developers', 'name')
+    ->searchable()
+    ->preload()
+    ->createOptionForm([
+        Forms\Components\TextInput::make('name')->required(),
+        Forms\Components\TextInput::make('website')->url(),
+        Forms\Components\ColorPicker::make('color')->default('#F59E0B'),
+    ])
+    ->helperText('Select all developers involved in this game'),
+```
+
+## Advanced Features
+
+### 1. Media Gallery with Modal Viewer
+
+**Photo Grid Implementation:**
+```php
+@if($product->photos && count($product->photos) > 0)
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        @foreach($product->photos as $index => $photo)
+            <div class="bg-[#2A2A2A] rounded-lg overflow-hidden group">
+                <img src="{{ $photo['url'] }}" 
+                     alt="{{ $photo['caption'] ?? 'Game screenshot' }}"
+                     class="w-full h-48 object-cover cursor-pointer group-hover:scale-105 transition-transform duration-300"
+                     onclick="openImageModal('{{ $photo['url'] }}', '{{ $photo['caption'] ?? '' }}', {{ $index }})">
+                @if(isset($photo['caption']) && $photo['caption'])
+                    <div class="p-3">
+                        <p class="text-sm text-[#A1A1AA]">{{ $photo['caption'] }}</p>
+                    </div>
+                @endif
+            </div>
+        @endforeach
+    </div>
+@endif
+```
+
+### 2. Dynamic Navigation Based on User Role
+
+```php
+<!-- Navbar with role-based navigation -->
+<nav class="bg-[#1A1A1A] border-b border-[#2A2A2A]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center space-x-8">
+                <!-- Logo and main navigation -->
+                <a href="{{ route('home') }}" class="text-white font-bold text-xl">ReviewSite</a>
+                <a href="{{ route('games.index') }}" class="text-[#A1A1AA] hover:text-white">Games</a>
+                <a href="{{ route('tech.index') }}" class="text-[#A1A1AA] hover:text-white">Tech</a>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                @auth
+                    <!-- Authenticated user menu -->
+                    <span class="text-[#A1A1AA]">Welcome, {{ Auth::user()->name }}!</span>
+                    
+                    @if(Auth::user()->is_admin)
+                        <a href="/admin" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
+                            Admin Panel
+                        </a>
+                    @endif
+                    
+                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                        @csrf
+                        <button type="submit" class="text-[#A1A1AA] hover:text-white">Logout</button>
+                    </form>
+                @else
+                    <!-- Guest user menu -->
+                    <a href="{{ route('login') }}" class="text-[#A1A1AA] hover:text-white">Login</a>
+                    <a href="{{ route('register') }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">Register</a>
+                @endauth
+            </div>
+        </div>
     </div>
 </nav>
 ```
 
-### Managing Positive/Negative Points
+### 3. Enhanced Search and Filter System
 
 ```php
-// Display structured feedback with enhanced styling
-@if($review->positive_points_list)
-    <ul class="space-y-4">
-        @foreach($review->positive_points_list as $point)
-            <li class="flex items-start group">
-                <div class="w-6 h-6 bg-green-500/20 rounded-full flex items-center justify-center mr-4 mt-0.5 flex-shrink-0">
-                    <svg class="w-3 h-3 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <span class="text-[#FFFFFF] font-['Inter'] leading-relaxed">{{ $point }}</span>
-            </li>
-        @endforeach
-    </ul>
-@endif
+// Advanced filtering with multiple criteria
+public function index(Request $request)
+{
+    $query = Product::where('type', 'game');
+    
+    // Apply filters
+    if ($request->has('genre') && $request->genre) {
+        $query->whereHas('genres', function ($q) use ($request) {
+            $q->where('slug', $request->genre);
+        });
+    }
+    
+    if ($request->has('platform') && $request->platform) {
+        $query->whereHas('platforms', function ($q) use ($request) {
+            $q->where('slug', $request->platform);
+        });
+    }
+    
+    if ($request->has('developer') && $request->developer) {
+        $query->whereHas('developers', function ($q) use ($request) {
+            $q->where('slug', $request->developer);
+        });
+    }
+    
+    if ($request->has('search') && $request->search) {
+        $query->where(function ($q) use ($request) {
+            $q->where('name', 'ILIKE', '%' . $request->search . '%')
+              ->orWhere('description', 'ILIKE', '%' . $request->search . '%');
+        });
+    }
+    
+    // Sort options
+    $sortBy = $request->get('sort', 'name');
+    $sortOrder = $request->get('order', 'asc');
+    
+    if ($sortBy === 'rating') {
+        $query->withAvg('reviews as avg_rating', 'rating')
+              ->orderBy('avg_rating', $sortOrder);
+    } else {
+        $query->orderBy($sortBy, $sortOrder);
+    }
+    
+    $products = $query->with(['genres', 'platforms', 'developers', 'publishers'])
+                      ->paginate(12)
+                      ->withQueryString();
+    
+    return view('games.index', compact('products'));
+}
 ```
-
-## Form Implementation with Nested Routes
-
-### 1. Dynamic Form Actions
-
-```html
-<!-- Form with dynamic action based on product type -->
-<form action="{{ route($product->type === 'game' ? 'games.reviews.store' : 'tech.reviews.store', $product) }}" method="POST" class="space-y-8">
-    @csrf
-    <!-- Form fields... -->
-</form>
-```
-
-### 2. Context-Aware Navigation
-
-```html
-<!-- Back navigation that respects product context -->
-@if($product->type === 'game')
-    <a href="{{ route('games.show', $product) }}" 
-       class="inline-flex items-center text-[#A1A1AA] hover:text-[#E53E3E] transition-colors">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-        Back to {{ $product->name }}
-    </a>
-@else
-    <a href="{{ route('tech.show', $product) }}" 
-       class="inline-flex items-center text-[#A1A1AA] hover:text-[#E53E3E] transition-colors">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-        Back to {{ $product->name }}
-    </a>
-@endif
-```
-
-### 3. Character Counter Integration
-
-```html
-<!-- Character counter display -->
-<div class="flex items-center justify-between">
-    <div class="text-xs text-[#A1A1AA] font-['Inter']">
-        Markdown examples: **bold** | *italic* | `code` | # Heading | - List item
-    </div>
-    <div class="text-xs font-['Inter']" id="char-counter">
-        <span id="char-count" class="text-[#A1A1AA]">0</span>
-        <span class="text-[#A1A1AA]"> / </span>
-        <span class="text-[#A1A1AA]">50 min</span>
-    </div>
-</div>
-
-<!-- Textarea with character counting -->
-<textarea id="content" 
-          name="content" 
-          rows="12"
-          class="w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-4 text-white placeholder-[#A1A1AA] focus:border-[#E53E3E] focus:ring-[#E53E3E] transition font-['Inter'] resize-y"
-          placeholder="Share your detailed thoughts about this {{ $product->type }}. You can use **markdown** formatting for *emphasis*, `code snippets`, and more!"
-          required>{{ old('content') }}</textarea>
-```
-
-### 4. Markdown Help Text
-
-```html
-<p class="text-xs text-[#A1A1AA] font-['Inter'] mb-2">
-    Write your detailed review here. <strong>Markdown is supported</strong> - you can use **bold**, *italic*, `code`, lists, and more. Minimum 50 characters.
-</p>
-<div class="text-xs text-[#A1A1AA] font-['Inter']">
-    Markdown examples: **bold** | *italic* | `code` | # Heading | - List item
-</div>
-```
-
-### 5. Structured Points Input
-
-```html
-<!-- Positive Points -->
-<textarea id="positive_points" 
-          name="positive_points" 
-          rows="6"
-          class="w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-3 text-white placeholder-[#A1A1AA] focus:border-[#E53E3E] focus:ring-[#E53E3E] transition font-['Inter']"
-          placeholder="List the things you loved (one per line)&#10;Great graphics&#10;Smooth gameplay&#10;Engaging story">{{ old('positive_points') }}</textarea>
-
-<!-- Negative Points -->
-<textarea id="negative_points" 
-          name="negative_points" 
-          rows="6"
-          class="w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-3 text-white placeholder-[#A1A1AA] focus:border-[#E53E3E] focus:ring-[#E53E3E] transition font-['Inter']"
-          placeholder="List areas that could be improved (one per line)&#10;Long loading times&#10;Some bugs&#10;Repetitive missions">{{ old('negative_points') }}</textarea>
-```
-
-## Features
-
-### 1. Nested URL Structure
-- **Product Context**: Reviews are organized under their respective products
-- **SEO Benefits**: Better URL hierarchy for search engines
-- **User Experience**: Logical navigation from product to review
-- **Route Validation**: Ensures reviews belong to correct products
-
-### 2. Rich Text Support
-- Full markdown syntax support with security
-- Real-time character counting with visual feedback
-- Minimum character requirements (50 characters)
-- Inline help and examples
-- Responsive textarea with resize capability
-
-### 3. Review Metadata
-- SEO-friendly slugs for individual review pages
-- User rating system (1-10 scale with descriptive labels)
-- Platform compatibility tracking
-- Game status tracking (want/playing/played)
-- Staff vs community review distinction
-
-### 4. Structured Feedback
-- Organized positive points list
-- Organized negative points list
-- One point per line input format
-- Visual icons and styling for feedback display
-- Color-coded positive (green) and negative (red) sections
-
-### 5. Content Management
-- Draft and published states
-- Edit capability for review authors and admins
-- Delete functionality with confirmation
-- Version control through updated_at timestamps
-- Content validation and sanitization
-
-### 6. User Experience
-- Intuitive form design with clear sections
-- Real-time feedback on character count
-- Helpful placeholder text and examples
-- Responsive design for all screen sizes
-- Consistent styling with MDC theme
-- Context-aware navigation and breadcrumbs
-
-### 7. Smart Route Management
-- Automatic route detection based on product type
-- Dynamic form actions and navigation links
-- Consistent URL patterns across games and tech products
-- Proper breadcrumb navigation with context
 
 ## Best Practices
 
-### 1. Content Quality
-- **Minimum Length**: Enforce 50-character minimum for meaningful reviews
-- **Structured Input**: Separate positive/negative points for clarity
-- **Rich Formatting**: Encourage markdown use for better readability
-- **Platform Context**: Track platform played on for relevance
+### 1. Database Optimization
+- Use proper indexing on frequently queried columns
+- Implement eager loading to prevent N+1 queries
+- Use pagination for large datasets
+- Optimize relationship queries with `with()` method
 
 ### 2. Security
-- **Input Sanitization**: Escape HTML in markdown processing
-- **Link Safety**: Prevent unsafe external links
-- **Authentication**: Verify user ownership for edit/delete
-- **Validation**: Server-side validation for all inputs
-- **Product-Review Validation**: Ensure reviews belong to correct products
-
-### 3. Performance
-- **Singleton Pattern**: Reuse markdown converter instance
-- **Database Indexing**: Index on slug, user_id, product_id
-- **Eager Loading**: Load related models efficiently
-- **Caching**: Cache frequently accessed reviews
-- **Route Model Binding**: Efficient model resolution
-
-### 4. User Experience
-- **Visual Feedback**: Color-coded character counter
-- **Progressive Enhancement**: JavaScript enhances but doesn't break without it
-- **Accessibility**: Proper labels and semantic HTML
-- **Mobile Optimization**: Responsive design for all devices
-- **Contextual Navigation**: Clear product-review relationships
-
-### 5. URL Structure
-- **Logical Hierarchy**: Products contain reviews
-- **SEO Optimization**: Descriptive, nested URLs
-- **Consistency**: Same pattern for games and tech products
-- **Validation**: Ensure URL integrity through controller checks
-
-## Security Considerations
-
-### 1. Input Validation
-```php
-// Review validation rules
-$rules = [
-    'title' => 'required|string|max:255',
-    'content' => 'required|string|min:50',
-    'rating' => 'required|integer|between:1,10',
-    'positive_points' => 'nullable|string',
-    'negative_points' => 'nullable|string',
-    'platform_played_on' => 'nullable|string'
-];
-```
-
-### 2. Markdown Security
-- HTML input is escaped by default
-- Unsafe links are prevented
-- No script execution allowed
-- Content is sanitized before storage
-
-### 3. Authorization with Product Context
-```php
-// Review policy checks with product validation
-public function update(User $user, Review $review, Product $product)
-{
-    return ($user->id === $review->user_id || $user->is_admin) 
-           && $review->product_id === $product->id;
-}
-
-public function delete(User $user, Review $review, Product $product)
-{
-    return ($user->id === $review->user_id || $user->is_admin)
-           && $review->product_id === $product->id;
-}
-```
-
-### 4. Route Security
-```php
-// Controller validation for nested routes
-public function show(Product $product, Review $review)
-{
-    // Verify the review belongs to the product
-    if ($review->product_id !== $product->id) {
-        abort(404);
-    }
-    
-    // Continue with authorization and display logic...
-}
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Character Counter Not Working**
-   - Verify JavaScript is loaded
-   - Check element IDs match
-   - Confirm event listeners are attached
-   - Test in different browsers
-
-2. **Markdown Not Rendering**
-   - Verify CommonMark package is installed
-   - Check converter configuration
-   - Ensure proper escaping
-   - Test with simple markdown
-
-3. **Slug Conflicts**
-   - Check slug uniqueness logic
-   - Verify database constraints
-   - Test with duplicate titles
-   - Monitor slug generation
-
-4. **Form Validation Issues**
-   - Check minimum character requirements
-   - Verify all required fields
-   - Test with edge cases
-   - Monitor server-side validation
-
-5. **Nested Route Issues**
-   - Verify route parameter order (product, review)
-   - Check route model binding configuration
-   - Ensure product-review relationship validation
-   - Test URL generation in views
-
-6. **Dynamic Route Selection**
-   - Verify product type detection logic
-   - Check route name consistency
-   - Test with different product types
-   - Monitor route generation in views
-
-### Debugging Tips
-
-1. **Database Queries**
-   ```sql
-   -- Check review content and metadata
-   SELECT title, slug, content, rating, is_published FROM reviews WHERE id = ?;
-   
-   -- Verify positive/negative points
-   SELECT positive_points, negative_points FROM reviews WHERE id = ?;
-   
-   -- Check user ownership and product relationship
-   SELECT user_id, product_id FROM reviews WHERE slug = ?;
-   
-   -- Verify product-review relationships
-   SELECT r.id, r.title, p.name, p.type 
-   FROM reviews r 
-   JOIN products p ON r.product_id = p.id 
-   WHERE r.slug = ?;
-   ```
-
-2. **JavaScript Debugging**
-   - Monitor character count updates in console
-   - Check event listener attachment
-   - Verify DOM element selection
-   - Test character count thresholds
-
-3. **Markdown Testing**
-   - Test with various markdown syntax
-   - Check HTML output for security
-   - Verify styling application
-   - Test with edge cases
-
-4. **Performance Monitoring**
-   - Monitor database query performance
-   - Check markdown conversion speed
-   - Verify caching effectiveness
-   - Test with large content volumes
-
-5. **Route Debugging**
-   ```php
-   // Debug route generation
-   Route::get('/debug-routes', function () {
-       $product = Product::first();
-       $review = Review::first();
-       
-       return [
-           'games.reviews.show' => route('games.reviews.show', [$product, $review]),
-           'tech.reviews.show' => route('tech.reviews.show', [$product, $review]),
-           'product_type' => $product->type,
-           'route_match' => $review->product_id === $product->id
-       ];
-   });
-   ```
-
-6. **Product-Review Validation**
-   ```php
-   // Test product-review relationship
-   $product = Product::find(1);
-   $review = Review::find(1);
-   
-   if ($review->product_id !== $product->id) {
-       // This should trigger a 404 in the controller
-       throw new \Exception('Review does not belong to product');
-   }
-   ```
-
-## Migration Guide
-
-### From Old Structure to Nested URLs
-
-If migrating from the old review system structure:
-
-1. **Update Route Definitions**
-   - Replace single review routes with nested product-review routes
-   - Update route names to include product context
-
-2. **Update Controller Methods**
-   - Add Product parameter to all review controller methods
-   - Implement product-review validation
-   - Update redirect logic to use nested routes
-
-3. **Update Views**
-   - Replace old route references with dynamic route selection
-   - Add product context to all review-related links
-   - Update breadcrumb navigation
-
-4. **Test URL Generation**
-   - Verify all review links generate correct nested URLs
-   - Test with both game and tech product types
-   - Ensure backward compatibility where needed
-
-5. **Update Documentation**
-   - Update API documentation with new URL structure
-   - Provide migration examples for developers
-   - Document new route patterns and conventions
-
-## Review Report System
-
-### Overview
-
-The Review Report System allows registered users to report inappropriate reviews for admin moderation. Administrators can then approve reports (which deletes the review) or deny them (which keeps the review). This system helps maintain content quality and provides a way for the community to self-moderate.
-
-### Core Components
-
-#### 1. Report Model (`App\Models\Report`)
-The primary report model that handles:
-
-1. **Report Management**: Links users to reported reviews with reasons
-2. **Status Tracking**: Pending, approved, and denied states
-3. **Admin Resolution**: Notes and resolution tracking
-4. **Duplicate Prevention**: Unique constraints prevent multiple reports from same user
-5. **Audit Trail**: Preserves report records even when reviews are deleted
-6. **Review Information Storage**: Automatically stores review details before deletion
-
-#### 2. Database Structure
-
-```sql
-CREATE TABLE reports (
-    id BIGINT UNSIGNED PRIMARY KEY,
-    review_id BIGINT UNSIGNED NULL, -- NULL when review is deleted
-    user_id BIGINT UNSIGNED,
-    reason VARCHAR(255) NOT NULL,
-    additional_info TEXT NULL,
-    status ENUM('pending', 'approved', 'denied') DEFAULT 'pending',
-    admin_notes TEXT NULL,
-    resolved_by BIGINT UNSIGNED NULL,
-    resolved_at TIMESTAMP NULL,
-    -- Audit trail columns (stored when review is deleted)
-    review_title VARCHAR(255) NULL,
-    review_author_name VARCHAR(255) NULL,
-    product_name VARCHAR(255) NULL,
-    product_type VARCHAR(255) NULL,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP,
-    
-    INDEX (status, created_at),
-    INDEX (review_id, user_id),
-    UNIQUE KEY unique_user_review_report (review_id, user_id),
-    
-    FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE SET NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (resolved_by) REFERENCES users(id) ON DELETE SET NULL
-);
-```
-
-#### 3. Report Reasons
-
-The system supports the following predefined report reasons:
-- **Inappropriate Content**: Content that violates community guidelines
-- **Spam or Self-Promotion**: Spam reviews or excessive self-promotion
-- **Offensive Language**: Reviews containing offensive or abusive language
-- **Fake or Misleading Review**: Reviews that appear to be fake or misleading
-- **Duplicate Review**: Duplicate reviews from the same user
-- **Other**: Other reasons with additional information required
-
-### Implementation Details
-
-#### 1. Report Controller (`App\Http\Controllers\ReportController`)
-
-The ReportController handles:
-- **Report Submission**: Validates and stores new reports
-- **Duplicate Prevention**: Checks for existing reports from same user
-- **Admin Actions**: Approve/deny functionality for administrators
-- **Nested Routing**: Works with both game and tech review URLs
-
-Key methods:
-```php
-// Store a new report
-public function store(Request $request, Product $product, Review $review)
-
-// Admin approval action (deletes review)
-public function approve(Request $request, Report $report)
-
-// Admin denial action (keeps review)
-public function deny(Request $request, Report $report)
-```
-
-#### 2. Filament Admin Resource (`App\Filament\Resources\ReportResource`)
-
-Comprehensive admin interface featuring:
-- **Table View**: All reports with status, reason, and review details
-- **Audit Trail**: Shows both active and deleted review information
-- **Filters**: Filter by status, reason, date, and review deletion status
-- **Quick Actions**: Approve/deny buttons with confirmation modals
-- **Navigation Badge**: Shows count of pending reports
-- **Detailed Views**: Full report information with linked reviews
-- **Historical Records**: Preserves all report data for compliance and audit purposes
-
-Features:
-- Real-time pending report count in navigation
-- Direct links to reported reviews (when still active)
-- Color-coded status badges and review status indicators
-- Admin notes for resolution tracking
-- Comprehensive audit trail showing deleted review information
-
-#### 3. Frontend Integration
-
-**Report Button**: Visible to all logged-in users
-```html
-<button id="reportButton" class="...">
-    Report Review
-</button>
-```
-
-**Report Modal**: Interactive modal with form validation
-- Reason selection dropdown
-- Optional additional information textarea
-- Character counter (1000 character limit)
-- Form validation and submission
-
-**Already Reported State**: Shows confirmation when user has already reported
-```html
-<div class="...">
-    <span>You have reported this review</span>
-</div>
-```
-
-### Routing Structure
-
-The report system follows the same nested URL structure as reviews:
-
-```php
-// Game Review Reports
-Route::get('/games/{product}/{review}/report', [ReportController::class, 'show'])
-    ->name('games.reviews.report.show');
-Route::post('/games/{product}/{review}/report', [ReportController::class, 'store'])
-    ->name('games.reviews.report.store');
-
-// Tech Review Reports  
-Route::get('/tech/{product}/{review}/report', [ReportController::class, 'show'])
-    ->name('tech.reviews.report.show');
-Route::post('/tech/{product}/{review}/report', [ReportController::class, 'store'])
-    ->name('tech.reviews.report.store');
-```
-
-### Security Features
-
-#### 1. Authorization Checks
-- Only authenticated users can submit reports
-- All logged-in users can report any review (including their own reviews)
-- Only admins can approve/deny reports in the admin panel
-
-#### 2. Duplicate Prevention
-- Database unique constraint prevents duplicate reports
-- Frontend checks and displays appropriate state
-- Backend validation ensures data integrity
-
-#### 3. Input Validation
-```php
-$request->validate([
-    'reason' => 'required|string|in:' . implode(',', array_keys(Report::getReasons())),
-    'additional_info' => 'nullable|string|max:1000',
-]);
-```
-
-#### 4. Admin Resolution Tracking
-- All actions tracked with admin ID and timestamp
-- Optional admin notes for resolution reasoning
-- Audit trail for moderation decisions
-
-### Usage Examples
-
-#### 1. Submitting a Report
-
-```php
-// User submits report via form
-Report::create([
-    'review_id' => $review->id,
-    'user_id' => Auth::id(),
-    'reason' => 'inappropriate',
-    'additional_info' => 'Contains offensive language',
-    'status' => 'pending',
-]);
-```
-
-#### 2. Admin Approval (Delete Review with Audit Trail)
-
-```php
-// Admin approves report - deletes review but preserves report
-$report->approve(Auth::id(), 'Review violated community guidelines');
-
-// This automatically:
-// - Stores review information (title, author, product) in report record
-// - Sets status to 'approved'
-// - Records admin ID and timestamp
-// - Deletes the reported review
-// - Saves admin notes
-// - Preserves report for audit trail
-```
-
-#### 3. Admin Denial (Keep Review)
-
-```php
-// Admin denies report - keeps review
-$report->deny(Auth::id(), 'Review appears to follow guidelines');
-
-// This automatically:
-// - Sets status to 'denied'
-// - Records admin ID and timestamp
-// - Keeps the review published
-// - Saves admin notes
-```
-
-### Admin Workflow
-
-#### 1. Viewing Reports
-1. Navigate to Admin Panel → Moderation → Review Reports
-2. See pending report count in navigation badge
-3. Filter reports by status, reason, or date
-4. Click on review links to view reported content
-
-#### 2. Resolving Reports
-1. Review the reported content and reason
-2. Click "Approve & Delete Review" to remove content
-3. Click "Deny & Keep Review" to keep content
-4. Add optional admin notes for record-keeping
-5. Confirm the action in the modal
-
-#### 3. Report Management
-- Bulk actions available for multiple reports
-- Edit reports if needed (pending only)
-- View detailed report information
-- Track resolution history
-
-### Frontend Features
-
-#### 1. Responsive Modal Design
-- Mobile-friendly modal interface
-- Keyboard navigation support (ESC to close)
-- Click-outside-to-close functionality
-- Form validation feedback
-
-#### 2. User Experience
-- Clear visual indicators for report status
-- Intuitive reason selection
-- Character counter for additional information
-- Loading states and confirmation messages
-
-#### 3. Accessibility
-- Proper form labels and ARIA attributes
-- Keyboard navigation support
-- Screen reader friendly
-- High contrast design elements
-
-### Monitoring and Analytics
-
-#### 1. Admin Dashboard
-- Real-time pending report count
-- Quick access to recent reports
-- Status overview and filtering
-
-#### 2. Report Metrics
-- Track report volume by reason
-- Monitor admin response times
-- Identify frequently reported content types
-
-### Best Practices
-
-#### 1. Moderation Guidelines
-- Review reports promptly (within 24-48 hours)
-- Provide clear admin notes for decisions
-- Be consistent in applying community guidelines
-- Consider context when evaluating reports
-
-#### 2. User Communication
-- Clear reporting guidelines in community standards
-- Transparent moderation process
-- Appeal process for disputed decisions
-- Regular updates to community guidelines
-
-#### 3. System Maintenance
-- Regular review of report reasons and effectiveness
-- Monitor for abuse of reporting system
-- Update guidelines based on common issues
-- Train moderators on consistent decision-making
-
-### Error Handling
-
-#### 1. Duplicate Report Prevention
-```php
-// Check for existing report
-$existingReport = Report::where('review_id', $review->id)
-    ->where('user_id', Auth::id())
-    ->first();
-
-if ($existingReport) {
-    return redirect()->back()
-        ->with('error', 'You have already reported this review.');
-}
-```
-
-#### 2. Invalid Review/Product Validation
-```php
-// Verify review belongs to product
-if ($review->product_id !== $product->id) {
-    abort(404);
-}
-```
-
-#### 3. Authorization Failures
-```php
-// Check user permissions
-if (!Auth::check() || !Auth::user()->is_admin) {
-    abort(403);
-}
-```
-
-### Performance Considerations
-
-#### 1. Database Optimization
-- Indexed columns for common queries
-- Efficient joins for report listings
-- Proper foreign key constraints
-
-#### 2. Query Optimization
-```php
-// Efficient loading with relationships
-$reports = Report::with(['review.product', 'user', 'resolvedBy'])
-    ->pending()
-    ->latest()
-    ->paginate(20);
-```
-
-#### 3. Frontend Performance
-- Lazy loading of modal content
-- Efficient DOM manipulation
-- Minimal JavaScript footprint
-
-### Troubleshooting
-
-#### Common Issues
-
-1. **Reports Not Showing**
-   - Check user authentication
-   - Verify user is not review author
-   - Ensure user hasn't already reported
-
-2. **Modal Not Opening**
-   - Check JavaScript console for errors
-   - Verify DOM elements exist
-   - Check for CSS conflicts
-
-3. **Form Submission Errors**
-   - Validate CSRF token
-   - Check required fields
-   - Verify route parameters
-
-4. **Admin Actions Failing**
-   - Check admin permissions
-   - Verify report exists and is pending
-   - Check database constraints
-
-#### Database Queries for Debugging
-
-```sql
--- Check report status distribution
-SELECT status, COUNT(*) as count FROM reports GROUP BY status;
-
--- Find reports for specific review
-SELECT * FROM reports WHERE review_id = ? ORDER BY created_at DESC;
-
--- Check admin resolution statistics
-SELECT resolved_by, COUNT(*) as resolved_count 
-FROM reports 
-WHERE status IN ('approved', 'denied') 
-GROUP BY resolved_by;
-```
-
-### Future Enhancements
-
-#### Potential Improvements
+- Always validate user inputs
+- Use CSRF protection on all forms
+- Implement proper authorization checks
+- Sanitize user-generated content
+
+### 3. User Experience
+- Provide clear visual feedback for user actions
+- Implement loading states for AJAX operations
+- Use consistent styling and interaction patterns
+- Ensure mobile responsiveness
+
+### 4. Admin Panel Management
+- Organize resources into logical groups
+- Use descriptive field labels and help text
+- Implement proper validation in admin forms
+- Provide bulk actions where appropriate
+
+### 5. Performance
+- Cache frequently accessed data
+- Optimize images and media files
+- Use CDN for static assets
+- Implement database query optimization
+
+## Future Enhancements
+
+### Potential Improvements
 
 1. **Email Notifications**
    - Notify admins of new reports
@@ -1143,4 +1291,240 @@ GROUP BY resolved_by;
 
 5. **Community Moderation**
    - User voting on reports
-   - Trusted user moderation privileges 
+   - Trusted user moderation privileges
+
+---
+
+## 🆕 NEW FEATURES DOCUMENTATION (2025)
+
+### Interactive Rating System
+
+#### 10-Star Rating Interface
+The platform now features a professional 10-star rating system with real-time feedback:
+
+**Frontend Implementation:**
+```javascript
+function initializeRating() {
+    const stars = document.querySelectorAll('.rating-star');
+    const ratingValue = document.getElementById('rating-value');
+    
+    stars.forEach((star, index) => {
+        star.addEventListener('click', function() {
+            const rating = index + 1;
+            ratingValue.textContent = rating;
+            
+            // Update visual state
+            updateStarDisplay(rating);
+            
+            // Submit rating via AJAX
+            submitRating(productId, rating);
+        });
+    });
+}
+
+async function submitRating(productId, rating) {
+    try {
+        const response = await fetch(`/games/${productId}/rate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ rating: rating })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            updateCommunityRating(data.communityRating, data.totalRatings);
+            showSuccessMessage('Thank you for rating!');
+        }
+    } catch (error) {
+        console.error('Rating submission failed:', error);
+    }
+}
+```
+
+**Backend Rating Controller:**
+```php
+public function rate(Request $request, Product $product)
+{
+    $request->validate([
+        'rating' => 'required|integer|min:1|max:10'
+    ]);
+
+    $user = Auth::user();
+    
+    // Create or update user's rating
+    $review = Review::updateOrCreate(
+        [
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'is_staff_review' => false
+        ],
+        [
+            'rating' => $request->rating,
+            'title' => 'Quick Rating by ' . $user->name,
+            'content' => 'User provided a rating without detailed review.',
+            'is_published' => true,
+            'slug' => Str::slug('rating-' . $product->slug . '-' . $user->id . '-' . time())
+        ]
+    );
+
+    // Calculate new community rating
+    $communityRating = $product->fresh()->getCommunityRatingAttribute();
+    $totalRatings = $product->getCommunityReviewsCountAttribute();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Thank you for rating this ' . $product->type . '!',
+        'communityRating' => round($communityRating, 1),
+        'totalRatings' => $totalRatings,
+        'userRating' => $request->rating
+    ]);
+}
+```
+
+### Advanced Database Relationships
+
+#### Many-to-Many Implementation
+The system now uses proper database relationships instead of simple text arrays:
+
+**Migration Example:**
+```php
+// Create developers table
+Schema::create('developers', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('slug')->unique();
+    $table->string('description')->nullable();
+    $table->string('website')->nullable();
+    $table->string('country')->nullable();
+    $table->string('color')->default('#F59E0B');
+    $table->boolean('is_active')->default(true);
+    $table->timestamps();
+});
+
+// Create pivot table
+Schema::create('developer_product', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('product_id')->constrained()->onDelete('cascade');
+    $table->foreignId('developer_id')->constrained()->onDelete('cascade');
+    $table->timestamps();
+    
+    $table->unique(['product_id', 'developer_id']);
+});
+```
+
+### Clickable Tag System
+
+#### Frontend Tag Implementation
+All relationship tags are now clickable and lead to filtered views:
+
+```php
+<!-- Developer Tags -->
+@if($product->developers && count($product->developers) > 0)
+    <div class="mb-4">
+        <h4 class="text-sm font-medium text-[#A1A1AA] mb-2">Developers</h4>
+        <div class="flex flex-wrap gap-2">
+            @foreach($product->developers as $developer)
+                <a href="{{ route('games.filter.developer', urlencode($developer->name)) }}" 
+                   class="inline-block px-3 py-1 rounded-full text-sm transition-colors"
+                   style="background-color: {{ $developer->color }}20; color: {{ $developer->color }};">
+                    {{ $developer->name }}
+                </a>
+            @endforeach
+        </div>
+    </div>
+@endif
+```
+
+### Enhanced Admin Panel
+
+#### Tabbed Interface System
+The admin panel now features organized tabs for better user experience:
+
+```php
+// GameResource with tabbed interface
+public static function form(Form $form): Form
+{
+    return $form->schema([
+        Forms\Components\Tabs::make('Game Information')
+            ->tabs([
+                Forms\Components\Tabs\Tab::make('Basic Info')
+                    ->icon('heroicon-m-information-circle')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')->required(),
+                        Forms\Components\TextInput::make('slug')->required(),
+                        Forms\Components\Select::make('genre_ids')
+                            ->multiple()
+                            ->relationship('genres', 'name')
+                            ->searchable()
+                            ->preload(),
+                    ]),
+                Forms\Components\Tabs\Tab::make('Media')
+                    ->icon('heroicon-m-photo')
+                    ->schema([
+                        Forms\Components\TextInput::make('image')->url(),
+                        Forms\Components\TextInput::make('video_url')->url(),
+                        Forms\Components\Repeater::make('photos')
+                            ->schema([
+                                Forms\Components\TextInput::make('url')->url()->required(),
+                                Forms\Components\TextInput::make('caption'),
+                                Forms\Components\Select::make('type')
+                                    ->options([
+                                        'screenshot' => 'Screenshot',
+                                        'artwork' => 'Artwork',
+                                        'poster' => 'Poster',
+                                    ]),
+                            ]),
+                    ]),
+                Forms\Components\Tabs\Tab::make('Content')
+                    ->icon('heroicon-m-document-text')
+                    ->schema([
+                        Forms\Components\Textarea::make('description'),
+                        Forms\Components\RichEditor::make('story'),
+                    ]),
+            ])
+    ]);
+}
+```
+
+### Key Features Summary
+
+#### 1. Dual Authentication System
+- Separate login flows for users and administrators
+- Role-based access control with middleware protection
+- User registration with validation
+- Secure admin panel access
+
+#### 2. Interactive Rating System
+- 10-star rating interface with visual feedback
+- AJAX rating submission without page reload
+- Community rating calculations
+- Login modal for guest users
+
+#### 3. Advanced Database Structure
+- Many-to-many relationships for all entities
+- Proper foreign key constraints
+- Color-coded admin displays
+- Automatic slug generation
+
+#### 4. Clickable Tag Filtering
+- All tags are clickable and filterable
+- URL-based filtering with clear indicators
+- Multi-value support for all relationships
+- Dynamic filter banners
+
+#### 5. Enhanced Admin Panel
+- Tabbed interface for better organization
+- Relationship management resources
+- Bulk operations and advanced filtering
+- Rich text editors and media management
+
+#### 6. Media Management
+- Multiple photo support with captions
+- Video management with metadata
+- Modal image viewing
+- Responsive gallery layouts
+
+This documentation now comprehensively covers all the new features implemented in the review system, providing both technical implementation details and usage examples for developers working with the platform. 
