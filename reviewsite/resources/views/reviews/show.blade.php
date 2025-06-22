@@ -283,8 +283,160 @@
                             </div>
                         @endif
                     @endauth
+
+                    <!-- Report Card -->
+                    @auth
+                        @php
+                            $userHasReported = \App\Models\Report::where('review_id', $review->id)
+                                ->where('user_id', Auth::id())
+                                ->exists();
+                        @endphp
+                        @if(!$userHasReported)
+                            <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] p-6">
+                                <h3 class="text-lg font-bold text-white mb-4 font-['Share_Tech_Mono']">Report Review</h3>
+                                <p class="text-[#A1A1AA] text-sm mb-4 font-['Inter']">
+                                    Found something inappropriate? Help us maintain quality by reporting this review.
+                                </p>
+                                <button id="reportButton" 
+                                        class="w-full inline-flex items-center justify-center px-4 py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-colors font-['Inter'] font-semibold">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6v1a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                                    </svg>
+                                    Report Review
+                                </button>
+                            </div>
+                        @else
+                            <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] p-6">
+                                <h3 class="text-lg font-bold text-white mb-4 font-['Share_Tech_Mono']">Report Submitted</h3>
+                                <div class="flex items-center text-green-400">
+                                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                    <span class="font-['Inter'] text-sm">You have reported this review</span>
+                                </div>
+                            </div>
+                        @endif
+                    @endauth
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Report Modal -->
+    <div id="reportModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-[#27272A] rounded-2xl max-w-md w-full mx-auto shadow-2xl border border-[#3F3F46]">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-white font-['Share_Tech_Mono']">Report Review</h3>
+                        <button id="closeModal" class="text-[#A1A1AA] hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <form id="reportForm" method="POST" action="{{ route($review->product->type === 'game' ? 'games.reviews.report.store' : 'tech.reviews.report.store', [$review->product, $review]) }}">
+                        @csrf
+                        <div class="mb-6">
+                            <label for="reason" class="block text-sm font-semibold text-white mb-3 font-['Inter']">Reason for Report</label>
+                            <select id="reason" name="reason" required 
+                                    class="w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-3 text-white focus:border-[#E53E3E] focus:ring-[#E53E3E] transition font-['Inter']">
+                                <option value="">Select a reason...</option>
+                                @foreach(\App\Models\Report::getReasons() as $key => $label)
+                                    <option value="{{ $key }}">{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-6">
+                            <label for="additional_info" class="block text-sm font-semibold text-white mb-3 font-['Inter']">Additional Information (Optional)</label>
+                            <textarea id="additional_info" name="additional_info" rows="4" maxlength="1000"
+                                      class="w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-3 text-white placeholder-[#A1A1AA] focus:border-[#E53E3E] focus:ring-[#E53E3E] transition font-['Inter'] resize-none"
+                                      placeholder="Please provide any additional details about why you're reporting this review..."></textarea>
+                            <div class="text-xs text-[#A1A1AA] mt-2 font-['Inter']">
+                                <span id="charCount">0</span>/1000 characters
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-3">
+                            <button type="button" id="cancelReport" 
+                                    class="flex-1 px-4 py-3 bg-[#3F3F46] text-white rounded-xl hover:bg-[#52525B] transition-colors font-['Inter'] font-semibold">
+                                Cancel
+                            </button>
+                            <button type="submit" 
+                                    class="flex-1 px-4 py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-colors font-['Inter'] font-semibold">
+                                Submit Report
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @auth
+        @php
+            $userHasReported = \App\Models\Report::where('review_id', $review->id)
+                ->where('user_id', Auth::id())
+                ->exists();
+        @endphp
+        @if(!$userHasReported)
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const reportButton = document.getElementById('reportButton');
+                    const reportModal = document.getElementById('reportModal');
+                    const closeModal = document.getElementById('closeModal');
+                    const cancelReport = document.getElementById('cancelReport');
+                    const additionalInfo = document.getElementById('additional_info');
+                    const charCount = document.getElementById('charCount');
+
+                    // Open modal
+                    reportButton.addEventListener('click', function() {
+                        reportModal.classList.remove('hidden');
+                        document.body.style.overflow = 'hidden';
+                    });
+
+                    // Close modal functions
+                    function closeReportModal() {
+                        reportModal.classList.add('hidden');
+                        document.body.style.overflow = 'auto';
+                        document.getElementById('reportForm').reset();
+                        charCount.textContent = '0';
+                    }
+
+                    closeModal.addEventListener('click', closeReportModal);
+                    cancelReport.addEventListener('click', closeReportModal);
+
+                    // Close modal when clicking outside
+                    reportModal.addEventListener('click', function(e) {
+                        if (e.target === reportModal) {
+                            closeReportModal();
+                        }
+                    });
+
+                    // Character counter
+                    additionalInfo.addEventListener('input', function() {
+                        const count = this.value.length;
+                        charCount.textContent = count;
+                        
+                        if (count > 950) {
+                            charCount.classList.remove('text-[#A1A1AA]');
+                            charCount.classList.add('text-orange-400');
+                        } else {
+                            charCount.classList.remove('text-orange-400');
+                            charCount.classList.add('text-[#A1A1AA]');
+                        }
+                    });
+
+                    // Close modal on escape key
+                    document.addEventListener('keydown', function(e) {
+                        if (e.key === 'Escape' && !reportModal.classList.contains('hidden')) {
+                            closeReportModal();
+                        }
+                    });
+                });
+            </script>
+        @endif
+    @endauth
 </x-layouts.app> 

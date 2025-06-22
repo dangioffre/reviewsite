@@ -747,4 +747,389 @@ If migrating from the old review system structure:
 5. **Update Documentation**
    - Update API documentation with new URL structure
    - Provide migration examples for developers
-   - Document new route patterns and conventions 
+   - Document new route patterns and conventions
+
+## Review Report System
+
+### Overview
+
+The Review Report System allows registered users to report inappropriate reviews for admin moderation. Administrators can then approve reports (which deletes the review) or deny them (which keeps the review). This system helps maintain content quality and provides a way for the community to self-moderate.
+
+### Core Components
+
+#### 1. Report Model (`App\Models\Report`)
+The primary report model that handles:
+
+1. **Report Management**: Links users to reported reviews with reasons
+2. **Status Tracking**: Pending, approved, and denied states
+3. **Admin Resolution**: Notes and resolution tracking
+4. **Duplicate Prevention**: Unique constraints prevent multiple reports from same user
+5. **Automatic Actions**: Approved reports automatically delete reviews
+
+#### 2. Database Structure
+
+```sql
+CREATE TABLE reports (
+    id BIGINT UNSIGNED PRIMARY KEY,
+    review_id BIGINT UNSIGNED,
+    user_id BIGINT UNSIGNED,
+    reason VARCHAR(255) NOT NULL,
+    additional_info TEXT NULL,
+    status ENUM('pending', 'approved', 'denied') DEFAULT 'pending',
+    admin_notes TEXT NULL,
+    resolved_by BIGINT UNSIGNED NULL,
+    resolved_at TIMESTAMP NULL,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    
+    INDEX (status, created_at),
+    INDEX (review_id, user_id),
+    UNIQUE KEY unique_user_review_report (review_id, user_id),
+    
+    FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (resolved_by) REFERENCES users(id) ON DELETE SET NULL
+);
+```
+
+#### 3. Report Reasons
+
+The system supports the following predefined report reasons:
+- **Inappropriate Content**: Content that violates community guidelines
+- **Spam or Self-Promotion**: Spam reviews or excessive self-promotion
+- **Offensive Language**: Reviews containing offensive or abusive language
+- **Fake or Misleading Review**: Reviews that appear to be fake or misleading
+- **Duplicate Review**: Duplicate reviews from the same user
+- **Other**: Other reasons with additional information required
+
+### Implementation Details
+
+#### 1. Report Controller (`App\Http\Controllers\ReportController`)
+
+The ReportController handles:
+- **Report Submission**: Validates and stores new reports
+- **Duplicate Prevention**: Checks for existing reports from same user
+- **Admin Actions**: Approve/deny functionality for administrators
+- **Nested Routing**: Works with both game and tech review URLs
+
+Key methods:
+```php
+// Store a new report
+public function store(Request $request, Product $product, Review $review)
+
+// Admin approval action (deletes review)
+public function approve(Request $request, Report $report)
+
+// Admin denial action (keeps review)
+public function deny(Request $request, Report $report)
+```
+
+#### 2. Filament Admin Resource (`App\Filament\Resources\ReportResource`)
+
+Comprehensive admin interface featuring:
+- **Table View**: All reports with status, reason, and review details
+- **Filters**: Filter by status, reason, and date
+- **Quick Actions**: Approve/deny buttons with confirmation modals
+- **Navigation Badge**: Shows count of pending reports
+- **Detailed Views**: Full report information with linked reviews
+
+Features:
+- Real-time pending report count in navigation
+- Direct links to reported reviews
+- Color-coded status badges
+- Admin notes for resolution tracking
+
+#### 3. Frontend Integration
+
+**Report Button**: Visible to all logged-in users
+```html
+<button id="reportButton" class="...">
+    Report Review
+</button>
+```
+
+**Report Modal**: Interactive modal with form validation
+- Reason selection dropdown
+- Optional additional information textarea
+- Character counter (1000 character limit)
+- Form validation and submission
+
+**Already Reported State**: Shows confirmation when user has already reported
+```html
+<div class="...">
+    <span>You have reported this review</span>
+</div>
+```
+
+### Routing Structure
+
+The report system follows the same nested URL structure as reviews:
+
+```php
+// Game Review Reports
+Route::get('/games/{product}/{review}/report', [ReportController::class, 'show'])
+    ->name('games.reviews.report.show');
+Route::post('/games/{product}/{review}/report', [ReportController::class, 'store'])
+    ->name('games.reviews.report.store');
+
+// Tech Review Reports  
+Route::get('/tech/{product}/{review}/report', [ReportController::class, 'show'])
+    ->name('tech.reviews.report.show');
+Route::post('/tech/{product}/{review}/report', [ReportController::class, 'store'])
+    ->name('tech.reviews.report.store');
+```
+
+### Security Features
+
+#### 1. Authorization Checks
+- Only authenticated users can submit reports
+- All logged-in users can report any review (including their own reviews)
+- Only admins can approve/deny reports in the admin panel
+
+#### 2. Duplicate Prevention
+- Database unique constraint prevents duplicate reports
+- Frontend checks and displays appropriate state
+- Backend validation ensures data integrity
+
+#### 3. Input Validation
+```php
+$request->validate([
+    'reason' => 'required|string|in:' . implode(',', array_keys(Report::getReasons())),
+    'additional_info' => 'nullable|string|max:1000',
+]);
+```
+
+#### 4. Admin Resolution Tracking
+- All actions tracked with admin ID and timestamp
+- Optional admin notes for resolution reasoning
+- Audit trail for moderation decisions
+
+### Usage Examples
+
+#### 1. Submitting a Report
+
+```php
+// User submits report via form
+Report::create([
+    'review_id' => $review->id,
+    'user_id' => Auth::id(),
+    'reason' => 'inappropriate',
+    'additional_info' => 'Contains offensive language',
+    'status' => 'pending',
+]);
+```
+
+#### 2. Admin Approval (Delete Review)
+
+```php
+// Admin approves report - deletes review
+$report->approve(Auth::id(), 'Review violated community guidelines');
+
+// This automatically:
+// - Sets status to 'approved'
+// - Records admin ID and timestamp
+// - Deletes the reported review
+// - Saves admin notes
+```
+
+#### 3. Admin Denial (Keep Review)
+
+```php
+// Admin denies report - keeps review
+$report->deny(Auth::id(), 'Review appears to follow guidelines');
+
+// This automatically:
+// - Sets status to 'denied'
+// - Records admin ID and timestamp
+// - Keeps the review published
+// - Saves admin notes
+```
+
+### Admin Workflow
+
+#### 1. Viewing Reports
+1. Navigate to Admin Panel → Moderation → Review Reports
+2. See pending report count in navigation badge
+3. Filter reports by status, reason, or date
+4. Click on review links to view reported content
+
+#### 2. Resolving Reports
+1. Review the reported content and reason
+2. Click "Approve & Delete Review" to remove content
+3. Click "Deny & Keep Review" to keep content
+4. Add optional admin notes for record-keeping
+5. Confirm the action in the modal
+
+#### 3. Report Management
+- Bulk actions available for multiple reports
+- Edit reports if needed (pending only)
+- View detailed report information
+- Track resolution history
+
+### Frontend Features
+
+#### 1. Responsive Modal Design
+- Mobile-friendly modal interface
+- Keyboard navigation support (ESC to close)
+- Click-outside-to-close functionality
+- Form validation feedback
+
+#### 2. User Experience
+- Clear visual indicators for report status
+- Intuitive reason selection
+- Character counter for additional information
+- Loading states and confirmation messages
+
+#### 3. Accessibility
+- Proper form labels and ARIA attributes
+- Keyboard navigation support
+- Screen reader friendly
+- High contrast design elements
+
+### Monitoring and Analytics
+
+#### 1. Admin Dashboard
+- Real-time pending report count
+- Quick access to recent reports
+- Status overview and filtering
+
+#### 2. Report Metrics
+- Track report volume by reason
+- Monitor admin response times
+- Identify frequently reported content types
+
+### Best Practices
+
+#### 1. Moderation Guidelines
+- Review reports promptly (within 24-48 hours)
+- Provide clear admin notes for decisions
+- Be consistent in applying community guidelines
+- Consider context when evaluating reports
+
+#### 2. User Communication
+- Clear reporting guidelines in community standards
+- Transparent moderation process
+- Appeal process for disputed decisions
+- Regular updates to community guidelines
+
+#### 3. System Maintenance
+- Regular review of report reasons and effectiveness
+- Monitor for abuse of reporting system
+- Update guidelines based on common issues
+- Train moderators on consistent decision-making
+
+### Error Handling
+
+#### 1. Duplicate Report Prevention
+```php
+// Check for existing report
+$existingReport = Report::where('review_id', $review->id)
+    ->where('user_id', Auth::id())
+    ->first();
+
+if ($existingReport) {
+    return redirect()->back()
+        ->with('error', 'You have already reported this review.');
+}
+```
+
+#### 2. Invalid Review/Product Validation
+```php
+// Verify review belongs to product
+if ($review->product_id !== $product->id) {
+    abort(404);
+}
+```
+
+#### 3. Authorization Failures
+```php
+// Check user permissions
+if (!Auth::check() || !Auth::user()->is_admin) {
+    abort(403);
+}
+```
+
+### Performance Considerations
+
+#### 1. Database Optimization
+- Indexed columns for common queries
+- Efficient joins for report listings
+- Proper foreign key constraints
+
+#### 2. Query Optimization
+```php
+// Efficient loading with relationships
+$reports = Report::with(['review.product', 'user', 'resolvedBy'])
+    ->pending()
+    ->latest()
+    ->paginate(20);
+```
+
+#### 3. Frontend Performance
+- Lazy loading of modal content
+- Efficient DOM manipulation
+- Minimal JavaScript footprint
+
+### Troubleshooting
+
+#### Common Issues
+
+1. **Reports Not Showing**
+   - Check user authentication
+   - Verify user is not review author
+   - Ensure user hasn't already reported
+
+2. **Modal Not Opening**
+   - Check JavaScript console for errors
+   - Verify DOM elements exist
+   - Check for CSS conflicts
+
+3. **Form Submission Errors**
+   - Validate CSRF token
+   - Check required fields
+   - Verify route parameters
+
+4. **Admin Actions Failing**
+   - Check admin permissions
+   - Verify report exists and is pending
+   - Check database constraints
+
+#### Database Queries for Debugging
+
+```sql
+-- Check report status distribution
+SELECT status, COUNT(*) as count FROM reports GROUP BY status;
+
+-- Find reports for specific review
+SELECT * FROM reports WHERE review_id = ? ORDER BY created_at DESC;
+
+-- Check admin resolution statistics
+SELECT resolved_by, COUNT(*) as resolved_count 
+FROM reports 
+WHERE status IN ('approved', 'denied') 
+GROUP BY resolved_by;
+```
+
+### Future Enhancements
+
+#### Potential Improvements
+
+1. **Email Notifications**
+   - Notify admins of new reports
+   - Inform users of report resolution
+
+2. **Appeal System**
+   - Allow users to appeal moderation decisions
+   - Review process for appealed content
+
+3. **Automated Moderation**
+   - AI-powered content analysis
+   - Automatic flagging of problematic content
+
+4. **Enhanced Analytics**
+   - Detailed reporting dashboard
+   - Trend analysis and insights
+
+5. **Community Moderation**
+   - User voting on reports
+   - Trusted user moderation privileges 

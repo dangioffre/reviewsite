@@ -74,6 +74,11 @@ class Review extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function reports()
+    {
+        return $this->hasMany(Report::class);
+    }
+
     public function scopeStaff($query)
     {
         return $query->where('is_staff_review', true);

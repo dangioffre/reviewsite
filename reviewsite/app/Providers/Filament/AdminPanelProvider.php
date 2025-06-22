@@ -28,7 +28,37 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->colors([
-                'primary' => Color::Red,
+                'primary' => [
+                    50 => '#fef2f2',
+                    100 => '#fee2e2',
+                    200 => '#fecaca',
+                    300 => '#fca5a5',
+                    400 => '#f87171',
+                    500 => '#ef4444', // Main red color
+                    600 => '#dc2626', // Darker red
+                    700 => '#b91c1c',
+                    800 => '#991b1b',
+                    900 => '#7f1d1d',
+                    950 => '#450a0a',
+                ],
+            ])
+            ->darkMode(true)
+            ->brandName('ReviewSite Admin')
+            ->brandLogo(asset('favicon.ico'))
+            ->brandLogoHeight('2rem')
+            ->font('Inter')
+            ->renderHook(
+                'panels::head.end',
+                fn (): string => '<style>
+                    .fi-sidebar { background: linear-gradient(135deg, #1a1a1b 0%, #27272a 100%) !important; border-right: 1px solid #3f3f46 !important; }
+                    .fi-topbar { background: linear-gradient(135deg, #1a1a1b 0%, #27272a 100%) !important; border-bottom: 1px solid #3f3f46 !important; }
+                    .fi-sidebar-nav-item:hover { background: rgba(239, 68, 68, 0.1) !important; }
+                    .fi-sidebar-nav-item[aria-current="page"] { background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%) !important; border-right: 3px solid #ef4444 !important; }
+                    .fi-sidebar-nav-item-badge { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important; color: white !important; font-weight: bold !important; }
+                </style>'
+            )
+            ->resources([
+                \App\Filament\Resources\ReportResource::class,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -52,6 +82,15 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->navigationGroups([
+                'Games Management',
+                'Tech Management',
+                'Content Management',
+                'Review Management',
+                'Moderation',
+                'Taxonomy',
+                'User Management',
             ]);
     }
 }

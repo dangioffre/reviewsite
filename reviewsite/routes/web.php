@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\TechController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ReportController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -21,6 +22,10 @@ Route::get('/games/{product}/{review}/edit', [ReviewController::class, 'edit'])-
 Route::put('/games/{product}/{review}', [ReviewController::class, 'update'])->name('games.reviews.update');
 Route::delete('/games/{product}/{review}', [ReviewController::class, 'destroy'])->name('games.reviews.destroy');
 
+// Game Review Reports
+Route::get('/games/{product}/{review}/report', [ReportController::class, 'show'])->name('games.reviews.report.show');
+Route::post('/games/{product}/{review}/report', [ReportController::class, 'store'])->name('games.reviews.report.store');
+
 // Tech system (hardware and accessories)
 Route::get('/tech', [TechController::class, 'index'])->name('tech.index');
 Route::get('/tech/{product}', [TechController::class, 'show'])->name('tech.show');
@@ -30,3 +35,9 @@ Route::get('/tech/{product}/{review}', [ReviewController::class, 'show'])->name(
 Route::get('/tech/{product}/{review}/edit', [ReviewController::class, 'edit'])->name('tech.reviews.edit');
 Route::put('/tech/{product}/{review}', [ReviewController::class, 'update'])->name('tech.reviews.update');
 Route::delete('/tech/{product}/{review}', [ReviewController::class, 'destroy'])->name('tech.reviews.destroy');
+
+// Tech Review Reports
+Route::get('/tech/{product}/{review}/report', [ReportController::class, 'show'])->name('tech.reviews.report.show');
+Route::post('/tech/{product}/{review}/report', [ReportController::class, 'store'])->name('tech.reviews.report.store');
+
+// Authentication Routes
