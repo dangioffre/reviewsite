@@ -176,7 +176,7 @@ class StaffReviewSeeder extends Seeder
             Review::create([
                 'product_id' => $product->id,
                 'user_id' => $staffUser->id,
-                'review' => $selectedTemplate,
+                'content' => $selectedTemplate,
                 'rating' => $selectedRating,
                 'is_staff_review' => true,
                 'created_at' => now()->subDays(rand(1, 30))->subHours(rand(0, 23))->subMinutes(rand(0, 59)),

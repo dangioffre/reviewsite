@@ -11,22 +11,30 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // User::factory(10)->create();
+
+        // User::factory()->create([
+        //     'name' => 'Test User',
+        //     'email' => 'test@example.com',
+        // ]);
+
+        // Run existing seeders
         $this->call([
-            // Core data first
+            AdminSeeder::class,
             RolesAndPermissionsSeeder::class,
             GenrePlatformSeeder::class,
             HardwareSeeder::class,
             
-            // Users (both admin and regular)
-            AdminSeeder::class,
-            UserSeeder::class,
+            // New seeders for testing
+            RegularUserSeeder::class,
+            GameSeeder::class,
+            TechProductSeeder::class,
             
-            // Content
+            // Existing content seeders
             PostSeeder::class,
-            
-            // Reviews (after users and products exist)
             StaffReviewSeeder::class,
             CommunityReviewSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }
