@@ -223,7 +223,18 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <p class="text-[#A1A1AA] leading-relaxed font-['Inter']">{{ $review->review }}</p>
+                                        <div class="text-[#A1A1AA] leading-relaxed font-['Inter']">
+                                            @if($review->content)
+                                                <p>{{ Str::limit($review->content, 150) }}</p>
+                                                @if(strlen($review->content) > 150 && $review->slug)
+                                                    <a href="{{ route('reviews.show', $review) }}" class="text-[#2563EB] hover:text-blue-400 font-semibold mt-2 inline-block">
+                                                        Read Full Review →
+                                                    </a>
+                                                @endif
+                                            @else
+                                                <p>{{ $review->review ?? 'No review content available.' }}</p>
+                                            @endif
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>
@@ -241,43 +252,16 @@
                 <div class="lg:col-span-1">
                     <div class="sticky top-8">
                         @auth
-                        <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
-                            <h3 class="text-xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Write a Review</h3>
-                            
-                            <form method="POST" action="{{ route('tech.reviews.store', $product) }}" class="space-y-6">
-                                @csrf
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-white mb-3 font-['Inter']">Rating</label>
-                                    <div class="flex items-center gap-2 mb-4">
-                                        <div class="flex" id="star-rating">
-                                            @for($i = 1; $i <= 10; $i++)
-                                                <button type="button" class="star-btn text-2xl text-[#3F3F46] hover:text-[#FFC107] transition-colors duration-200" data-rating="{{ $i }}">
-                                                    ★
-                                                </button>
-                                            @endfor
-                                        </div>
-                                        <span id="rating-text" class="text-[#A1A1AA] font-['Inter'] ml-2">Select a rating</span>
-                                    </div>
-                                    <input type="hidden" name="rating" id="rating-input" required>
-                                </div>
-                                
-                                <div>
-                                    <label for="review" class="block text-sm font-medium text-white mb-2 font-['Inter']">Your Review</label>
-                                    <textarea 
-                                        id="review" 
-                                        name="review" 
-                                        rows="4" 
-                                        class="w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-3 text-white placeholder-[#A1A1AA] focus:border-[#2563EB] focus:ring-[#2563EB] transition font-['Inter']"
-                                        placeholder="Share your thoughts about this product..."
-                                        required
-                                    ></textarea>
-                                </div>
-                                
-                                <button type="submit" class="w-full bg-gradient-to-r from-[#E53E3E] to-[#DC2626] hover:from-[#DC2626] hover:to-[#B91C1C] text-white px-6 py-3 rounded-xl font-bold font-['Inter'] shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300">
-                                    Submit Review
-                                </button>
-                            </form>
+                        <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl text-center">
+                            <div class="text-4xl mb-4">✍️</div>
+                            <h3 class="text-xl font-bold text-white mb-4 font-['Share_Tech_Mono']">Share Your Review</h3>
+                            <p class="text-[#A1A1AA] mb-6 font-['Inter']">Write a detailed review with your thoughts, ratings, and more.</p>
+                            <a href="{{ route('reviews.create', $product) }}" class="inline-flex items-center bg-gradient-to-r from-[#E53E3E] to-[#DC2626] text-white px-6 py-3 rounded-xl font-bold font-['Inter'] shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Write Review
+                            </a>
                         </div>
                         @else
                         <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl text-center">
@@ -350,70 +334,5 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const stars = document.querySelectorAll('.star-btn');
-            const ratingInput = document.getElementById('rating-input');
-            const ratingText = document.getElementById('rating-text');
-            let currentRating = 0;
 
-            stars.forEach((star, index) => {
-                star.addEventListener('click', function() {
-                    currentRating = parseInt(this.dataset.rating);
-                    ratingInput.value = currentRating;
-                    updateStars();
-                    updateRatingText();
-                });
-
-                star.addEventListener('mouseenter', function() {
-                    const hoverRating = parseInt(this.dataset.rating);
-                    highlightStars(hoverRating);
-                });
-            });
-
-            document.getElementById('star-rating').addEventListener('mouseleave', function() {
-                updateStars();
-            });
-
-            function updateStars() {
-                stars.forEach((star, index) => {
-                    if (index < currentRating) {
-                        star.classList.remove('text-[#3F3F46]');
-                        star.classList.add('text-[#FFC107]');
-                    } else {
-                        star.classList.remove('text-[#FFC107]');
-                        star.classList.add('text-[#3F3F46]');
-                    }
-                });
-            }
-
-            function highlightStars(rating) {
-                stars.forEach((star, index) => {
-                    if (index < rating) {
-                        star.classList.remove('text-[#3F3F46]');
-                        star.classList.add('text-[#FFC107]');
-                    } else {
-                        star.classList.remove('text-[#FFC107]');
-                        star.classList.add('text-[#3F3F46]');
-                    }
-                });
-            }
-
-            function updateRatingText() {
-                const ratingLabels = {
-                    1: '1/10 - Terrible',
-                    2: '2/10 - Very Poor',
-                    3: '3/10 - Poor',
-                    4: '4/10 - Below Average',
-                    5: '5/10 - Average',
-                    6: '6/10 - Above Average',
-                    7: '7/10 - Good',
-                    8: '8/10 - Very Good',
-                    9: '9/10 - Excellent',
-                    10: '10/10 - Perfect'
-                };
-                ratingText.textContent = ratingLabels[currentRating] || 'Select a rating';
-            }
-        });
-    </script>
 </x-layouts.app> 

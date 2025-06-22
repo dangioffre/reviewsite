@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Review extends Model
 {
@@ -12,14 +13,57 @@ class Review extends Model
     protected $fillable = [
         'product_id',
         'user_id',
-        'review',
+        'title',
+        'slug',
+        'content',
         'rating',
+        'positive_points',
+        'negative_points',
+        'platform_played_on',
+        'game_status',
         'is_staff_review',
+        'is_published',
     ];
 
     protected $casts = [
         'is_staff_review' => 'boolean',
+        'is_published' => 'boolean',
+        'positive_points' => 'array',
+        'negative_points' => 'array',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($review) {
+            if (empty($review->slug) && !empty($review->title)) {
+                $review->slug = Str::slug($review->title);
+                
+                // Ensure uniqueness
+                $originalSlug = $review->slug;
+                $count = 1;
+                while (static::where('slug', $review->slug)->exists()) {
+                    $review->slug = $originalSlug . '-' . $count;
+                    $count++;
+                }
+            }
+        });
+        
+        static::updating(function ($review) {
+            if ($review->isDirty('title') && !empty($review->title)) {
+                $review->slug = Str::slug($review->title);
+                
+                // Ensure uniqueness
+                $originalSlug = $review->slug;
+                $count = 1;
+                while (static::where('slug', $review->slug)->where('id', '!=', $review->id)->exists()) {
+                    $review->slug = $originalSlug . '-' . $count;
+                    $count++;
+                }
+            }
+        });
+    }
 
     public function product()
     {
@@ -39,5 +83,40 @@ class Review extends Model
     public function scopeUser($query)
     {
         return $query->where('is_staff_review', false);
+    }
+
+    public function scopePublished($query)
+    {
+        return $query->where('is_published', true);
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
+    public function getHardwarePlayedOn()
+    {
+        if (!$this->platform_played_on) {
+            return null;
+        }
+        
+        return \App\Models\Hardware::where('slug', $this->platform_played_on)->first();
+    }
+
+    public function getPositivePointsListAttribute()
+    {
+        if (is_string($this->positive_points)) {
+            return array_filter(explode("\n", $this->positive_points));
+        }
+        return $this->positive_points ?? [];
+    }
+
+    public function getNegativePointsListAttribute()
+    {
+        if (is_string($this->negative_points)) {
+            return array_filter(explode("\n", $this->negative_points));
+        }
+        return $this->negative_points ?? [];
     }
 }

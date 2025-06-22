@@ -116,19 +116,7 @@ class TechController extends Controller
             abort(404);
         }
 
-        $request->validate([
-            'review' => 'required|string|max:1000',
-            'rating' => 'required|integer|min:1|max:10',
-        ]);
-
-        $product->reviews()->create([
-            'user_id' => Auth::id(),
-            'review' => $request->review,
-            'rating' => $request->rating,
-            'is_staff_review' => Auth::user()->is_admin, // Automatically mark admin reviews as staff
-        ]);
-
-        return redirect()->route('tech.show', $product)
-            ->with('success', 'Your review has been submitted successfully!');
+        // Redirect to new review creation system
+        return redirect()->route('reviews.create', $product);
     }
 } 

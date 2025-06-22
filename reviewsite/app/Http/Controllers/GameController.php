@@ -88,19 +88,7 @@ class GameController extends Controller
 
     public function storeReview(Request $request, Product $product)
     {
-        $request->validate([
-            'review' => 'required|string|max:1000',
-            'rating' => 'required|integer|min:1|max:10',
-        ]);
-
-        $product->reviews()->create([
-            'user_id' => Auth::id(),
-            'review' => $request->review,
-            'rating' => $request->rating,
-            'is_staff_review' => Auth::user()->is_admin,
-        ]);
-
-        return redirect()->route('games.show', $product)
-            ->with('success', 'Your review has been submitted successfully!');
+        // Redirect to new review creation system
+        return redirect()->route('reviews.create', $product);
     }
 } 

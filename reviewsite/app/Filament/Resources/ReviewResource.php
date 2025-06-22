@@ -34,9 +34,43 @@ class ReviewResource extends Resource
                     ->relationship('user', 'name')
                     ->searchable()
                     ->required(),
-                Forms\Components\Textarea::make('review')->required()->columnSpanFull(),
-                Forms\Components\TextInput::make('rating')->numeric()->required()->minValue(1)->maxValue(10),
-                Forms\Components\Toggle::make('is_staff')->label('Is Staff Review?'),
+                Forms\Components\TextInput::make('title')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\Textarea::make('content')
+                    ->required()
+                    ->rows(8)
+                    ->columnSpanFull()
+                    ->helperText('Write your detailed review content here. You can use line breaks for paragraphs.'),
+                Forms\Components\TextInput::make('rating')
+                    ->numeric()
+                    ->required()
+                    ->minValue(1)
+                    ->maxValue(10),
+                Forms\Components\Textarea::make('positive_points')
+                    ->rows(4)
+                    ->helperText('List positive points, one per line'),
+                Forms\Components\Textarea::make('negative_points')
+                    ->rows(4)
+                    ->helperText('List negative points, one per line'),
+                Forms\Components\Select::make('platform_played_on')
+                    ->options(function () {
+                        return \App\Models\Hardware::active()->pluck('name', 'slug');
+                    })
+                    ->searchable()
+                    ->helperText('Platform the reviewer played on'),
+                Forms\Components\Select::make('game_status')
+                    ->options([
+                        'want' => 'Want to Play',
+                        'playing' => 'Currently Playing',
+                        'played' => 'Completed',
+                    ])
+                    ->helperText('Only applicable for games'),
+                Forms\Components\Toggle::make('is_staff_review')
+                    ->label('Is Staff Review?'),
+                Forms\Components\Toggle::make('is_published')
+                    ->label('Published')
+                    ->default(true),
             ]);
     }
 
@@ -44,16 +78,55 @@ class ReviewResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('product.name')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('user.name')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('rating')->sortable()->badge(),
-                Tables\Columns\TextColumn::make('review')->limit(50),
-                Tables\Columns\IconColumn::make('is_staff')->boolean(),
+                Tables\Columns\TextColumn::make('title')
+                    ->searchable()
+                    ->sortable()
+                    ->limit(30),
+                Tables\Columns\TextColumn::make('product.name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('user.name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('rating')
+                    ->sortable()
+                    ->badge()
+                    ->color(fn (string $state): string => match (true) {
+                        $state >= 8 => 'success',
+                        $state >= 6 => 'warning',
+                        default => 'danger',
+                    }),
+                Tables\Columns\TextColumn::make('game_status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'want' => 'gray',
+                        'playing' => 'warning',
+                        'played' => 'success',
+                        default => 'gray',
+                    }),
+                Tables\Columns\IconColumn::make('is_staff_review')
+                    ->boolean()
+                    ->label('Staff'),
+                Tables\Columns\IconColumn::make('is_published')
+                    ->boolean()
+                    ->label('Published'),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('product')
+                    ->relationship('product', 'name'),
+                Tables\Filters\TernaryFilter::make('is_staff_review')
+                    ->label('Staff Review'),
+                Tables\Filters\TernaryFilter::make('is_published')
+                    ->label('Published'),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make()
+                    ->url(fn ($record) => route('reviews.show', $record))
+                    ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
