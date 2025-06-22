@@ -34,75 +34,189 @@ class TechProductResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Product Information')
-                    ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(function (string $operation, $state, Forms\Set $set) {
-                                if ($operation !== 'create') {
-                                    return;
-                                }
-                                $set('slug', \Illuminate\Support\Str::slug($state));
-                            }),
-                        
-                        Forms\Components\TextInput::make('slug')
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(Product::class, 'slug', ignoreRecord: true)
-                            ->rules(['alpha_dash']),
-                        
-                        Forms\Components\Select::make('type')
-                            ->required()
-                            ->options([
-                                'hardware' => 'Hardware',
-                                'accessory' => 'Accessory',
-                            ])
-                            ->live(),
-                        
-                        Forms\Components\Select::make('genre_id')
-                            ->label('Category')
-                            ->options(Genre::active()->pluck('name', 'id'))
-                            ->searchable()
-                            ->helperText('Use genres to categorize your tech products'),
-                        
-                        Forms\Components\Select::make('platform_id')
-                            ->label('Platform Compatibility')
-                            ->options(Platform::active()->pluck('name', 'id'))
-                            ->searchable()
-                            ->helperText('Which platform is this compatible with?'),
-                        
-                        Forms\Components\Select::make('hardware_id')
-                            ->label('Hardware (for Accessories)')
-                            ->options(Hardware::active()->pluck('name', 'id'))
-                            ->searchable()
-                            ->visible(fn (Forms\Get $get) => $get('type') === 'accessory')
-                            ->helperText('Select the hardware this accessory is compatible with'),
-                        
-                        Forms\Components\TextInput::make('image')
-                            ->label('Image URL')
-                            ->url(),
-                        
-                        Forms\Components\TextInput::make('video_url')
-                            ->label('Video URL')
-                            ->url(),
-                        
-                        Forms\Components\DatePicker::make('release_date')
-                            ->label('Release Date'),
-                        
-                        Forms\Components\TextInput::make('developer')
-                            ->label('Manufacturer/Brand')
-                            ->maxLength(255),
+                Forms\Components\Tabs::make('Product Information')
+                    ->tabs([
+                        Forms\Components\Tabs\Tab::make('Basic Info')
+                            ->icon('heroicon-m-information-circle')
+                            ->schema([
+                                Forms\Components\Section::make('Product Information')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('name')
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->live(onBlur: true)
+                                            ->afterStateUpdated(function (string $operation, $state, Forms\Set $set) {
+                                                if ($operation !== 'create') {
+                                                    return;
+                                                }
+                                                $set('slug', \Illuminate\Support\Str::slug($state));
+                                            }),
+                                        
+                                        Forms\Components\TextInput::make('slug')
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->unique(Product::class, 'slug', ignoreRecord: true)
+                                            ->rules(['alpha_dash']),
+                                        
+                                        Forms\Components\Select::make('type')
+                                            ->required()
+                                            ->options([
+                                                'hardware' => 'Hardware',
+                                                'accessory' => 'Accessory',
+                                            ])
+                                            ->live(),
+                                        
+                                        Forms\Components\Select::make('genre_id')
+                                            ->label('Category')
+                                            ->options(Genre::active()->pluck('name', 'id'))
+                                            ->searchable()
+                                            ->helperText('Use genres to categorize your tech products'),
+                                        
+                                        Forms\Components\Select::make('platform_id')
+                                            ->label('Platform Compatibility')
+                                            ->options(Platform::active()->pluck('name', 'id'))
+                                            ->searchable()
+                                            ->helperText('Which platform is this compatible with?'),
+                                        
+                                        Forms\Components\Select::make('hardware_id')
+                                            ->label('Hardware (for Accessories)')
+                                            ->options(Hardware::active()->pluck('name', 'id'))
+                                            ->searchable()
+                                            ->visible(fn (Forms\Get $get) => $get('type') === 'accessory')
+                                            ->helperText('Select the hardware this accessory is compatible with'),
+                                        
+                                        Forms\Components\DatePicker::make('release_date')
+                                            ->label('Release Date'),
+                                        
+                                        Forms\Components\TextInput::make('theme')
+                                            ->label('Theme/Category')
+                                            ->maxLength(255)
+                                            ->helperText('e.g., Gaming, Professional, Budget, Premium, etc.'),
+                                    ])
+                                    ->columns(2),
+
+                                Forms\Components\Section::make('Manufacturer Information')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('developer')
+                                            ->label('Manufacturer/Brand')
+                                            ->maxLength(255),
+                                        
+                                        Forms\Components\TextInput::make('publisher')
+                                            ->label('Publisher/Distributor')
+                                            ->maxLength(255),
+                                        
+                                        Forms\Components\TextInput::make('game_modes')
+                                            ->label('Key Features')
+                                            ->maxLength(255)
+                                            ->helperText('e.g., RGB Lighting, Wireless, Mechanical, etc.'),
+                                    ])
+                                    ->columns(2),
+                            ]),
+
+                        Forms\Components\Tabs\Tab::make('Media')
+                            ->icon('heroicon-m-photo')
+                            ->schema([
+                                Forms\Components\Section::make('Main Media')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('image')
+                                            ->label('Main Product Image')
+                                            ->url()
+                                            ->helperText('Primary image displayed on product pages')
+                                            ->columnSpanFull(),
+                                        
+                                        Forms\Components\TextInput::make('video_url')
+                                            ->label('Main Product Video')
+                                            ->url()
+                                            ->helperText('YouTube embed URL for product demonstration')
+                                            ->columnSpanFull(),
+                                    ]),
+
+                                Forms\Components\Section::make('Additional Photos')
+                                    ->schema([
+                                        Forms\Components\Repeater::make('photos')
+                                            ->label('Product Photos')
+                                            ->schema([
+                                                Forms\Components\TextInput::make('url')
+                                                    ->label('Image URL')
+                                                    ->url()
+                                                    ->required(),
+                                                Forms\Components\TextInput::make('caption')
+                                                    ->label('Caption')
+                                                    ->maxLength(255)
+                                                    ->helperText('Optional description for this image'),
+                                                Forms\Components\Select::make('type')
+                                                    ->label('Image Type')
+                                                    ->options([
+                                                        'product' => 'Product Photo',
+                                                        'detail' => 'Detail Shot',
+                                                        'packaging' => 'Packaging',
+                                                        'usage' => 'In Use',
+                                                        'other' => 'Other',
+                                                    ])
+                                                    ->default('product'),
+                                            ])
+                                            ->columns(3)
+                                            ->defaultItems(0)
+                                            ->addActionLabel('Add Photo')
+                                            ->helperText('Add multiple product images, detail shots, etc.')
+                                            ->columnSpanFull(),
+                                    ]),
+
+                                Forms\Components\Section::make('Additional Videos')
+                                    ->schema([
+                                        Forms\Components\Repeater::make('videos')
+                                            ->label('Additional Videos')
+                                            ->schema([
+                                                Forms\Components\TextInput::make('url')
+                                                    ->label('Video URL')
+                                                    ->url()
+                                                    ->required()
+                                                    ->helperText('YouTube embed URL'),
+                                                Forms\Components\TextInput::make('title')
+                                                    ->label('Video Title')
+                                                    ->maxLength(255)
+                                                    ->required(),
+                                                Forms\Components\Select::make('type')
+                                                    ->label('Video Type')
+                                                    ->options([
+                                                        'demo' => 'Product Demo',
+                                                        'unboxing' => 'Unboxing',
+                                                        'review' => 'Review',
+                                                        'tutorial' => 'Tutorial',
+                                                        'other' => 'Other',
+                                                    ])
+                                                    ->default('demo'),
+                                            ])
+                                            ->columns(3)
+                                            ->defaultItems(0)
+                                            ->addActionLabel('Add Video')
+                                            ->helperText('Add product demos, unboxing videos, reviews, etc.')
+                                            ->columnSpanFull(),
+                                    ]),
+                            ]),
+
+                        Forms\Components\Tabs\Tab::make('Content')
+                            ->icon('heroicon-m-document-text')
+                            ->schema([
+                                Forms\Components\Section::make('Description')
+                                    ->schema([
+                                        Forms\Components\Textarea::make('description')
+                                            ->label('Product Description')
+                                            ->rows(4)
+                                            ->helperText('Brief overview of the product (2-3 sentences)')
+                                            ->columnSpanFull(),
+                                    ]),
+
+                                Forms\Components\Section::make('Detailed Information')
+                                    ->schema([
+                                        Forms\Components\RichEditor::make('story')
+                                            ->label('Detailed Information')
+                                            ->helperText('Detailed technical specifications, features, or additional information')
+                                            ->columnSpanFull(),
+                                    ]),
+                            ]),
                     ])
-                    ->columns(2),
-                
-                Forms\Components\Section::make('Description')
-                    ->schema([
-                        Forms\Components\Textarea::make('description')
-                            ->rows(3)
-                            ->columnSpanFull(),
-                    ]),
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -149,6 +263,20 @@ class TechProductResource extends Resource
                 
                 Tables\Columns\TextColumn::make('developer')
                     ->label('Brand')
+                    ->toggleable(),
+                
+                Tables\Columns\TextColumn::make('publisher')
+                    ->label('Publisher')
+                    ->toggleable(),
+                
+                Tables\Columns\TextColumn::make('theme')
+                    ->badge()
+                    ->color('info')
+                    ->toggleable(),
+                
+                Tables\Columns\TextColumn::make('release_date')
+                    ->date()
+                    ->sortable()
                     ->toggleable(),
                 
                 Tables\Columns\TextColumn::make('created_at')

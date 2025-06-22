@@ -15,10 +15,16 @@ class Product extends Model
         'name',
         'slug',
         'description',
+        'story',
         'image',
         'video_url',
+        'photos',
+        'videos',
         'release_date',
         'developer',
+        'publisher',
+        'game_modes',
+        'theme',
         'type',
         'genre_id',
         'platform_id',
@@ -27,6 +33,8 @@ class Product extends Model
 
     protected $casts = [
         'release_date' => 'date',
+        'photos' => 'array',
+        'videos' => 'array',
     ];
 
     /**

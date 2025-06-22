@@ -135,16 +135,26 @@
                 <!-- Left Column: Video & Staff Review -->
                 <div class="lg:col-span-2 space-y-12">
                     <!-- Video Section -->
-                    @if($product->video)
+                    @if($product->video_url)
                     <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
-                        <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Gameplay Video</h2>
+                        <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Product Video</h2>
                         <div class="relative aspect-video rounded-xl overflow-hidden border border-[#3F3F46]">
                             <iframe 
-                                src="{{ $product->video }}" 
+                                src="{{ $product->video_url }}" 
                                 class="w-full h-full"
                                 frameborder="0" 
                                 allowfullscreen
                             ></iframe>
+                        </div>
+                    </section>
+                    @endif
+
+                    <!-- Detailed Information Section -->
+                    @if($product->story)
+                    <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                        <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Detailed Information</h2>
+                        <div class="text-[#A1A1AA] leading-relaxed font-['Inter'] prose prose-invert max-w-none">
+                            {!! $product->story !!}
                         </div>
                     </section>
                     @endif
@@ -280,23 +290,54 @@
                             <div class="space-y-4">
                                 @if($product->genre)
                                 <div class="flex justify-between items-center">
-                                    <span class="text-[#A1A1AA] font-['Inter']">Genre</span>
+                                    <span class="text-[#A1A1AA] font-['Inter']">Category</span>
                                     <span class="text-white font-semibold font-['Inter']">{{ $product->genre->name }}</span>
                                 </div>
                                 @endif
                                 @if($product->platform)
                                 <div class="flex justify-between items-center">
-                                    <span class="text-[#A1A1AA] font-['Inter']">Platform</span>
-                                    <span class="text-white font-semibold font-['Inter']">{{ $product->platform->name }}</span>
+                                    <span class="text-[#A1A1AA] font-['Inter']">Compatibility</span>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-white" 
+                                          style="background-color: {{ $product->platform->color }};">
+                                        {{ $product->platform->name }}
+                                    </span>
                                 </div>
                                 @endif
                                 @if($product->hardware)
                                 <div class="flex justify-between items-center">
-                                    <span class="text-[#A1A1AA] font-['Inter']">Hardware</span>
+                                    <span class="text-[#A1A1AA] font-['Inter']">Hardware Type</span>
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-white" 
                                           style="background-color: {{ $product->hardware->color }};">
                                         {{ $product->hardware->name }}
                                     </span>
+                                </div>
+                                @endif
+                                @if($product->theme)
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[#A1A1AA] font-['Inter']">Theme</span>
+                                    <span class="text-white font-semibold font-['Inter']">{{ $product->theme }}</span>
+                                </div>
+                                @endif
+                                @if($product->game_modes)
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[#A1A1AA] font-['Inter']">Features</span>
+                                    <span class="text-white font-semibold font-['Inter']">{{ $product->game_modes }}</span>
+                                </div>
+                                @endif
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[#A1A1AA] font-['Inter']">Release Date</span>
+                                    <span class="text-white font-['Inter'] font-medium">{{ $product->release_date ? $product->release_date->format('M d, Y') : 'TBA' }}</span>
+                                </div>
+                                @if($product->developer)
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[#A1A1AA] font-['Inter']">Manufacturer</span>
+                                    <span class="text-white font-['Inter'] font-medium">{{ $product->developer }}</span>
+                                </div>
+                                @endif
+                                @if($product->publisher)
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[#A1A1AA] font-['Inter']">Publisher</span>
+                                    <span class="text-white font-['Inter'] font-medium">{{ $product->publisher }}</span>
                                 </div>
                                 @endif
                                 <div class="flex justify-between items-center">
@@ -306,25 +347,6 @@
                                 <div class="flex justify-between items-center">
                                     <span class="text-[#A1A1AA] font-['Inter']">Added</span>
                                     <span class="text-white font-semibold font-['Inter']">{{ $product->created_at->format('M Y') }}</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-[#A1A1AA] font-['Inter']">Release Date:</span>
-                                    <span class="text-white font-['Inter'] font-medium">{{ $product->release_date ? $product->release_date->format('M d, Y') : 'TBA' }}</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-[#A1A1AA] font-['Inter']">Manufacturer:</span>
-                                    <span class="text-white font-['Inter'] font-medium">{{ $product->developer ?? 'Unknown' }}</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-[#A1A1AA] font-['Inter']">Compatibility:</span>
-                                    @if($product->platform)
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-white" 
-                                              style="background-color: {{ $product->platform->color }};">
-                                            {{ $product->platform->name }}
-                                        </span>
-                                    @else
-                                        <span class="text-[#A1A1AA] font-['Inter']">Universal</span>
-                                    @endif
                                 </div>
                             </div>
                         </div>

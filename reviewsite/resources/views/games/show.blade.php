@@ -66,10 +66,10 @@
                             
                             <!-- YouTube Video -->
                             <div class="flex-1">
-                                @if($product->video)
+                                @if($product->video_url)
                                     <div class="bg-[#1A1A1B] rounded-xl overflow-hidden border border-[#3F3F46]/20 aspect-video">
                                         <iframe 
-                                            src="{{ $product->video }}" 
+                                            src="{{ $product->video_url }}" 
                                             class="w-full h-full"
                                             frameborder="0" 
                                             allowfullscreen
@@ -166,113 +166,364 @@
                     </div>
                 </div>
 
-                <!-- Simple Description Section -->
+                <!-- Tab Navigation -->
                 <div class="mb-12">
-                    <h2 class="text-2xl font-bold text-white mb-4 font-['Share_Tech_Mono']">Description</h2>
-                    <p class="text-[#A1A1AA] leading-relaxed font-['Inter'] text-lg">
-                        {{ $product->description ?? 'No description available for this game.' }}
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Reviews Content -->
-        <div class="container mx-auto px-4 py-12">
-            <div class="space-y-12">
-                <!-- Staff Reviews Section -->
-                @if($staffReviews->count() > 0)
-                <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
-                    <div class="flex items-center gap-4 mb-6">
-                        <div class="w-12 h-12 bg-[#E53E3E] bg-opacity-20 rounded-lg flex items-center justify-center">
-                            <svg class="w-6 h-6 text-[#E53E3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                            </svg>
-                        </div>
-                        <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono']">Staff Reviews</h2>
+                    <div class="border-b border-[#3F3F46]">
+                        <nav class="flex space-x-8">
+                            <button onclick="switchTab('about')" id="about-tab" class="tab-button active py-4 px-2 text-sm font-medium font-['Inter'] border-b-2 transition-colors duration-200">
+                                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                About
+                            </button>
+                            <button onclick="switchTab('reviews')" id="reviews-tab" class="tab-button py-4 px-2 text-sm font-medium font-['Inter'] border-b-2 transition-colors duration-200">
+                                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                </svg>
+                                Reviews
+                            </button>
+                            <button onclick="switchTab('media')" id="media-tab" class="tab-button py-4 px-2 text-sm font-medium font-['Inter'] border-b-2 transition-colors duration-200">
+                                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                Media
+                            </button>
+                        </nav>
                     </div>
-                    
-                    <div class="space-y-6">
-                        @foreach($staffReviews as $review)
-                            <div class="bg-[#1A1A1B] rounded-xl p-6 border border-[#3F3F46]">
-                                <div class="flex items-start justify-between mb-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-gradient-to-r from-[#E53E3E] to-[#DC2626] rounded-full flex items-center justify-center">
-                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <div class="text-white font-semibold font-['Inter']">{{ $review->user->name }} <span class="text-[#E53E3E] text-sm">STAFF</span></div>
-                                            <div class="text-[#A1A1AA] text-sm font-['Inter']">{{ $review->created_at->diffForHumans() }}</div>
-                                        </div>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <!-- About Tab -->
+                    <div id="about-content" class="tab-panel active">
+                        <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                            <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">About {{ $product->name }}</h2>
+                            
+                            <div class="space-y-8">
+                                <!-- Description -->
+                                <div>
+                                    <h3 class="text-lg font-semibold text-white mb-3 font-['Inter']">Description</h3>
+                                    <p class="text-[#A1A1AA] leading-relaxed font-['Inter']">
+                                        {{ $product->description ?? 'No description available for this game.' }}
+                                    </p>
+                                </div>
+
+                                <!-- Story Section -->
+                                <div>
+                                    <h3 class="text-lg font-semibold text-white mb-3 font-['Inter']">Story</h3>
+                                    <div class="bg-[#1A1A1B] rounded-lg p-4 border border-[#3F3F46]/50">
+                                                                        @if(isset($product->story) && $product->story)
+                                    <div class="text-[#A1A1AA] leading-relaxed font-['Inter'] prose prose-invert max-w-none">
+                                        {!! $product->story !!}
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="bg-[#E53E3E] text-white font-bold font-['Share_Tech_Mono'] px-3 py-1 rounded-lg">{{ $review->rating }}/10</span>
+                                @else
+                                    <p class="text-[#A1A1AA] leading-relaxed font-['Inter'] italic">Story details will be added by our editorial team soon.</p>
+                                @endif
                                     </div>
                                 </div>
-                                <div class="text-[#A1A1AA] leading-relaxed font-['Inter']">
-                                    @if($review->content)
-                                        <p>{{ Str::limit($review->content, 200) }}</p>
-                                        @if(strlen($review->content) > 200 && $review->slug)
-                                            <a href="{{ route('games.reviews.show', [$product, $review]) }}" class="text-[#E53E3E] hover:text-red-400 font-semibold mt-2 inline-block">
-                                                Read Full Review →
-                                            </a>
-                                        @endif
-                                    @else
-                                        <p>{{ $review->review ?? 'No review content available.' }}</p>
+
+                                <div class="grid md:grid-cols-2 gap-8">
+                                    <!-- Game Details -->
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-white mb-4 font-['Inter']">Game Details</h3>
+                                        <div class="space-y-3">
+                                            @if($product->platform)
+                                            <div class="flex justify-between items-center py-2 border-b border-[#3F3F46]/50">
+                                                <span class="text-[#A1A1AA] font-['Inter']">Platform</span>
+                                                <span class="text-white font-semibold font-['Inter']">{{ $product->platform->name }}</span>
+                                            </div>
+                                            @endif
+                                            
+                                            @if($product->genre)
+                                            <div class="flex justify-between items-center py-2 border-b border-[#3F3F46]/50">
+                                                <span class="text-[#A1A1AA] font-['Inter']">Genre</span>
+                                                <span class="text-white font-semibold font-['Inter']">{{ $product->genre->name }}</span>
+                                            </div>
+                                            @endif
+
+                                            <div class="flex justify-between items-center py-2 border-b border-[#3F3F46]/50">
+                                                <span class="text-[#A1A1AA] font-['Inter']">Type</span>
+                                                <span class="text-white font-semibold font-['Inter']">{{ ucfirst($product->type) }}</span>
+                                            </div>
+
+                                            @if($product->release_date)
+                                            <div class="flex justify-between items-center py-2 border-b border-[#3F3F46]/50">
+                                                <span class="text-[#A1A1AA] font-['Inter']">Release Date</span>
+                                                <span class="text-white font-semibold font-['Inter']">{{ $product->release_date->format('M d, Y') }}</span>
+                                            </div>
+                                            @endif
+
+                                            <!-- Game Modes (placeholder) -->
+                                            <div class="flex justify-between items-center py-2 border-b border-[#3F3F46]/50">
+                                                <span class="text-[#A1A1AA] font-['Inter']">Game Modes</span>
+                                                @if(isset($product->game_modes) && $product->game_modes)
+                                                    <span class="text-white font-semibold font-['Inter']">{{ $product->game_modes }}</span>
+                                                @else
+                                                    <span class="text-[#A1A1AA] font-['Inter'] italic text-sm">Coming Soon</span>
+                                                @endif
+                                            </div>
+
+                                            <!-- Theme (placeholder) -->
+                                            <div class="flex justify-between items-center py-2 border-b border-[#3F3F46]/50">
+                                                <span class="text-[#A1A1AA] font-['Inter']">Theme</span>
+                                                @if(isset($product->theme) && $product->theme)
+                                                    <span class="text-white font-semibold font-['Inter']">{{ $product->theme }}</span>
+                                                @else
+                                                    <span class="text-[#A1A1AA] font-['Inter'] italic text-sm">Coming Soon</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Development Info -->
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-white mb-4 font-['Inter']">Development Information</h3>
+                                        <div class="space-y-3">
+                                            @if($product->developer)
+                                            <div class="flex justify-between items-center py-2 border-b border-[#3F3F46]/50">
+                                                <span class="text-[#A1A1AA] font-['Inter']">Developer</span>
+                                                <span class="text-white font-semibold font-['Inter']">{{ $product->developer }}</span>
+                                            </div>
+                                            @endif
+
+                                            <!-- Publisher (placeholder) -->
+                                            <div class="flex justify-between items-center py-2 border-b border-[#3F3F46]/50">
+                                                <span class="text-[#A1A1AA] font-['Inter']">Publisher</span>
+                                                @if(isset($product->publisher) && $product->publisher)
+                                                    <span class="text-white font-semibold font-['Inter']">{{ $product->publisher }}</span>
+                                                @else
+                                                    <span class="text-[#A1A1AA] font-['Inter'] italic text-sm">Coming Soon</span>
+                                                @endif
+                                            </div>
+
+                                            @if($product->hardware)
+                                            <div class="flex justify-between items-center py-2 border-b border-[#3F3F46]/50">
+                                                <span class="text-[#A1A1AA] font-['Inter']">Hardware Category</span>
+                                                <span class="text-white font-semibold font-['Inter']">{{ $product->hardware->name }}</span>
+                                            </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reviews Tab -->
+                    <div id="reviews-content" class="tab-panel">
+                        <div class="space-y-12">
+                            <!-- Staff Reviews Section -->
+                            @if($staffReviews->count() > 0)
+                            <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                                <div class="flex items-center gap-4 mb-6">
+                                    <div class="w-12 h-12 bg-[#E53E3E] bg-opacity-20 rounded-lg flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-[#E53E3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                        </svg>
+                                    </div>
+                                    <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono']">Staff Reviews</h2>
+                                </div>
+                                
+                                <div class="space-y-6">
+                                    @foreach($staffReviews as $review)
+                                        <div class="bg-[#1A1A1B] rounded-xl p-6 border border-[#3F3F46]">
+                                            <div class="flex items-start justify-between mb-4">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-10 h-10 bg-gradient-to-r from-[#E53E3E] to-[#DC2626] rounded-full flex items-center justify-center">
+                                                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <div class="text-white font-semibold font-['Inter']">{{ $review->user->name }} <span class="text-[#E53E3E] text-sm">STAFF</span></div>
+                                                        <div class="text-[#A1A1AA] text-sm font-['Inter']">{{ $review->created_at->diffForHumans() }}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="bg-[#E53E3E] text-white font-bold font-['Share_Tech_Mono'] px-3 py-1 rounded-lg">{{ $review->rating }}/10</span>
+                                                </div>
+                                            </div>
+                                            <div class="text-[#A1A1AA] leading-relaxed font-['Inter']">
+                                                @if($review->content)
+                                                    <p>{{ Str::limit($review->content, 200) }}</p>
+                                                    @if(strlen($review->content) > 200 && $review->slug)
+                                                        <a href="{{ route('games.reviews.show', [$product, $review]) }}" class="text-[#E53E3E] hover:text-red-400 font-semibold mt-2 inline-block">
+                                                            Read Full Review →
+                                                        </a>
+                                                    @endif
+                                                @else
+                                                    <p>{{ $review->review ?? 'No review content available.' }}</p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </section>
+                            @endif
+
+                            <!-- User Reviews Section -->
+                            <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                                <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Community Reviews</h2>
+                                
+                                @if($userReviews->count() > 0)
+                                    <div class="space-y-6">
+                                        @foreach($userReviews as $review)
+                                            <div class="bg-[#1A1A1B] rounded-xl p-6 border border-[#3F3F46]">
+                                                <div class="flex items-start justify-between mb-4">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-10 h-10 bg-gradient-to-r from-[#E53E3E] to-[#2563EB] rounded-full flex items-center justify-center">
+                                                            <span class="text-white font-bold font-['Share_Tech_Mono']">{{ substr($review->user->name, 0, 1) }}</span>
+                                                        </div>
+                                                        <div>
+                                                            <div class="text-white font-semibold font-['Inter']">{{ $review->user->name }}</div>
+                                                            <div class="text-[#A1A1AA] text-sm font-['Inter']">{{ $review->created_at->diffForHumans() }}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="bg-[#2563EB] text-white font-bold font-['Share_Tech_Mono'] px-3 py-1 rounded-lg">{{ $review->rating }}/10</span>
+                                                    </div>
+                                                </div>
+                                                <div class="text-[#A1A1AA] leading-relaxed font-['Inter']">
+                                                    @if($review->content)
+                                                        <p>{{ Str::limit($review->content, 150) }}</p>
+                                                        @if(strlen($review->content) > 150 && $review->slug)
+                                                            <a href="{{ route('games.reviews.show', [$product, $review]) }}" class="text-[#2563EB] hover:text-blue-400 font-semibold mt-2 inline-block">
+                                                                Read Full Review →
+                                                            </a>
+                                                        @endif
+                                                    @else
+                                                        <p>{{ $review->review ?? 'No review content available.' }}</p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <div class="text-center py-12">
+                                        <div class="text-6xl mb-4">💬</div>
+                                        <h3 class="text-xl font-bold text-white mb-2 font-['Share_Tech_Mono']">No Community Reviews Yet</h3>
+                                        <p class="text-[#A1A1AA] font-['Inter']">Be the first to share your thoughts on this game!</p>
+                                    </div>
+                                @endif
+                            </section>
+                        </div>
+                    </div>
+
+                    <!-- Media Tab -->
+                    <div id="media-content" class="tab-panel">
+                        <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                            <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Media Gallery</h2>
+                            
+                            <!-- Videos Section -->
+                            <div class="mb-8">
+                                <h3 class="text-lg font-semibold text-white mb-4 font-['Inter']">Videos</h3>
+                                <div class="grid md:grid-cols-3 gap-4">
+                                    <!-- Main Video -->
+                                    @if($product->video_url)
+                                        <div class="bg-[#1A1A1B] rounded-xl overflow-hidden border border-[#3F3F46]">
+                                            <div class="aspect-video">
+                                                <iframe 
+                                                    src="{{ $product->video_url }}" 
+                                                    class="w-full h-full"
+                                                    frameborder="0" 
+                                                    allowfullscreen
+                                                    title="{{ $product->name }} - Main Video"
+                                                ></iframe>
+                                            </div>
+                                            <div class="p-3">
+                                                <h4 class="text-white font-semibold text-sm font-['Inter']">Main Video</h4>
+                                                <p class="text-[#A1A1AA] text-xs font-['Inter']">{{ $product->name }} official video</p>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <!-- Additional Videos -->
+                                    @if($product->videos && count($product->videos) > 0)
+                                        @foreach($product->videos as $video)
+                                            <div class="bg-[#1A1A1B] rounded-xl overflow-hidden border border-[#3F3F46]">
+                                                <div class="aspect-video">
+                                                    <iframe 
+                                                        src="{{ $video['url'] }}" 
+                                                        class="w-full h-full"
+                                                        frameborder="0" 
+                                                        allowfullscreen
+                                                        title="{{ $video['title'] ?? $product->name }}"
+                                                    ></iframe>
+                                                </div>
+                                                <div class="p-3">
+                                                    <h4 class="text-white font-semibold text-sm font-['Inter']">{{ $video['title'] ?? 'Video' }}</h4>
+                                                    <p class="text-[#A1A1AA] text-xs font-['Inter']">
+                                                        {{ ucfirst($video['type'] ?? 'video') }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+
+                                    <!-- No Videos Placeholder -->
+                                    @if(!$product->video_url && (!$product->videos || count($product->videos) === 0))
+                                        <div class="bg-[#1A1A1B] rounded-xl border border-[#3F3F46] aspect-video flex items-center justify-center">
+                                            <div class="text-center">
+                                                <div class="text-4xl mb-3 opacity-50">🎮</div>
+                                                <h4 class="text-lg font-semibold text-white mb-1 font-['Inter']">No Videos Available</h4>
+                                                <p class="text-sm text-[#A1A1AA] font-['Inter']">Videos will be added by our team</p>
+                                            </div>
+                                        </div>
                                     @endif
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
-                </section>
-                @endif
 
-                <!-- User Reviews Section -->
-                <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
-                    <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Community Reviews</h2>
-                    
-                    @if($userReviews->count() > 0)
-                        <div class="space-y-6">
-                            @foreach($userReviews as $review)
-                                <div class="bg-[#1A1A1B] rounded-xl p-6 border border-[#3F3F46]">
-                                    <div class="flex items-start justify-between mb-4">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 bg-gradient-to-r from-[#E53E3E] to-[#2563EB] rounded-full flex items-center justify-center">
-                                                <span class="text-white font-bold font-['Share_Tech_Mono']">{{ substr($review->user->name, 0, 1) }}</span>
-                                            </div>
-                                            <div>
-                                                <div class="text-white font-semibold font-['Inter']">{{ $review->user->name }}</div>
-                                                <div class="text-[#A1A1AA] text-sm font-['Inter']">{{ $review->created_at->diffForHumans() }}</div>
+                            <!-- Photos & Screenshots Section -->
+                            <div>
+                                <h3 class="text-lg font-semibold text-white mb-4 font-['Inter']">Photos & Screenshots</h3>
+                                <div class="grid md:grid-cols-3 gap-4">
+                                    <!-- Main Image -->
+                                    @if($product->image)
+                                        <div class="bg-[#1A1A1B] rounded-xl overflow-hidden border border-[#3F3F46] group cursor-pointer" onclick="openImageModal('{{ $product->image }}', 'Main Image')">
+                                            <img 
+                                                src="{{ $product->image }}" 
+                                                alt="{{ $product->name }} main image"
+                                                class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                                            >
+                                            <div class="p-3">
+                                                <p class="text-white text-sm font-semibold font-['Inter']">Main Image</p>
+                                                <p class="text-[#A1A1AA] text-xs font-['Inter']">Official poster</p>
                                             </div>
                                         </div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="bg-[#2563EB] text-white font-bold font-['Share_Tech_Mono'] px-3 py-1 rounded-lg">{{ $review->rating }}/10</span>
+                                    @endif
+
+                                    <!-- Additional Photos -->
+                                    @if($product->photos && count($product->photos) > 0)
+                                        @foreach($product->photos as $photo)
+                                            <div class="bg-[#1A1A1B] rounded-xl overflow-hidden border border-[#3F3F46] group cursor-pointer" onclick="openImageModal('{{ $photo['url'] }}', '{{ $photo['caption'] ?? 'Screenshot' }}')">
+                                                <img 
+                                                    src="{{ $photo['url'] }}" 
+                                                    alt="{{ $photo['caption'] ?? $product->name . ' screenshot' }}"
+                                                    class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                                                >
+                                                <div class="p-3">
+                                                    <p class="text-white text-sm font-semibold font-['Inter']">{{ $photo['caption'] ?? 'Screenshot' }}</p>
+                                                    <p class="text-[#A1A1AA] text-xs font-['Inter']">{{ ucfirst($photo['type'] ?? 'screenshot') }}</p>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+
+                                    <!-- No Photos Placeholder -->
+                                    @if(!$product->image && (!$product->photos || count($product->photos) === 0))
+                                        <div class="bg-[#1A1A1B] rounded-xl border border-[#3F3F46] h-48 flex items-center justify-center">
+                                            <div class="text-center">
+                                                <div class="text-2xl mb-2 opacity-30">🖼️</div>
+                                                <p class="text-sm text-[#A1A1AA] font-['Inter']">No Photos Available</p>
+                                                <p class="text-xs text-[#A1A1AA] font-['Inter']">Photos will be added by our team</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="text-[#A1A1AA] leading-relaxed font-['Inter']">
-                                        @if($review->content)
-                                            <p>{{ Str::limit($review->content, 150) }}</p>
-                                            @if(strlen($review->content) > 150 && $review->slug)
-                                                <a href="{{ route('games.reviews.show', [$product, $review]) }}" class="text-[#2563EB] hover:text-blue-400 font-semibold mt-2 inline-block">
-                                                    Read Full Review →
-                                                </a>
-                                            @endif
-                                        @else
-                                            <p>{{ $review->review ?? 'No review content available.' }}</p>
-                                        @endif
-                                    </div>
+                                    @endif
                                 </div>
-                            @endforeach
+                            </div>
                         </div>
-                    @else
-                        <div class="text-center py-12">
-                            <div class="text-6xl mb-4">💬</div>
-                            <h3 class="text-xl font-bold text-white mb-2 font-['Share_Tech_Mono']">No Community Reviews Yet</h3>
-                            <p class="text-[#A1A1AA] font-['Inter']">Be the first to share your thoughts on this game!</p>
-                        </div>
-                    @endif
-                </section>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -299,6 +550,46 @@
         </div>
     </div>
 
+    <!-- Image Modal -->
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-80 hidden z-50 flex items-center justify-center p-4">
+        <div class="relative max-w-4xl max-h-full">
+            <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white hover:text-[#E53E3E] z-10 bg-black bg-opacity-50 rounded-full p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            <img id="modalImage" src="" alt="" class="max-w-full max-h-full object-contain rounded-lg">
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-4 rounded-b-lg">
+                <h3 id="modalImageTitle" class="text-white font-semibold text-lg"></h3>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Tab Styles */
+        .tab-button {
+            color: #A1A1AA;
+            border-bottom-color: transparent;
+        }
+        
+        .tab-button.active {
+            color: #E53E3E;
+            border-bottom-color: #E53E3E;
+        }
+        
+        .tab-button:hover {
+            color: #E53E3E;
+        }
+        
+        .tab-panel {
+            display: none;
+        }
+        
+        .tab-panel.active {
+            display: block;
+        }
+    </style>
+
     <script>
         function showLoginPrompt() {
             document.getElementById('loginModal').classList.remove('hidden');
@@ -308,12 +599,43 @@
             document.getElementById('loginModal').classList.add('hidden');
         }
 
-        // Close modal when clicking outside
+        function openImageModal(imageUrl, title) {
+            document.getElementById('modalImage').src = imageUrl;
+            document.getElementById('modalImageTitle').textContent = title;
+            document.getElementById('imageModal').classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+        }
+
+        // Close modals when clicking outside
         document.getElementById('loginModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeLoginPrompt();
             }
         });
+
+        document.getElementById('imageModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeImageModal();
+            }
+        });
+
+        // Tab functionality
+        function switchTab(tabName) {
+            // Remove active class from all tabs and panels
+            document.querySelectorAll('.tab-button').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab and corresponding panel
+            document.getElementById(tabName + '-tab').classList.add('active');
+            document.getElementById(tabName + '-content').classList.add('active');
+        }
 
         @auth
         function rateGame(rating) {
