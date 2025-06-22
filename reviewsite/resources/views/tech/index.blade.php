@@ -230,6 +230,30 @@
                 </div>
             </form>
 
+            <!-- Filter Display Section -->
+            @if(isset($filterType) && isset($filterValue))
+            <div class="container mx-auto px-4 mb-8">
+                <div class="bg-gradient-to-r from-[#E53E3E] to-[#DC2626] rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                            </svg>
+                            <span class="text-white font-semibold font-['Inter']">
+                                Showing tech products filtered by {{ $filterType }}: <span class="font-bold">{{ $filterValue }}</span>
+                            </span>
+                        </div>
+                        <a href="{{ route('tech.index') }}" class="text-white hover:text-gray-200 font-semibold font-['Inter'] flex items-center gap-2 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            Clear Filter
+                        </a>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <!-- Active Filters Display -->
             @if(request()->hasAny(['search', 'category', 'sort', 'score_range', 'platform', 'genre', 'hardware']))
                 <div class="mb-6 mt-4">

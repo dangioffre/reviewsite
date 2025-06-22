@@ -29,12 +29,24 @@ class Product extends Model
         'genre_id',
         'platform_id',
         'hardware_id',
+        'genres',
+        'platforms',
+        'developers',
+        'publishers',
+        'themes',
+        'game_modes_list',
     ];
 
     protected $casts = [
         'release_date' => 'date',
         'photos' => 'array',
         'videos' => 'array',
+        'genres' => 'array',
+        'platforms' => 'array',
+        'developers' => 'array',
+        'publishers' => 'array',
+        'themes' => 'array',
+        'game_modes_list' => 'array',
     ];
 
     /**
@@ -103,6 +115,38 @@ class Product extends Model
     public function hardware()
     {
         return $this->belongsTo(Hardware::class);
+    }
+
+    /**
+     * Many-to-many relationship with GameMode.
+     */
+    public function gameModes()
+    {
+        return $this->belongsToMany(GameMode::class, 'game_mode_product');
+    }
+
+    /**
+     * Many-to-many relationship with Developer.
+     */
+    public function developers()
+    {
+        return $this->belongsToMany(Developer::class, 'developer_product');
+    }
+
+    /**
+     * Many-to-many relationship with Publisher.
+     */
+    public function publishers()
+    {
+        return $this->belongsToMany(Publisher::class, 'product_publisher');
+    }
+
+    /**
+     * Many-to-many relationship with Theme.
+     */
+    public function themes()
+    {
+        return $this->belongsToMany(Theme::class, 'product_theme');
     }
 
     /**

@@ -25,6 +25,12 @@ class DatabaseSeeder extends Seeder
             GenrePlatformSeeder::class,
             HardwareSeeder::class,
             
+            // New relationship seeders
+            GameModeSeeder::class,
+            DeveloperSeeder::class,
+            PublisherSeeder::class,
+            ThemeSeeder::class,
+            
             // New seeders for testing
             RegularUserSeeder::class,
             GameSeeder::class,

@@ -291,16 +291,18 @@
                                 @if($product->genre)
                                 <div class="flex justify-between items-center">
                                     <span class="text-[#A1A1AA] font-['Inter']">Category</span>
-                                    <span class="text-white font-semibold font-['Inter']">{{ $product->genre->name }}</span>
+                                    <a href="{{ route('tech.by-category', $product->genre) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200">
+                                        {{ $product->genre->name }}
+                                    </a>
                                 </div>
                                 @endif
                                 @if($product->platform)
                                 <div class="flex justify-between items-center">
                                     <span class="text-[#A1A1AA] font-['Inter']">Compatibility</span>
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-white" 
+                                    <a href="{{ route('tech.by-platform', $product->platform) }}" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-white hover:opacity-80 transition-opacity" 
                                           style="background-color: {{ $product->platform->color }};">
                                         {{ $product->platform->name }}
-                                    </span>
+                                    </a>
                                 </div>
                                 @endif
                                 @if($product->hardware)
@@ -315,7 +317,9 @@
                                 @if($product->theme)
                                 <div class="flex justify-between items-center">
                                     <span class="text-[#A1A1AA] font-['Inter']">Theme</span>
-                                    <span class="text-white font-semibold font-['Inter']">{{ $product->theme }}</span>
+                                    <a href="{{ route('tech.by-theme', urlencode($product->theme)) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200">
+                                        {{ $product->theme }}
+                                    </a>
                                 </div>
                                 @endif
                                 @if($product->game_modes)
@@ -331,13 +335,17 @@
                                 @if($product->developer)
                                 <div class="flex justify-between items-center">
                                     <span class="text-[#A1A1AA] font-['Inter']">Manufacturer</span>
-                                    <span class="text-white font-['Inter'] font-medium">{{ $product->developer }}</span>
+                                    <a href="{{ route('tech.by-brand', urlencode($product->developer)) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200">
+                                        {{ $product->developer }}
+                                    </a>
                                 </div>
                                 @endif
                                 @if($product->publisher)
                                 <div class="flex justify-between items-center">
                                     <span class="text-[#A1A1AA] font-['Inter']">Publisher</span>
-                                    <span class="text-white font-['Inter'] font-medium">{{ $product->publisher }}</span>
+                                    <a href="{{ route('tech.by-publisher', urlencode($product->publisher)) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200">
+                                        {{ $product->publisher }}
+                                    </a>
                                 </div>
                                 @endif
                                 <div class="flex justify-between items-center">

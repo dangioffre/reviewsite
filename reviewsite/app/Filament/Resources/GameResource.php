@@ -54,40 +54,58 @@ class GameResource extends Resource
                                             ->unique(Product::class, 'slug', ignoreRecord: true)
                                             ->rules(['alpha_dash']),
                                         
-                                        Forms\Components\Select::make('genre_id')
-                                            ->label('Genre')
-                                            ->options(Genre::active()->pluck('name', 'id'))
-                                            ->searchable(),
+                                        Forms\Components\Select::make('genres')
+                                            ->label('Genres')
+                                            ->multiple()
+                                            ->options(Genre::active()->pluck('name', 'name'))
+                                            ->searchable()
+                                            ->helperText('Select multiple genres that apply to this game'),
                                         
-                                        Forms\Components\Select::make('platform_id')
-                                            ->label('Platform')
-                                            ->options(Platform::active()->pluck('name', 'id'))
-                                            ->searchable(),
+                                        Forms\Components\Select::make('platforms')
+                                            ->label('Platforms')
+                                            ->multiple()
+                                            ->options(Platform::active()->pluck('name', 'name'))
+                                            ->searchable()
+                                            ->helperText('Select all platforms this game is available on'),
                                         
                                         Forms\Components\DatePicker::make('release_date')
                                             ->label('Release Date'),
                                         
-                                        Forms\Components\TextInput::make('theme')
-                                            ->label('Theme')
-                                            ->maxLength(255)
-                                            ->helperText('e.g., Fantasy, Sci-Fi, Horror, etc.'),
+                                        Forms\Components\Select::make('theme_ids')
+                                            ->label('Themes')
+                                            ->multiple()
+                                            ->relationship('themes', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->helperText('Select themes that apply to this game'),
                                     ])
                                     ->columns(2),
 
                                 Forms\Components\Section::make('Development Information')
                                     ->schema([
-                                        Forms\Components\TextInput::make('developer')
-                                            ->label('Developer')
-                                            ->maxLength(255),
+                                        Forms\Components\Select::make('developer_ids')
+                                            ->label('Developers')
+                                            ->multiple()
+                                            ->relationship('developers', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->helperText('Select all developers involved in this game'),
                                         
-                                        Forms\Components\TextInput::make('publisher')
-                                            ->label('Publisher')
-                                            ->maxLength(255),
+                                        Forms\Components\Select::make('publisher_ids')
+                                            ->label('Publishers')
+                                            ->multiple()
+                                            ->relationship('publishers', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->helperText('Select all publishers involved in this game'),
                                         
-                                        Forms\Components\TextInput::make('game_modes')
+                                        Forms\Components\Select::make('game_mode_ids')
                                             ->label('Game Modes')
-                                            ->maxLength(255)
-                                            ->helperText('e.g., Single-player, Multiplayer, Co-op, etc.'),
+                                            ->multiple()
+                                            ->relationship('gameModes', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->helperText('Select game modes (e.g., Single-player, Multiplayer, Co-op, etc.)'),
                                     ])
                                     ->columns(2),
                             ]),
@@ -218,26 +236,46 @@ class GameResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->copyable(),
                 
-                Tables\Columns\TextColumn::make('genre.name')
+                Tables\Columns\TextColumn::make('genres')
                     ->badge()
-                    ->color(fn ($record) => $record->genre?->color ?: 'gray'),
-                
-                Tables\Columns\TextColumn::make('platform.name')
-                    ->badge()
-                    ->color(fn ($record) => $record->platform?->color ?: 'gray'),
-                
-                Tables\Columns\TextColumn::make('developer')
+                    ->separator(',')
+                    ->color('primary')
+                    ->formatStateUsing(fn ($state) => is_array($state) ? implode(', ', $state) : $state)
                     ->toggleable(),
                 
-                Tables\Columns\TextColumn::make('publisher')
+                Tables\Columns\TextColumn::make('platforms')
+                    ->badge()
+                    ->separator(',')
+                    ->color('success')
+                    ->formatStateUsing(fn ($state) => is_array($state) ? implode(', ', $state) : $state)
                     ->toggleable(),
                 
-                Tables\Columns\TextColumn::make('theme')
+                Tables\Columns\TextColumn::make('developers.name')
+                    ->label('Developers')
                     ->badge()
+                    ->separator(',')
+                    ->color('warning')
+                    ->toggleable(),
+                
+                Tables\Columns\TextColumn::make('publishers.name')
+                    ->label('Publishers')
+                    ->badge()
+                    ->separator(',')
                     ->color('info')
                     ->toggleable(),
                 
-                Tables\Columns\TextColumn::make('game_modes')
+                Tables\Columns\TextColumn::make('themes.name')
+                    ->label('Themes')
+                    ->badge()
+                    ->separator(',')
+                    ->color('gray')
+                    ->toggleable(),
+                
+                Tables\Columns\TextColumn::make('gameModes.name')
+                    ->label('Game Modes')
+                    ->badge()
+                    ->separator(',')
+                    ->color('secondary')
                     ->toggleable(isToggledHiddenByDefault: true),
                 
                 Tables\Columns\TextColumn::make('release_date')

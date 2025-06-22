@@ -169,5 +169,103 @@ class TechController extends Controller
         ]);
     }
 
+    public function byCategory(Genre $genre)
+    {
+        $products = Product::with(['genre', 'platform', 'reviews'])
+            ->whereIn('type', ['hardware', 'accessory'])
+            ->where(function($query) use ($genre) {
+                $query->where('genre_id', $genre->id)
+                      ->orWhereJsonContains('genres', $genre->name);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
 
+        $genres = Genre::active()->get();
+        $platforms = Platform::active()->get();
+        $hardware = Hardware::active()->get();
+        $filterType = 'Category';
+        $filterValue = $genre->name;
+
+        return view('tech.index', compact('products', 'genres', 'platforms', 'hardware', 'filterType', 'filterValue'));
+    }
+
+    public function byPlatform(Platform $platform)
+    {
+        $products = Product::with(['genre', 'platform', 'reviews'])
+            ->whereIn('type', ['hardware', 'accessory'])
+            ->where(function($query) use ($platform) {
+                $query->where('platform_id', $platform->id)
+                      ->orWhereJsonContains('platforms', $platform->name);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        $genres = Genre::active()->get();
+        $platforms = Platform::active()->get();
+        $hardware = Hardware::active()->get();
+        $filterType = 'Platform';
+        $filterValue = $platform->name;
+
+        return view('tech.index', compact('products', 'genres', 'platforms', 'hardware', 'filterType', 'filterValue'));
+    }
+
+    public function byBrand($developer)
+    {
+        $products = Product::with(['genre', 'platform', 'reviews'])
+            ->whereIn('type', ['hardware', 'accessory'])
+            ->where(function($query) use ($developer) {
+                $query->where('developer', $developer)
+                      ->orWhereJsonContains('developers', $developer);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        $genres = Genre::active()->get();
+        $platforms = Platform::active()->get();
+        $hardware = Hardware::active()->get();
+        $filterType = 'Brand';
+        $filterValue = $developer;
+
+        return view('tech.index', compact('products', 'genres', 'platforms', 'hardware', 'filterType', 'filterValue'));
+    }
+
+    public function byPublisher($publisher)
+    {
+        $products = Product::with(['genre', 'platform', 'reviews'])
+            ->whereIn('type', ['hardware', 'accessory'])
+            ->where(function($query) use ($publisher) {
+                $query->where('publisher', $publisher)
+                      ->orWhereJsonContains('publishers', $publisher);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        $genres = Genre::active()->get();
+        $platforms = Platform::active()->get();
+        $hardware = Hardware::active()->get();
+        $filterType = 'Publisher';
+        $filterValue = $publisher;
+
+        return view('tech.index', compact('products', 'genres', 'platforms', 'hardware', 'filterType', 'filterValue'));
+    }
+
+    public function byTheme($theme)
+    {
+        $products = Product::with(['genre', 'platform', 'reviews'])
+            ->whereIn('type', ['hardware', 'accessory'])
+            ->where(function($query) use ($theme) {
+                $query->where('theme', $theme)
+                      ->orWhereJsonContains('themes', $theme);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        $genres = Genre::active()->get();
+        $platforms = Platform::active()->get();
+        $hardware = Hardware::active()->get();
+        $filterType = 'Theme';
+        $filterValue = $theme;
+
+        return view('tech.index', compact('products', 'genres', 'platforms', 'hardware', 'filterType', 'filterValue'));
+    }
 } 

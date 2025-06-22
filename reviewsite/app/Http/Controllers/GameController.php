@@ -146,5 +146,117 @@ class GameController extends Controller
         ]);
     }
 
+    public function byGenre(Genre $genre)
+    {
+        $products = Product::with(['genre', 'platform', 'reviews'])
+            ->where('type', 'game')
+            ->where(function($query) use ($genre) {
+                $query->where('genre_id', $genre->id)
+                      ->orWhereJsonContains('genres', $genre->name);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
 
+        $genres = Genre::active()->get();
+        $platforms = Platform::active()->get();
+        $filterType = 'Genre';
+        $filterValue = $genre->name;
+
+        return view('games.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
+    }
+
+    public function byPlatform(Platform $platform)
+    {
+        $products = Product::with(['genre', 'platform', 'reviews'])
+            ->where('type', 'game')
+            ->where(function($query) use ($platform) {
+                $query->where('platform_id', $platform->id)
+                      ->orWhereJsonContains('platforms', $platform->name);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        $genres = Genre::active()->get();
+        $platforms = Platform::active()->get();
+        $filterType = 'Platform';
+        $filterValue = $platform->name;
+
+        return view('games.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
+    }
+
+    public function byDeveloper($developer)
+    {
+        $products = Product::with(['genre', 'platform', 'reviews'])
+            ->where('type', 'game')
+            ->where(function($query) use ($developer) {
+                $query->where('developer', $developer)
+                      ->orWhereJsonContains('developers', $developer);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        $genres = Genre::active()->get();
+        $platforms = Platform::active()->get();
+        $filterType = 'Developer';
+        $filterValue = $developer;
+
+        return view('games.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
+    }
+
+    public function byPublisher($publisher)
+    {
+        $products = Product::with(['genre', 'platform', 'reviews'])
+            ->where('type', 'game')
+            ->where(function($query) use ($publisher) {
+                $query->where('publisher', $publisher)
+                      ->orWhereJsonContains('publishers', $publisher);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        $genres = Genre::active()->get();
+        $platforms = Platform::active()->get();
+        $filterType = 'Publisher';
+        $filterValue = $publisher;
+
+        return view('games.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
+    }
+
+    public function byTheme($theme)
+    {
+        $products = Product::with(['genre', 'platform', 'reviews'])
+            ->where('type', 'game')
+            ->where(function($query) use ($theme) {
+                $query->where('theme', $theme)
+                      ->orWhereJsonContains('themes', $theme);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        $genres = Genre::active()->get();
+        $platforms = Platform::active()->get();
+        $filterType = 'Theme';
+        $filterValue = $theme;
+
+        return view('games.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
+    }
+
+    public function byGameMode($mode)
+    {
+        $products = Product::with(['genre', 'platform', 'reviews'])
+            ->where('type', 'game')
+            ->where(function($query) use ($mode) {
+                $query->where('game_modes', 'like', '%' . $mode . '%')
+                      ->orWhereJsonContains('game_modes_list', $mode);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        $genres = Genre::active()->get();
+        $platforms = Platform::active()->get();
+        $filterType = 'Game Mode';
+        $filterValue = $mode;
+
+        return view('games.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
+    }
 } 

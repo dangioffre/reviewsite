@@ -66,17 +66,19 @@ class TechProductResource extends Resource
                                             ])
                                             ->live(),
                                         
-                                        Forms\Components\Select::make('genre_id')
-                                            ->label('Category')
-                                            ->options(Genre::active()->pluck('name', 'id'))
+                                        Forms\Components\Select::make('genres')
+                                            ->label('Categories')
+                                            ->multiple()
+                                            ->options(Genre::active()->pluck('name', 'name'))
                                             ->searchable()
-                                            ->helperText('Use genres to categorize your tech products'),
+                                            ->helperText('Select multiple categories that apply to this tech product'),
                                         
-                                        Forms\Components\Select::make('platform_id')
+                                        Forms\Components\Select::make('platforms')
                                             ->label('Platform Compatibility')
-                                            ->options(Platform::active()->pluck('name', 'id'))
+                                            ->multiple()
+                                            ->options(Platform::active()->pluck('name', 'name'))
                                             ->searchable()
-                                            ->helperText('Which platform is this compatible with?'),
+                                            ->helperText('Select all platforms this product is compatible with'),
                                         
                                         Forms\Components\Select::make('hardware_id')
                                             ->label('Hardware (for Accessories)')
@@ -88,27 +90,41 @@ class TechProductResource extends Resource
                                         Forms\Components\DatePicker::make('release_date')
                                             ->label('Release Date'),
                                         
-                                        Forms\Components\TextInput::make('theme')
-                                            ->label('Theme/Category')
-                                            ->maxLength(255)
-                                            ->helperText('e.g., Gaming, Professional, Budget, Premium, etc.'),
+                                        Forms\Components\Select::make('theme_ids')
+                                            ->label('Themes/Categories')
+                                            ->multiple()
+                                            ->relationship('themes', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->helperText('Select themes/categories that apply to this product'),
                                     ])
                                     ->columns(2),
 
                                 Forms\Components\Section::make('Manufacturer Information')
                                     ->schema([
-                                        Forms\Components\TextInput::make('developer')
-                                            ->label('Manufacturer/Brand')
-                                            ->maxLength(255),
+                                        Forms\Components\Select::make('developer_ids')
+                                            ->label('Manufacturers/Brands')
+                                            ->multiple()
+                                            ->relationship('developers', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->helperText('Select all manufacturers/brands involved'),
                                         
-                                        Forms\Components\TextInput::make('publisher')
-                                            ->label('Publisher/Distributor')
-                                            ->maxLength(255),
+                                        Forms\Components\Select::make('publisher_ids')
+                                            ->label('Publishers/Distributors')
+                                            ->multiple()
+                                            ->relationship('publishers', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->helperText('Select all publishers/distributors involved'),
                                         
-                                        Forms\Components\TextInput::make('game_modes')
+                                        Forms\Components\Select::make('game_mode_ids')
                                             ->label('Key Features')
-                                            ->maxLength(255)
-                                            ->helperText('e.g., RGB Lighting, Wireless, Mechanical, etc.'),
+                                            ->multiple()
+                                            ->relationship('gameModes', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->helperText('Select key features (e.g., RGB Lighting, Wireless, Mechanical, etc.)'),
                                     ])
                                     ->columns(2),
                             ]),
@@ -247,31 +263,45 @@ class TechProductResource extends Resource
                         };
                     }),
                 
-                Tables\Columns\TextColumn::make('genre.name')
-                    ->label('Category')
+                Tables\Columns\TextColumn::make('genres')
+                    ->label('Categories')
                     ->badge()
-                    ->color(fn ($record) => $record->genre?->color ?: 'gray'),
+                    ->separator(',')
+                    ->color('primary')
+                    ->formatStateUsing(fn ($state) => is_array($state) ? implode(', ', $state) : $state)
+                    ->toggleable(),
                 
-                Tables\Columns\TextColumn::make('platform.name')
+                Tables\Columns\TextColumn::make('platforms')
                     ->badge()
-                    ->color(fn ($record) => $record->platform?->color ?: 'gray'),
+                    ->separator(',')
+                    ->color('success')
+                    ->formatStateUsing(fn ($state) => is_array($state) ? implode(', ', $state) : $state)
+                    ->toggleable(),
                 
                 Tables\Columns\TextColumn::make('hardware.name')
                     ->badge()
                     ->color(fn ($record) => $record->hardware?->color ?: 'gray')
                     ->placeholder('N/A'),
                 
-                Tables\Columns\TextColumn::make('developer')
-                    ->label('Brand')
-                    ->toggleable(),
-                
-                Tables\Columns\TextColumn::make('publisher')
-                    ->label('Publisher')
-                    ->toggleable(),
-                
-                Tables\Columns\TextColumn::make('theme')
+                Tables\Columns\TextColumn::make('developers.name')
+                    ->label('Brands')
                     ->badge()
+                    ->separator(',')
+                    ->color('warning')
+                    ->toggleable(),
+                
+                Tables\Columns\TextColumn::make('publishers.name')
+                    ->label('Publishers')
+                    ->badge()
+                    ->separator(',')
                     ->color('info')
+                    ->toggleable(),
+                
+                Tables\Columns\TextColumn::make('themes.name')
+                    ->label('Themes')
+                    ->badge()
+                    ->separator(',')
+                    ->color('gray')
                     ->toggleable(),
                 
                 Tables\Columns\TextColumn::make('release_date')

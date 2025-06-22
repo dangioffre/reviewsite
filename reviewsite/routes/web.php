@@ -17,6 +17,14 @@ Route::resource('posts', PostController::class);
 Route::get('/games', [GameController::class, 'index'])->name('games.index');
 Route::get('/games/{product}', [GameController::class, 'show'])->name('games.show');
 Route::post('/games/{product}/rate', [GameController::class, 'rate'])->name('games.rate');
+
+// Game filtering routes
+Route::get('/games/genre/{genre}', [GameController::class, 'byGenre'])->name('games.by-genre');
+Route::get('/games/platform/{platform}', [GameController::class, 'byPlatform'])->name('games.by-platform');
+Route::get('/games/developer/{developer}', [GameController::class, 'byDeveloper'])->name('games.by-developer');
+Route::get('/games/publisher/{publisher}', [GameController::class, 'byPublisher'])->name('games.by-publisher');
+Route::get('/games/theme/{theme}', [GameController::class, 'byTheme'])->name('games.by-theme');
+Route::get('/games/mode/{mode}', [GameController::class, 'byGameMode'])->name('games.by-mode');
 Route::get('/games/{product}/reviews/create', [ReviewController::class, 'create'])->name('games.reviews.create');
 Route::post('/games/{product}/reviews', [ReviewController::class, 'store'])->name('games.reviews.store');
 Route::get('/games/{product}/{review}', [ReviewController::class, 'show'])->name('games.reviews.show');
@@ -32,6 +40,13 @@ Route::post('/games/{product}/{review}/report', [ReportController::class, 'store
 Route::get('/tech', [TechController::class, 'index'])->name('tech.index');
 Route::get('/tech/{product}', [TechController::class, 'show'])->name('tech.show');
 Route::post('/tech/{product}/rate', [TechController::class, 'rate'])->name('tech.rate');
+
+// Tech filtering routes
+Route::get('/tech/category/{genre}', [TechController::class, 'byCategory'])->name('tech.by-category');
+Route::get('/tech/platform/{platform}', [TechController::class, 'byPlatform'])->name('tech.by-platform');
+Route::get('/tech/brand/{developer}', [TechController::class, 'byBrand'])->name('tech.by-brand');
+Route::get('/tech/publisher/{publisher}', [TechController::class, 'byPublisher'])->name('tech.by-publisher');
+Route::get('/tech/theme/{theme}', [TechController::class, 'byTheme'])->name('tech.by-theme');
 Route::get('/tech/{product}/reviews/create', [ReviewController::class, 'create'])->name('tech.reviews.create');
 Route::post('/tech/{product}/reviews', [ReviewController::class, 'store'])->name('tech.reviews.store');
 Route::get('/tech/{product}/{review}', [ReviewController::class, 'show'])->name('tech.reviews.show');
