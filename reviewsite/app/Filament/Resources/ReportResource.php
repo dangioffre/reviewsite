@@ -34,10 +34,38 @@ class ReportResource extends Resource
             ->schema([
                 Forms\Components\Section::make('Report Details')
                     ->schema([
-                        Forms\Components\Select::make('review_id')
-                            ->relationship('review', 'title')
-                            ->searchable()
-                            ->required()
+                        Forms\Components\TextInput::make('review_info')
+                            ->label('Reported Review')
+                            ->formatStateUsing(function ($record) {
+                                if ($record && $record->review) {
+                                    return $record->review->title;
+                                } else if ($record) {
+                                    return ($record->review_title ?? 'Unknown Review') . ' (DELETED)';
+                                }
+                                return '';
+                            })
+                            ->disabled(),
+                        Forms\Components\TextInput::make('product_info')
+                            ->label('Product')
+                            ->formatStateUsing(function ($record) {
+                                if ($record && $record->review) {
+                                    return $record->review->product->name . ' (' . ucfirst($record->review->product->type) . ')';
+                                } else if ($record) {
+                                    return ($record->product_name ?? 'Unknown Product') . ' (' . ucfirst($record->product_type ?? 'unknown') . ')';
+                                }
+                                return '';
+                            })
+                            ->disabled(),
+                        Forms\Components\TextInput::make('review_author_info')
+                            ->label('Review Author')
+                            ->formatStateUsing(function ($record) {
+                                if ($record && $record->review) {
+                                    return $record->review->user->name;
+                                } else if ($record) {
+                                    return $record->review_author_name ?? 'Unknown Author';
+                                }
+                                return '';
+                            })
                             ->disabled(),
                         Forms\Components\Select::make('user_id')
                             ->relationship('user', 'name')
@@ -85,17 +113,53 @@ class ReportResource extends Resource
                     ->label('Report #')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('review.title')
+                Tables\Columns\TextColumn::make('review_info')
                     ->label('Reported Review')
                     ->limit(50)
-                    ->searchable()
-                    ->url(fn ($record) => $record->review ? 
-                        route($record->review->product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show', 
-                              [$record->review->product, $record->review]) : null)
-                    ->openUrlInNewTab(),
-                Tables\Columns\TextColumn::make('review.user.name')
+                    ->searchable(['review_title', 'product_name'])
+                    ->formatStateUsing(function ($record) {
+                        if ($record->review) {
+                            // Review still exists
+                            return $record->review->title;
+                        } else {
+                            // Review was deleted, show stored info
+                            return ($record->review_title ?? 'Unknown Review') . ' (DELETED)';
+                        }
+                    })
+                    ->url(function ($record) {
+                        if ($record->review) {
+                            return route($record->review->product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show', 
+                                  [$record->review->product, $record->review]);
+                        }
+                        return null;
+                    })
+                    ->openUrlInNewTab()
+                    ->color(fn ($record) => $record->review ? 'primary' : 'gray'),
+                Tables\Columns\TextColumn::make('product_info')
+                    ->label('Product')
+                    ->formatStateUsing(function ($record) {
+                        if ($record->review) {
+                            return $record->review->product->name;
+                        } else {
+                            return $record->product_name ?? 'Unknown Product';
+                        }
+                    })
+                    ->badge()
+                    ->color(fn ($record) => match($record->product_type ?? ($record->review ? $record->review->product->type : 'unknown')) {
+                        'game' => 'success',
+                        'tech' => 'info',
+                        default => 'gray',
+                    }),
+                Tables\Columns\TextColumn::make('review_author_info')
                     ->label('Review Author')
-                    ->searchable(),
+                    ->formatStateUsing(function ($record) {
+                        if ($record->review) {
+                            return $record->review->user->name;
+                        } else {
+                            return $record->review_author_name ?? 'Unknown Author';
+                        }
+                    })
+                    ->searchable(['review_author_name']),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Reported By')
                     ->searchable(),
@@ -148,6 +212,15 @@ class ReportResource extends Resource
                     ]),
                 Tables\Filters\SelectFilter::make('reason')
                     ->options(Report::getReasons()),
+                Tables\Filters\TernaryFilter::make('review_deleted')
+                    ->label('Review Status')
+                    ->placeholder('All Reports')
+                    ->trueLabel('Review Deleted')
+                    ->falseLabel('Review Active')
+                    ->queries(
+                        true: fn (Builder $query) => $query->whereNull('review_id'),
+                        false: fn (Builder $query) => $query->whereNotNull('review_id'),
+                    ),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -155,10 +228,10 @@ class ReportResource extends Resource
                     ->label('Approve & Delete Review')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (Report $record): bool => $record->status === 'pending')
+                    ->visible(fn (Report $record): bool => $record->status === 'pending' && $record->review !== null)
                     ->requiresConfirmation()
                     ->modalHeading('Approve Report')
-                    ->modalDescription('This will delete the reported review permanently. Are you sure?')
+                    ->modalDescription('This will delete the reported review permanently. The report will be kept for audit purposes. Are you sure?')
                     ->form([
                         Forms\Components\Textarea::make('admin_notes')
                             ->label('Admin Notes')
@@ -194,7 +267,11 @@ class ReportResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label('Delete Reports')
+                        ->modalHeading('Delete Selected Reports')
+                        ->modalDescription('This will permanently delete the selected reports. This action cannot be undone.')
+                        ->visible(fn (): bool => Auth::user()->is_admin),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

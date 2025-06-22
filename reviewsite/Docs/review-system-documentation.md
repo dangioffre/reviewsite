@@ -764,14 +764,15 @@ The primary report model that handles:
 2. **Status Tracking**: Pending, approved, and denied states
 3. **Admin Resolution**: Notes and resolution tracking
 4. **Duplicate Prevention**: Unique constraints prevent multiple reports from same user
-5. **Automatic Actions**: Approved reports automatically delete reviews
+5. **Audit Trail**: Preserves report records even when reviews are deleted
+6. **Review Information Storage**: Automatically stores review details before deletion
 
 #### 2. Database Structure
 
 ```sql
 CREATE TABLE reports (
     id BIGINT UNSIGNED PRIMARY KEY,
-    review_id BIGINT UNSIGNED,
+    review_id BIGINT UNSIGNED NULL, -- NULL when review is deleted
     user_id BIGINT UNSIGNED,
     reason VARCHAR(255) NOT NULL,
     additional_info TEXT NULL,
@@ -779,6 +780,11 @@ CREATE TABLE reports (
     admin_notes TEXT NULL,
     resolved_by BIGINT UNSIGNED NULL,
     resolved_at TIMESTAMP NULL,
+    -- Audit trail columns (stored when review is deleted)
+    review_title VARCHAR(255) NULL,
+    review_author_name VARCHAR(255) NULL,
+    product_name VARCHAR(255) NULL,
+    product_type VARCHAR(255) NULL,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
     
@@ -786,7 +792,7 @@ CREATE TABLE reports (
     INDEX (review_id, user_id),
     UNIQUE KEY unique_user_review_report (review_id, user_id),
     
-    FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE CASCADE,
+    FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE SET NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (resolved_by) REFERENCES users(id) ON DELETE SET NULL
 );
@@ -828,16 +834,19 @@ public function deny(Request $request, Report $report)
 
 Comprehensive admin interface featuring:
 - **Table View**: All reports with status, reason, and review details
-- **Filters**: Filter by status, reason, and date
+- **Audit Trail**: Shows both active and deleted review information
+- **Filters**: Filter by status, reason, date, and review deletion status
 - **Quick Actions**: Approve/deny buttons with confirmation modals
 - **Navigation Badge**: Shows count of pending reports
 - **Detailed Views**: Full report information with linked reviews
+- **Historical Records**: Preserves all report data for compliance and audit purposes
 
 Features:
 - Real-time pending report count in navigation
-- Direct links to reported reviews
-- Color-coded status badges
+- Direct links to reported reviews (when still active)
+- Color-coded status badges and review status indicators
 - Admin notes for resolution tracking
+- Comprehensive audit trail showing deleted review information
 
 #### 3. Frontend Integration
 
@@ -919,17 +928,19 @@ Report::create([
 ]);
 ```
 
-#### 2. Admin Approval (Delete Review)
+#### 2. Admin Approval (Delete Review with Audit Trail)
 
 ```php
-// Admin approves report - deletes review
+// Admin approves report - deletes review but preserves report
 $report->approve(Auth::id(), 'Review violated community guidelines');
 
 // This automatically:
+// - Stores review information (title, author, product) in report record
 // - Sets status to 'approved'
 // - Records admin ID and timestamp
 // - Deletes the reported review
 // - Saves admin notes
+// - Preserves report for audit trail
 ```
 
 #### 3. Admin Denial (Keep Review)
