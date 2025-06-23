@@ -215,7 +215,7 @@
                                     <div class="flex justify-between items-center">
                                         <span class="text-[#A1A1AA] font-['Inter']">Played On</span>
                                         @php
-                                            $hardware = \App\Models\Hardware::where('slug', $review->platform_played_on)->first();
+                                            $hardware = \App\Models\Product::whereIn('type', ['hardware', 'accessory'])->where('slug', $review->platform_played_on)->first();
                                         @endphp
                                         @if($hardware)
                                             <span class="inline-flex items-center text-white text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider font-['Share_Tech_Mono'] shadow-lg border border-white/20" style="background: linear-gradient(135deg, {{ $hardware->color }}, {{ $hardware->color }}dd);">

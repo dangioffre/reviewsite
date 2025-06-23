@@ -19,9 +19,9 @@ class DeveloperResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-code-bracket';
     
-    protected static ?string $navigationGroup = 'Product Management';
+    protected static ?string $navigationGroup = 'Companies';
     
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {

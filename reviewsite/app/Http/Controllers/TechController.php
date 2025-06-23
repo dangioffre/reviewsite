@@ -6,7 +6,6 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\Genre;
 use App\Models\Platform;
-use App\Models\Hardware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -46,12 +45,8 @@ class TechController extends Controller
             });
         }
 
-        // Hardware filter (for accessories)
-        if ($request->filled('hardware')) {
-            $query->whereHas('hardware', function ($q) use ($request) {
-                $q->where('slug', $request->hardware);
-            });
-        }
+        // Hardware compatibility filter (for accessories)
+        // Note: This filter was removed as we consolidated hardware into the Product model
 
         // Score range filter
         if ($request->filled('score_range')) {
@@ -85,9 +80,8 @@ class TechController extends Controller
         $products = $query->paginate(12);
         $genres = Genre::active()->get();
         $platforms = Platform::active()->get();
-        $hardware = Hardware::active()->get();
 
-        return view('tech.index', compact('products', 'genres', 'platforms', 'hardware'));
+        return view('tech.index', compact('products', 'genres', 'platforms'));
     }
 
     public function show(Product $product)
@@ -182,11 +176,10 @@ class TechController extends Controller
 
         $genres = Genre::active()->get();
         $platforms = Platform::active()->get();
-        $hardware = Hardware::active()->get();
         $filterType = 'Category';
         $filterValue = $genre->name;
 
-        return view('tech.index', compact('products', 'genres', 'platforms', 'hardware', 'filterType', 'filterValue'));
+        return view('tech.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
     }
 
     public function byPlatform(Platform $platform)
@@ -202,11 +195,10 @@ class TechController extends Controller
 
         $genres = Genre::active()->get();
         $platforms = Platform::active()->get();
-        $hardware = Hardware::active()->get();
         $filterType = 'Platform';
         $filterValue = $platform->name;
 
-        return view('tech.index', compact('products', 'genres', 'platforms', 'hardware', 'filterType', 'filterValue'));
+        return view('tech.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
     }
 
     public function byBrand($developer)
@@ -222,11 +214,10 @@ class TechController extends Controller
 
         $genres = Genre::active()->get();
         $platforms = Platform::active()->get();
-        $hardware = Hardware::active()->get();
         $filterType = 'Brand';
         $filterValue = $developer;
 
-        return view('tech.index', compact('products', 'genres', 'platforms', 'hardware', 'filterType', 'filterValue'));
+        return view('tech.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
     }
 
     public function byPublisher($publisher)
@@ -242,11 +233,10 @@ class TechController extends Controller
 
         $genres = Genre::active()->get();
         $platforms = Platform::active()->get();
-        $hardware = Hardware::active()->get();
         $filterType = 'Publisher';
         $filterValue = $publisher;
 
-        return view('tech.index', compact('products', 'genres', 'platforms', 'hardware', 'filterType', 'filterValue'));
+        return view('tech.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
     }
 
     public function byTheme($theme)
@@ -262,10 +252,9 @@ class TechController extends Controller
 
         $genres = Genre::active()->get();
         $platforms = Platform::active()->get();
-        $hardware = Hardware::active()->get();
         $filterType = 'Theme';
         $filterValue = $theme;
 
-        return view('tech.index', compact('products', 'genres', 'platforms', 'hardware', 'filterType', 'filterValue'));
+        return view('tech.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
     }
 } 

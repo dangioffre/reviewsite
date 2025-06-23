@@ -7,7 +7,7 @@ use App\Filament\Resources\GameResource\RelationManagers;
 use App\Models\Product;
 use App\Models\Genre;
 use App\Models\Platform;
-use App\Models\Hardware;
+
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -22,7 +22,7 @@ class GameResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-puzzle-piece';
     protected static ?string $navigationLabel = 'Games';
-    protected static ?string $navigationGroup = 'Games Management';
+    protected static ?string $navigationGroup = 'Products';
     protected static ?int $navigationSort = 1;
     protected static ?string $slug = 'games';
 

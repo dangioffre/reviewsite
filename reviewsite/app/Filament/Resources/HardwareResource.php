@@ -7,7 +7,6 @@ use App\Filament\Resources\HardwareResource\RelationManagers;
 use App\Models\Product;
 use App\Models\Genre;
 use App\Models\Platform;
-use App\Models\Hardware;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -24,9 +23,9 @@ class HardwareResource extends Resource
     
     protected static ?string $navigationLabel = 'Hardware';
     
-    protected static ?string $navigationGroup = 'Hardware & Tech';
+    protected static ?string $navigationGroup = 'Products';
     
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
     
     protected static ?string $slug = 'hardware';
 

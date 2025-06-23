@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Review;
 use App\Models\Product;
-use App\Models\Hardware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -51,7 +50,7 @@ class ReviewController extends Controller
             // If it's just a quick rating (star rating), allow them to upgrade to full review
             if ($existingReview->title === 'Quick Rating' && $existingReview->content === 'User rating via star system') {
                 // Pre-populate the form with existing rating
-                $hardware = Hardware::active()->get();
+                $hardware = Product::whereIn('type', ['hardware', 'accessory'])->get();
                 return view('reviews.create', compact('product', 'hardware', 'existingReview'));
             } else {
                 // If it's already a full review, redirect to edit
@@ -61,7 +60,7 @@ class ReviewController extends Controller
             }
         }
         
-        $hardware = Hardware::active()->get();
+        $hardware = Product::whereIn('type', ['hardware', 'accessory'])->get();
         
         return view('reviews.create', compact('product', 'hardware'));
     }
@@ -147,7 +146,7 @@ class ReviewController extends Controller
             abort(403);
         }
         
-        $hardware = Hardware::active()->get();
+        $hardware = Product::whereIn('type', ['hardware', 'accessory'])->get();
         
         return view('reviews.edit', compact('review', 'product', 'hardware'));
     }

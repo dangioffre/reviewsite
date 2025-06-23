@@ -19,7 +19,7 @@ class PlatformResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-device-phone-mobile';
 
-    protected static ?string $navigationGroup = 'Taxonomy';
+    protected static ?string $navigationGroup = 'Categories';
 
     protected static ?int $navigationSort = 2;
 

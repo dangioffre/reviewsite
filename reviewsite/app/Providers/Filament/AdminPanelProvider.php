@@ -6,6 +6,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -85,13 +86,11 @@ class AdminPanelProvider extends PanelProvider
                 \App\Http\Middleware\AdminMiddleware::class,
             ])
             ->navigationGroups([
-                'Games Management',
-                'Tech Management',
-                'Content Management',
-                'Review Management',
-                'Moderation',
-                'Taxonomy',
-                'User Management',
+                NavigationGroup::make('Products'),
+                NavigationGroup::make('Content'),
+                NavigationGroup::make('Community'),
+                NavigationGroup::make('Categories'),
+                NavigationGroup::make('Companies'),
             ]);
     }
 }

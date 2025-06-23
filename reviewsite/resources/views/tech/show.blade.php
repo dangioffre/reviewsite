@@ -305,15 +305,7 @@
                                     </a>
                                 </div>
                                 @endif
-                                @if($product->hardware)
-                                <div class="flex justify-between items-center">
-                                    <span class="text-[#A1A1AA] font-['Inter']">Hardware Type</span>
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-white" 
-                                          style="background-color: {{ $product->hardware->color }};">
-                                        {{ $product->hardware->name }}
-                                    </span>
-                                </div>
-                                @endif
+
                                 @if($product->theme)
                                 <div class="flex justify-between items-center">
                                     <span class="text-[#A1A1AA] font-['Inter']">Theme</span>

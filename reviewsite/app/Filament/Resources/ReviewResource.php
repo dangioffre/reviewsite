@@ -18,9 +18,9 @@ class ReviewResource extends Resource
     protected static ?string $model = Review::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
-    protected static ?string $navigationGroup = 'Review Management';
+    protected static ?string $navigationGroup = 'Content';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -55,7 +55,7 @@ class ReviewResource extends Resource
                     ->helperText('List negative points, one per line'),
                 Forms\Components\Select::make('platform_played_on')
                     ->options(function () {
-                        return \App\Models\Hardware::active()->pluck('name', 'slug');
+                        return \App\Models\Product::whereIn('type', ['hardware', 'accessory'])->pluck('name', 'slug');
                     })
                     ->searchable()
                     ->helperText('Platform the reviewer played on'),

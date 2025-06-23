@@ -19,7 +19,7 @@ class GenreResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
 
-    protected static ?string $navigationGroup = 'Taxonomy';
+    protected static ?string $navigationGroup = 'Categories';
 
     protected static ?int $navigationSort = 1;
 

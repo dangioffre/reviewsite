@@ -19,9 +19,9 @@ class ThemeResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-paint-brush';
     
-    protected static ?string $navigationGroup = 'Product Management';
+    protected static ?string $navigationGroup = 'Categories';
     
-    protected static ?int $navigationSort = 8;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {

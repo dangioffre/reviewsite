@@ -192,14 +192,11 @@
                                 @endforeach
                             </select>
 
-                            <!-- Hardware Filter (for accessories) -->
-                            <select name="hardware" class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white text-sm font-['Inter'] focus:border-[#2563EB] focus:ring-[#2563EB] min-w-[130px]">
-                                <option value="">All Hardware</option>
-                                @foreach($hardware as $hw)
-                                    <option value="{{ $hw->slug }}" {{ request('hardware') == $hw->slug ? 'selected' : '' }}>
-                                        {{ $hw->name }}
-                                    </option>
-                                @endforeach
+                            <!-- Category Filter -->
+                            <select name="category" class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white text-sm font-['Inter'] focus:border-[#2563EB] focus:ring-[#2563EB] min-w-[130px]">
+                                <option value="">All Categories</option>
+                                <option value="hardware" {{ request('category') == 'hardware' ? 'selected' : '' }}>Hardware</option>
+                                <option value="accessories" {{ request('category') == 'accessories' ? 'selected' : '' }}>Accessories</option>
                             </select>
                         </div>
                     </div>
@@ -221,7 +218,7 @@
                             </svg>
                             Search
                         </button>
-                        @if(request()->hasAny(['search', 'category', 'sort', 'score_range', 'platform', 'genre', 'hardware']))
+                        @if(request()->hasAny(['search', 'category', 'sort', 'score_range', 'platform', 'genre']))
                             <a href="{{ route('tech.index') }}" class="bg-[#27272A] text-white px-4 py-2.5 rounded-lg border border-[#E53E3E] hover:bg-red-900/50 transition-colors font-['Inter'] flex items-center">
                                 Clear Filters
                             </a>
@@ -255,7 +252,7 @@
             @endif
 
             <!-- Active Filters Display -->
-            @if(request()->hasAny(['search', 'category', 'sort', 'score_range', 'platform', 'genre', 'hardware']))
+            @if(request()->hasAny(['search', 'category', 'sort', 'score_range', 'platform', 'genre']))
                 <div class="mb-6 mt-4">
                     <div class="flex flex-wrap gap-2">
                         <span class="text-sm text-[#A1A1AA] font-['Inter'] mr-2">Active filters:</span>
@@ -284,11 +281,7 @@
                                 {{ ucfirst(request('genre')) }}
                             </span>
                         @endif
-                        @if(request('hardware'))
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-['Share_Tech_Mono'] bg-[#9333EA] text-white">
-                                Hardware: {{ ucfirst(request('hardware')) }}
-                            </span>
-                        @endif
+
 
                     </div>
                 </div>
@@ -360,14 +353,7 @@
                                                             {{ $product->genre->name }}
                                                         </span>
                                                     @endif
-                                                    @if($product->hardware)
-                                                        <span class="inline-flex items-center text-white text-xs font-bold px-4 py-2 rounded-full uppercase tracking-wider font-['Share_Tech_Mono'] shadow-lg border border-white/20" style="background: linear-gradient(135deg, {{ $product->hardware->color }}, {{ $product->hardware->color }}dd);">
-                                                            <svg class="w-3 h-3 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                                            </svg>
-                                                            {{ $product->hardware->name }}
-                                                        </span>
-                                                    @endif
+
                                                 </div>
                                             </div>
                                             

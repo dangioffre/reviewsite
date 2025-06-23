@@ -105,7 +105,9 @@ class Review extends Model
             return null;
         }
         
-        return \App\Models\Hardware::where('slug', $this->platform_played_on)->first();
+        return \App\Models\Product::whereIn('type', ['hardware', 'accessory'])
+            ->where('slug', $this->platform_played_on)
+            ->first();
     }
 
     public function getPositivePointsListAttribute()

@@ -20,11 +20,11 @@ class ReportResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-flag';
     
-    protected static ?string $navigationGroup = 'Moderation';
+    protected static ?string $navigationGroup = 'Community';
     
     protected static ?string $navigationLabel = 'Review Reports';
     
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'id';
 
