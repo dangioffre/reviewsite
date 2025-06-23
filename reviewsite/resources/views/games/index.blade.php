@@ -329,6 +329,9 @@
                                                 </p>
                                             </div>
                                             
+                                            <!-- Status Buttons Livewire Component -->
+                                            <livewire:game-status-buttons :product="$product" />
+                                            
                                             <!-- Enhanced Action Button -->
                                             <div class="flex items-center gap-4">
                                                 <a 

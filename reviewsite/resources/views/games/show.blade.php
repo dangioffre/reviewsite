@@ -140,6 +140,7 @@
                                     </button>
                                 @endfor
                             </div>
+                            <livewire:game-status-buttons :product="$product" />
                             
                             <!-- Action Buttons -->
                             <div class="space-y-3">
