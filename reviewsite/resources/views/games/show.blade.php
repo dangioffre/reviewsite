@@ -228,41 +228,25 @@
                                         <h3 class="text-lg font-semibold text-white mb-4 font-['Inter']">Game Details</h3>
                                         <div class="space-y-3">
                                             <!-- Platforms -->
-                                            @if($product->platform || ($product->platforms && count($product->platforms) > 0))
+                                            @if($product->platform)
                                             <div class="flex justify-between items-start py-2 border-b border-[#3F3F46]/50">
-                                                <span class="text-[#A1A1AA] font-['Inter']">Platform(s)</span>
+                                                <span class="text-[#A1A1AA] font-['Inter']">Platform</span>
                                                 <div class="flex flex-wrap gap-2 justify-end">
-                                                    @if($product->platforms && count($product->platforms) > 0)
-                                                        @foreach($product->platforms as $platform)
-                                                            <a href="{{ route('games.by-platform', ['platform' => $platform]) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200 text-sm bg-[#E53E3E]/10 px-2 py-1 rounded">
-                                                                {{ $platform }}
-                                                            </a>
-                                                        @endforeach
-                                                    @elseif($product->platform)
-                                                        <a href="{{ route('games.by-platform', $product->platform) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200">
-                                                            {{ $product->platform->name }}
-                                                        </a>
-                                                    @endif
+                                                    <a href="{{ route('games.by-platform', $product->platform) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200 text-sm bg-[#E53E3E]/10 px-2 py-1 rounded">
+                                                        {{ $product->platform->name }}
+                                                    </a>
                                                 </div>
                                             </div>
                                             @endif
                                             
                                             <!-- Genres -->
-                                            @if($product->genre || ($product->genres && count($product->genres) > 0))
+                                            @if($product->genre)
                                             <div class="flex justify-between items-start py-2 border-b border-[#3F3F46]/50">
-                                                <span class="text-[#A1A1AA] font-['Inter']">Genre(s)</span>
+                                                <span class="text-[#A1A1AA] font-['Inter']">Genre</span>
                                                 <div class="flex flex-wrap gap-2 justify-end">
-                                                    @if($product->genres && count($product->genres) > 0)
-                                                        @foreach($product->genres as $genre)
-                                                            <a href="{{ route('games.by-genre', ['genre' => $genre]) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200 text-sm bg-[#E53E3E]/10 px-2 py-1 rounded">
-                                                                {{ $genre }}
-                                                            </a>
-                                                        @endforeach
-                                                    @elseif($product->genre)
-                                                        <a href="{{ route('games.by-genre', $product->genre) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200">
-                                                            {{ $product->genre->name }}
-                                                        </a>
-                                                    @endif
+                                                    <a href="{{ route('games.by-genre', $product->genre) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200 text-sm bg-[#E53E3E]/10 px-2 py-1 rounded">
+                                                        {{ $product->genre->name }}
+                                                    </a>
                                                 </div>
                                             </div>
                                             @endif
@@ -280,21 +264,15 @@
                                             @endif
 
                                             <!-- Game Modes -->
-                                            @if(($product->game_modes && $product->game_modes) || ($product->game_modes_list && count($product->game_modes_list) > 0))
+                                            @if($product->gameModes && $product->gameModes->count() > 0)
                                             <div class="flex justify-between items-start py-2 border-b border-[#3F3F46]/50">
                                                 <span class="text-[#A1A1AA] font-['Inter']">Game Modes</span>
                                                 <div class="flex flex-wrap gap-2 justify-end">
-                                                    @if($product->game_modes_list && count($product->game_modes_list) > 0)
-                                                        @foreach($product->game_modes_list as $mode)
-                                                            <a href="{{ route('games.by-mode', urlencode($mode)) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200 text-sm bg-[#E53E3E]/10 px-2 py-1 rounded">
-                                                                {{ $mode }}
-                                                            </a>
-                                                        @endforeach
-                                                    @elseif($product->game_modes)
-                                                        <a href="{{ route('games.by-mode', urlencode($product->game_modes)) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200">
-                                                            {{ $product->game_modes }}
+                                                    @foreach($product->gameModes as $mode)
+                                                        <a href="{{ route('games.by-mode', $mode->slug) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200 text-sm bg-[#E53E3E]/10 px-2 py-1 rounded">
+                                                            {{ $mode->name }}
                                                         </a>
-                                                    @endif
+                                                    @endforeach
                                                 </div>
                                             </div>
                                             @else
@@ -305,21 +283,15 @@
                                             @endif
 
                                             <!-- Themes -->
-                                            @if(($product->theme && $product->theme) || ($product->themes && count($product->themes) > 0))
+                                            @if($product->themes && $product->themes->count() > 0)
                                             <div class="flex justify-between items-start py-2 border-b border-[#3F3F46]/50">
                                                 <span class="text-[#A1A1AA] font-['Inter']">Theme(s)</span>
                                                 <div class="flex flex-wrap gap-2 justify-end">
-                                                    @if($product->themes && count($product->themes) > 0)
-                                                        @foreach($product->themes as $theme)
-                                                            <a href="{{ route('games.by-theme', urlencode($theme)) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200 text-sm bg-[#E53E3E]/10 px-2 py-1 rounded">
-                                                                {{ $theme }}
-                                                            </a>
-                                                        @endforeach
-                                                    @elseif($product->theme)
-                                                        <a href="{{ route('games.by-theme', urlencode($product->theme)) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200">
-                                                            {{ $product->theme }}
+                                                    @foreach($product->themes as $theme)
+                                                        <a href="{{ route('games.by-theme', $theme->slug) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200 text-sm bg-[#E53E3E]/10 px-2 py-1 rounded">
+                                                            {{ $theme->name }}
                                                         </a>
-                                                    @endif
+                                                    @endforeach
                                                 </div>
                                             </div>
                                             @else
@@ -336,41 +308,29 @@
                                         <h3 class="text-lg font-semibold text-white mb-4 font-['Inter']">Development Information</h3>
                                         <div class="space-y-3">
                                             <!-- Developers -->
-                                            @if($product->developer || ($product->developers && count($product->developers) > 0))
+                                            @if($product->developers && $product->developers->count() > 0)
                                             <div class="flex justify-between items-start py-2 border-b border-[#3F3F46]/50">
                                                 <span class="text-[#A1A1AA] font-['Inter']">Developer(s)</span>
                                                 <div class="flex flex-wrap gap-2 justify-end">
-                                                    @if($product->developers && count($product->developers) > 0)
-                                                        @foreach($product->developers as $developer)
-                                                            <a href="{{ route('games.by-developer', urlencode($developer)) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200 text-sm bg-[#E53E3E]/10 px-2 py-1 rounded">
-                                                                {{ $developer }}
-                                                            </a>
-                                                        @endforeach
-                                                    @elseif($product->developer)
-                                                        <a href="{{ route('games.by-developer', urlencode($product->developer)) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200">
-                                                            {{ $product->developer }}
+                                                    @foreach($product->developers as $developer)
+                                                        <a href="{{ route('games.by-developer', $developer->slug) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200 text-sm bg-[#E53E3E]/10 px-2 py-1 rounded">
+                                                            {{ $developer->name }}
                                                         </a>
-                                                    @endif
+                                                    @endforeach
                                                 </div>
                                             </div>
                                             @endif
 
                                             <!-- Publishers -->
-                                            @if($product->publisher || ($product->publishers && count($product->publishers) > 0))
+                                            @if($product->publishers && $product->publishers->count() > 0)
                                             <div class="flex justify-between items-start py-2 border-b border-[#3F3F46]/50">
                                                 <span class="text-[#A1A1AA] font-['Inter']">Publisher(s)</span>
                                                 <div class="flex flex-wrap gap-2 justify-end">
-                                                    @if($product->publishers && count($product->publishers) > 0)
-                                                        @foreach($product->publishers as $publisher)
-                                                            <a href="{{ route('games.by-publisher', urlencode($publisher)) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200 text-sm bg-[#E53E3E]/10 px-2 py-1 rounded">
-                                                                {{ $publisher }}
-                                                            </a>
-                                                        @endforeach
-                                                    @elseif($product->publisher)
-                                                        <a href="{{ route('games.by-publisher', urlencode($product->publisher)) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200">
-                                                            {{ $product->publisher }}
+                                                    @foreach($product->publishers as $publisher)
+                                                        <a href="{{ route('games.by-publisher', $publisher->slug) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200 text-sm bg-[#E53E3E]/10 px-2 py-1 rounded">
+                                                            {{ $publisher->name }}
                                                         </a>
-                                                    @endif
+                                                    @endforeach
                                                 </div>
                                             </div>
                                             @else

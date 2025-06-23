@@ -21,32 +21,16 @@ class Product extends Model
         'photos',
         'videos',
         'release_date',
-        'developer',
-        'publisher',
-        'game_modes',
-        'theme',
         'type',
         'genre_id',
         'platform_id',
         'hardware_id',
-        'genres',
-        'platforms',
-        'developers',
-        'publishers',
-        'themes',
-        'game_modes_list',
     ];
 
     protected $casts = [
         'release_date' => 'date',
         'photos' => 'array',
         'videos' => 'array',
-        'genres' => 'array',
-        'platforms' => 'array',
-        'developers' => 'array',
-        'publishers' => 'array',
-        'themes' => 'array',
-        'game_modes_list' => 'array',
     ];
 
     /**
@@ -198,10 +182,17 @@ class Product extends Model
     }
 
     /**
-     * Get the full URL for the product's image.
+     * Get the image URL attribute.
      */
     public function getImageUrlAttribute()
     {
-        return $this->image ? Storage::url($this->image) : null;
+        if ($this->image) {
+            if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+                return $this->image;
+            } else {
+                return Storage::url($this->image);
+            }
+        }
+        return null;
     }
 }

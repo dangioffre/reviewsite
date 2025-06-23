@@ -66,19 +66,19 @@ class TechProductResource extends Resource
                                             ])
                                             ->live(),
                                         
-                                        Forms\Components\Select::make('genres')
-                                            ->label('Categories')
-                                            ->multiple()
-                                            ->options(Genre::active()->pluck('name', 'name'))
+                                        Forms\Components\Select::make('genre_id')
+                                            ->label('Primary Category')
+                                            ->relationship('genre', 'name')
                                             ->searchable()
-                                            ->helperText('Select multiple categories that apply to this tech product'),
+                                            ->preload()
+                                            ->helperText('Select the primary category for this tech product'),
                                         
-                                        Forms\Components\Select::make('platforms')
-                                            ->label('Platform Compatibility')
-                                            ->multiple()
-                                            ->options(Platform::active()->pluck('name', 'name'))
+                                        Forms\Components\Select::make('platform_id')
+                                            ->label('Primary Platform Compatibility')
+                                            ->relationship('platform', 'name')
                                             ->searchable()
-                                            ->helperText('Select all platforms this product is compatible with'),
+                                            ->preload()
+                                            ->helperText('Select the primary platform this product is compatible with'),
                                         
                                         Forms\Components\Select::make('hardware_id')
                                             ->label('Hardware (for Accessories)')
@@ -263,19 +263,16 @@ class TechProductResource extends Resource
                         };
                     }),
                 
-                Tables\Columns\TextColumn::make('genres')
-                    ->label('Categories')
+                Tables\Columns\TextColumn::make('genre.name')
+                    ->label('Primary Category')
                     ->badge()
-                    ->separator(',')
                     ->color('primary')
-                    ->formatStateUsing(fn ($state) => is_array($state) ? implode(', ', $state) : $state)
                     ->toggleable(),
                 
-                Tables\Columns\TextColumn::make('platforms')
+                Tables\Columns\TextColumn::make('platform.name')
+                    ->label('Primary Platform Compatibility')
                     ->badge()
-                    ->separator(',')
                     ->color('success')
-                    ->formatStateUsing(fn ($state) => is_array($state) ? implode(', ', $state) : $state)
                     ->toggleable(),
                 
                 Tables\Columns\TextColumn::make('hardware.name')

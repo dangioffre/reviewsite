@@ -54,19 +54,19 @@ class GameResource extends Resource
                                             ->unique(Product::class, 'slug', ignoreRecord: true)
                                             ->rules(['alpha_dash']),
                                         
-                                        Forms\Components\Select::make('genres')
-                                            ->label('Genres')
-                                            ->multiple()
-                                            ->options(Genre::active()->pluck('name', 'name'))
+                                        Forms\Components\Select::make('genre_id')
+                                            ->label('Primary Genre')
+                                            ->relationship('genre', 'name')
                                             ->searchable()
-                                            ->helperText('Select multiple genres that apply to this game'),
+                                            ->preload()
+                                            ->helperText('Select the primary genre for this game'),
                                         
-                                        Forms\Components\Select::make('platforms')
-                                            ->label('Platforms')
-                                            ->multiple()
-                                            ->options(Platform::active()->pluck('name', 'name'))
+                                        Forms\Components\Select::make('platform_id')
+                                            ->label('Primary Platform')
+                                            ->relationship('platform', 'name')
                                             ->searchable()
-                                            ->helperText('Select all platforms this game is available on'),
+                                            ->preload()
+                                            ->helperText('Select the primary platform for this game'),
                                         
                                         Forms\Components\DatePicker::make('release_date')
                                             ->label('Release Date'),
@@ -236,18 +236,16 @@ class GameResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->copyable(),
                 
-                Tables\Columns\TextColumn::make('genres')
+                Tables\Columns\TextColumn::make('genre.name')
+                    ->label('Genre')
                     ->badge()
-                    ->separator(',')
                     ->color('primary')
-                    ->formatStateUsing(fn ($state) => is_array($state) ? implode(', ', $state) : $state)
                     ->toggleable(),
                 
-                Tables\Columns\TextColumn::make('platforms')
+                Tables\Columns\TextColumn::make('platform.name')
+                    ->label('Platform')
                     ->badge()
-                    ->separator(',')
                     ->color('success')
-                    ->formatStateUsing(fn ($state) => is_array($state) ? implode(', ', $state) : $state)
                     ->toggleable(),
                 
                 Tables\Columns\TextColumn::make('developers.name')

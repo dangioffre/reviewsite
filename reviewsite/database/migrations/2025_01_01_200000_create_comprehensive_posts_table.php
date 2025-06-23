@@ -14,10 +14,15 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->text('content');
+            $table->string('slug')->unique();
             $table->text('excerpt')->nullable();
-            $table->string('author')->nullable();
-            $table->string('featured_image')->nullable();
+            $table->longText('content');
+            $table->string('image')->nullable();
+            $table->boolean('is_published')->default(false);
+            $table->boolean('is_featured')->default(false);
+            $table->enum('type', ['news', 'article', 'announcement'])->default('article');
+            $table->timestamp('published_at')->nullable();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -29,4 +34,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('posts');
     }
-};
+}; 
