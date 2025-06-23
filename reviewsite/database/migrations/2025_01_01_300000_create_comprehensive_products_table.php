@@ -27,7 +27,6 @@ return new class extends Migration
             // Foreign key relationships
             $table->foreignId('genre_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('platform_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('hardware_id')->nullable()->constrained()->onDelete('set null');
             
             $table->timestamps();
         });

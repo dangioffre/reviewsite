@@ -24,7 +24,6 @@ class Product extends Model
         'type',
         'genre_id',
         'platform_id',
-        'hardware_id',
     ];
 
     protected $casts = [
@@ -94,11 +93,6 @@ class Product extends Model
     public function platform()
     {
         return $this->belongsTo(Platform::class);
-    }
-
-    public function hardware()
-    {
-        return $this->belongsTo(Hardware::class);
     }
 
     /**

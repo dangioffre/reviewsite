@@ -282,25 +282,6 @@
                                             </div>
                                             @endif
 
-                                            <!-- Themes -->
-                                            @if($product->themes && $product->themes->count() > 0)
-                                            <div class="flex justify-between items-start py-2 border-b border-[#3F3F46]/50">
-                                                <span class="text-[#A1A1AA] font-['Inter']">Theme(s)</span>
-                                                <div class="flex flex-wrap gap-2 justify-end">
-                                                    @foreach($product->themes as $theme)
-                                                        <a href="{{ route('games.by-theme', $theme->slug) }}" class="text-[#E53E3E] hover:text-[#DC2626] font-semibold font-['Inter'] transition-colors duration-200 text-sm bg-[#E53E3E]/10 px-2 py-1 rounded">
-                                                            {{ $theme->name }}
-                                                        </a>
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                            @else
-                                            <div class="flex justify-between items-center py-2 border-b border-[#3F3F46]/50">
-                                                <span class="text-[#A1A1AA] font-['Inter']">Theme(s)</span>
-                                                <span class="text-[#A1A1AA] font-['Inter'] italic text-sm">Coming Soon</span>
-                                            </div>
-                                            @endif
-                                        </div>
                                     </div>
 
                                     <!-- Development Info -->
@@ -337,13 +318,6 @@
                                             <div class="flex justify-between items-center py-2 border-b border-[#3F3F46]/50">
                                                 <span class="text-[#A1A1AA] font-['Inter']">Publisher(s)</span>
                                                 <span class="text-[#A1A1AA] font-['Inter'] italic text-sm">Coming Soon</span>
-                                            </div>
-                                            @endif
-
-                                            @if($product->hardware)
-                                            <div class="flex justify-between items-center py-2 border-b border-[#3F3F46]/50">
-                                                <span class="text-[#A1A1AA] font-['Inter']">Hardware Category</span>
-                                                <span class="text-white font-semibold font-['Inter']">{{ $product->hardware->name }}</span>
                                             </div>
                                             @endif
                                         </div>

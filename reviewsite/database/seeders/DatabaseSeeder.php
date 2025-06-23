@@ -23,20 +23,13 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             RolesAndPermissionsSeeder::class,
             GenrePlatformSeeder::class,
-            HardwareSeeder::class,
-            
-            // New relationship seeders
             GameModeSeeder::class,
             DeveloperSeeder::class,
             PublisherSeeder::class,
             ThemeSeeder::class,
-            
-            // New seeders for testing
             RegularUserSeeder::class,
             GameSeeder::class,
             TechProductSeeder::class,
-            
-            // Existing content seeders
             PostSeeder::class,
             StaffReviewSeeder::class,
             CommunityReviewSeeder::class,
