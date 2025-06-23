@@ -201,10 +201,14 @@
                     <!-- Tab Content -->
                     <div class="tab-content">
                         <div x-show="activeTab === 'about'" class="prose prose-invert max-w-none">
-                            <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                            <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl mb-8">
                                 <h2 class="text-3xl font-bold text-white mb-6 font-['Share_Tech_Mono']">About {{ $product->name }}</h2>
-                                <div class="grid md:grid-cols-2 gap-8 mb-8">
-                                    <div class="space-y-3">
+                                <div class="mb-8">
+                                    <h3 class="text-xl font-bold text-white mb-2 font-['Share_Tech_Mono']">Description</h3>
+                                    <p class="text-[#A1A1AA] text-lg leading-relaxed font-['Inter']">{{ $product->description ?? 'No description available for this game.' }}</p>
+                                </div>
+                                <div class="bg-[#18181B] rounded-xl p-6 border border-[#3F3F46] mb-8">
+                                    <div class="grid md:grid-cols-2 gap-x-12 gap-y-4">
                                         <div><span class="font-bold text-white">Name:</span> <span class="text-[#A1A1AA]">{{ $product->name }}</span></div>
                                         @if($product->genre)
                                             <div><span class="font-bold text-white">Primary Genre:</span> <span class="text-[#A1A1AA]">{{ $product->genre->name }}</span></div>
@@ -229,12 +233,8 @@
                                         @endif
                                     </div>
                                 </div>
-                                <div class="mb-8">
-                                    <h3 class="text-xl font-bold text-white mb-2 font-['Share_Tech_Mono']">Description</h3>
-                                    <p class="text-[#A1A1AA] leading-relaxed font-['Inter']">{{ $product->description ?? 'No description available for this game.' }}</p>
-                                </div>
                                 @if($product->story)
-                                <div>
+                                <div class="bg-[#18181B] rounded-xl p-6 border border-[#3F3F46]">
                                     <h3 class="text-xl font-bold text-white mb-2 font-['Share_Tech_Mono']">Game Story</h3>
                                     <div class="text-[#A1A1AA] leading-relaxed font-['Inter'] prose prose-invert max-w-none">
                                         {!! $product->story !!}
