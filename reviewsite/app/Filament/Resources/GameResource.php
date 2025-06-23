@@ -56,7 +56,7 @@ class GameResource extends Resource
                                         
                                         Forms\Components\Select::make('genre_id')
                                             ->label('Primary Genre')
-                                            ->relationship('genre', 'name')
+                                            ->relationship('genre', 'name', fn ($query) => $query->where('type', 'game'))
                                             ->searchable()
                                             ->preload()
                                             ->helperText('Select the primary genre for this game'),
@@ -102,7 +102,7 @@ class GameResource extends Resource
                                         Forms\Components\Select::make('game_mode_ids')
                                             ->label('Game Modes')
                                             ->multiple()
-                                            ->relationship('gameModes', 'name')
+                                            ->relationship('gameModes', 'name', fn ($query) => $query->where('type', 'game'))
                                             ->searchable()
                                             ->preload()
                                             ->helperText('Select game modes (e.g., Single-player, Multiplayer, Co-op, etc.)'),

@@ -16,6 +16,7 @@ class Genre extends Model
         'description',
         'color',
         'is_active',
+        'type',
     ];
 
     protected $casts = [
@@ -47,5 +48,15 @@ class Genre extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function scopeGame($query)
+    {
+        return $query->where('type', 'game');
+    }
+
+    public function scopeHardware($query)
+    {
+        return $query->where('type', 'hardware');
     }
 }

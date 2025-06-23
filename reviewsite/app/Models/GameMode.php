@@ -16,6 +16,7 @@ class GameMode extends Model
         'description',
         'color',
         'is_active',
+        'type',
     ];
 
     protected $casts = [
@@ -68,6 +69,22 @@ class GameMode extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope for game game modes.
+     */
+    public function scopeGame($query)
+    {
+        return $query->where('type', 'game');
+    }
+
+    /**
+     * Scope for hardware game modes.
+     */
+    public function scopeHardware($query)
+    {
+        return $query->where('type', 'hardware');
     }
 
     /**

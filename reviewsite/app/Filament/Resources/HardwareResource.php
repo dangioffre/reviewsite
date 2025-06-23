@@ -62,18 +62,18 @@ class HardwareResource extends Resource
                                             ->required()
                                             ->options([
                                                 'hardware' => 'Hardware',
-                                                'tech' => 'Tech Accessory',
+                                                'accessory' => 'Accessory',
                                             ])
                                             ->default('hardware')
                                             ->live(),
                                         
                                         Forms\Components\Select::make('genre_id')
                                             ->label('Primary Category')
-                                            ->relationship('genre', 'name')
+                                            ->relationship('genre', 'name', fn ($query) => $query->where('type', 'hardware'))
                                             ->searchable()
                                             ->preload()
                                             ->nullable()
-                                            ->helperText('Optional: Select a category if applicable'),
+                                            ->helperText('Optional: Select a hardware category'),
                                         
                                         Forms\Components\Select::make('platform_id')
                                             ->label('Platform Compatibility')
@@ -85,14 +85,6 @@ class HardwareResource extends Resource
                                         
                                         Forms\Components\DatePicker::make('release_date')
                                             ->label('Release Date'),
-                                        
-                                        Forms\Components\Select::make('theme_ids')
-                                            ->label('Themes/Categories')
-                                            ->multiple()
-                                            ->relationship('themes', 'name')
-                                            ->searchable()
-                                            ->preload()
-                                            ->helperText('Select themes/categories that apply to this product'),
                                     ])
                                     ->columns(2),
 
@@ -106,18 +98,10 @@ class HardwareResource extends Resource
                                             ->preload()
                                             ->helperText('Select all manufacturers/brands involved'),
                                         
-                                        Forms\Components\Select::make('publisher_ids')
-                                            ->label('Publishers/Distributors')
-                                            ->multiple()
-                                            ->relationship('publishers', 'name')
-                                            ->searchable()
-                                            ->preload()
-                                            ->helperText('Select all publishers/distributors involved'),
-                                        
                                         Forms\Components\Select::make('game_mode_ids')
                                             ->label('Key Features')
                                             ->multiple()
-                                            ->relationship('gameModes', 'name')
+                                            ->relationship('gameModes', 'name', fn ($query) => $query->where('type', 'hardware'))
                                             ->searchable()
                                             ->preload()
                                             ->helperText('Select key features (e.g., RGB Lighting, Wireless, Mechanical, etc.)'),
@@ -254,7 +238,7 @@ class HardwareResource extends Resource
                     ->color(function ($state) {
                         return match($state) {
                             'hardware' => 'warning',
-                            'tech' => 'info',
+                            'accessory' => 'info',
                             default => 'gray',
                         };
                     }),
@@ -280,19 +264,12 @@ class HardwareResource extends Resource
                     ->color('warning')
                     ->toggleable(),
                 
-                Tables\Columns\TextColumn::make('publishers.name')
-                    ->label('Publishers')
+                Tables\Columns\TextColumn::make('gameModes.name')
+                    ->label('Key Features')
                     ->badge()
                     ->separator(',')
-                    ->color('info')
-                    ->toggleable(),
-                
-                Tables\Columns\TextColumn::make('themes.name')
-                    ->label('Themes')
-                    ->badge()
-                    ->separator(',')
-                    ->color('gray')
-                    ->toggleable(),
+                    ->color('secondary')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 
                 Tables\Columns\TextColumn::make('release_date')
                     ->date()
@@ -308,12 +285,11 @@ class HardwareResource extends Resource
                 Tables\Filters\SelectFilter::make('type')
                     ->options([
                         'hardware' => 'Hardware',
-                        'tech' => 'Tech Accessory',
+                        'accessory' => 'Accessory',
                     ]),
                 
                 Tables\Filters\SelectFilter::make('genre')
-                    ->relationship('genre', 'name')
-                    ->label('Category'),
+                    ->relationship('genre', 'name'),
                 
                 Tables\Filters\SelectFilter::make('platform')
                     ->relationship('platform', 'name'),
@@ -338,7 +314,7 @@ class HardwareResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->whereIn('type', ['hardware', 'tech']);
+        return parent::getEloquentQuery()->whereIn('type', ['hardware', 'accessory']);
     }
 
     public static function getPages(): array
