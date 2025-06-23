@@ -201,16 +201,47 @@
                     <!-- Tab Content -->
                     <div class="tab-content">
                         <div x-show="activeTab === 'about'" class="prose prose-invert max-w-none">
-                            <!-- About content from previous state -->
-                            <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
-                                <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">About {{ $product->name }}</h2>
-                                <div class="space-y-8">
-                                    <p class="text-[#A1A1AA] leading-relaxed font-['Inter']">
-                                        {{ $product->description ?? 'No description available for this game.' }}
-                                    </p>
-                                    {{-- ... other about content ... --}}
+                            <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                                <h2 class="text-3xl font-bold text-white mb-6 font-['Share_Tech_Mono']">About {{ $product->name }}</h2>
+                                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                                    <div class="space-y-3">
+                                        <div><span class="font-bold text-white">Name:</span> <span class="text-[#A1A1AA]">{{ $product->name }}</span></div>
+                                        @if($product->genre)
+                                            <div><span class="font-bold text-white">Primary Genre:</span> <span class="text-[#A1A1AA]">{{ $product->genre->name }}</span></div>
+                                        @endif
+                                        @if($product->platform)
+                                            <div><span class="font-bold text-white">Primary Platform:</span> <span class="text-[#A1A1AA]">{{ $product->platform->name }}</span></div>
+                                        @endif
+                                        @if($product->release_date)
+                                            <div><span class="font-bold text-white">Release Date:</span> <span class="text-[#A1A1AA]">{{ $product->release_date->format('F d, Y') }}</span></div>
+                                        @endif
+                                        @if($product->themes && $product->themes->count())
+                                            <div><span class="font-bold text-white">Theme:</span> <span class="text-[#A1A1AA]">{{ $product->themes->pluck('name')->join(', ') }}</span></div>
+                                        @endif
+                                        @if($product->developers && $product->developers->count())
+                                            <div><span class="font-bold text-white">Developer:</span> <span class="text-[#A1A1AA]">{{ $product->developers->pluck('name')->join(', ') }}</span></div>
+                                        @endif
+                                        @if($product->publishers && $product->publishers->count())
+                                            <div><span class="font-bold text-white">Publisher:</span> <span class="text-[#A1A1AA]">{{ $product->publishers->pluck('name')->join(', ') }}</span></div>
+                                        @endif
+                                        @if($product->gameModes && $product->gameModes->count())
+                                            <div><span class="font-bold text-white">Game Mode:</span> <span class="text-[#A1A1AA]">{{ $product->gameModes->pluck('name')->join(', ') }}</span></div>
+                                        @endif
+                                    </div>
                                 </div>
-                            </div>
+                                <div class="mb-8">
+                                    <h3 class="text-xl font-bold text-white mb-2 font-['Share_Tech_Mono']">Description</h3>
+                                    <p class="text-[#A1A1AA] leading-relaxed font-['Inter']">{{ $product->description ?? 'No description available for this game.' }}</p>
+                                </div>
+                                @if($product->story)
+                                <div>
+                                    <h3 class="text-xl font-bold text-white mb-2 font-['Share_Tech_Mono']">Game Story</h3>
+                                    <div class="text-[#A1A1AA] leading-relaxed font-['Inter'] prose prose-invert max-w-none">
+                                        {!! $product->story !!}
+                                    </div>
+                                </div>
+                                @endif
+                            </section>
                         </div>
                         <div x-show="activeTab === 'reviews'" style="display: none;" class="prose prose-invert max-w-none">
                             <div class="space-y-12">
