@@ -246,7 +246,7 @@
                         <div x-show="activeTab === 'reviews'" style="display: none;" class="prose prose-invert max-w-none">
                             <div class="space-y-12">
                                 @if($staffReviews->count() > 0)
-                                <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                                <section x-data="{ view: 'grid', page: 1, perPage: 10 }" class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
                                     <div class="flex items-center gap-4 mb-6">
                                         <div class="w-12 h-12 bg-[#E53E3E] bg-opacity-20 rounded-lg flex items-center justify-center">
                                             <svg class="w-6 h-6 text-[#E53E3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -254,91 +254,65 @@
                                             </svg>
                                         </div>
                                         <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono']">Staff Reviews</h2>
+                                        <div class="ml-auto flex gap-2">
+                                            <button @click="view = 'grid'" :class="view === 'grid' ? 'bg-[#E53E3E] text-white' : 'bg-[#232326] text-[#A1A1AA]'" class="px-3 py-1 rounded font-bold text-xs transition">Grid</button>
+                                            <button @click="view = 'list'" :class="view === 'list' ? 'bg-[#E53E3E] text-white' : 'bg-[#232326] text-[#A1A1AA]'" class="px-3 py-1 rounded font-bold text-xs transition">List</button>
+                                        </div>
                                     </div>
-                                    <div class="space-y-6">
-                                        @foreach($staffReviews as $review)
-                                            <div class="relative flex group transition-transform duration-200 hover:scale-[1.025] hover:shadow-2xl">
-                                                <div class="w-2 rounded-l-xl bg-gradient-to-b from-[#E53E3E] to-[#DC2626] mr-4"></div>
-                                                <div class="bg-[#1A1A1B] rounded-xl p-6 border border-[#3F3F46] flex-1 flex flex-col">
-                                                    <div class="flex items-center gap-3 mb-2">
-                                                        <div class="w-10 h-10 bg-gradient-to-r from-[#E53E3E] to-[#DC2626] rounded-full flex items-center justify-center">
-                                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                                                            </svg>
-                                                        </div>
-                                                        <div>
-                                                            <span class="text-white font-semibold font-['Inter']">{{ $review->user->name }}</span>
-                                                            <span class="ml-2 px-2 py-0.5 bg-[#E53E3E] text-white text-xs rounded font-bold align-middle">STAFF</span>
-                                                            <div class="text-[#A1A1AA] text-xs font-['Inter']">{{ $review->created_at->format('M d, Y') }}</div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex items-center gap-2 mb-2">
-                                                        <span class="text-yellow-400 font-bold text-xl font-['Share_Tech_Mono']">{{ $review->rating }}/10</span>
-                                                        <div class="flex">
-                                                            @for($i = 1; $i <= 5; $i++)
-                                                                <svg class="w-5 h-5 {{ ($review->rating/2) >= $i ? 'text-[#FFC107]' : 'text-[#3F3F46]' }}" fill="currentColor" viewBox="0 0 20 20">
-                                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                                </svg>
-                                                            @endfor
-                                                        </div>
-                                                    </div>
-                                                    <div class="font-bold text-lg mb-1 text-white font-['Inter']">{{ $review->title }}</div>
-                                                    <p class="text-[#A1A1AA] leading-relaxed font-['Inter']">{{ $review->content }}</p>
-                                                </div>
-                                            </div>
-                                        @endforeach
+                                    <template x-if="view === 'grid'">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                            @foreach($staffReviews->forPage(1, 1000) as $i => $review)
+                                                <template x-if="page === Math.ceil(({{ $i+1 }} / perPage))">
+                                                    @include('partials.review_card', ['review' => $review, 'type' => 'staff'])
+                                                </template>
+                                            @endforeach
+                                        </div>
+                                    </template>
+                                    <template x-if="view === 'list'">
+                                        <div class="space-y-6">
+                                            @foreach($staffReviews->forPage(1, 1000) as $i => $review)
+                                                <template x-if="page === Math.ceil(({{ $i+1 }} / perPage))">
+                                                    @include('partials.review_card', ['review' => $review, 'type' => 'staff'])
+                                                </template>
+                                            @endforeach
+                                        </div>
+                                    </template>
+                                    <div class="flex justify-center mt-6 gap-2">
+                                        <button @click="if(page > 1) page--" :disabled="page === 1" class="px-3 py-1 rounded bg-[#232326] text-[#A1A1AA] font-bold text-xs disabled:opacity-50">Prev</button>
+                                        <span class="text-[#A1A1AA] font-bold text-xs">Page <span x-text="page"></span></span>
+                                        <button @click="if(page < Math.ceil({{ $staffReviews->count() }} / perPage)) page++" :disabled="page === Math.ceil({{ $staffReviews->count() }} / perPage)" class="px-3 py-1 rounded bg-[#232326] text-[#A1A1AA] font-bold text-xs disabled:opacity-50">Next</button>
                                     </div>
                                 </section>
                                 @endif
-                                <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                                <section x-data="{ view: 'grid', page: 1, perPage: 10 }" class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
                                     <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Community Reviews</h2>
-                                    @if($userReviews->count() > 0)
-                                        <div class="space-y-6">
-                                            @foreach($userReviews as $review)
-                                                <div class="relative flex group transition-transform duration-200 hover:scale-[1.025] hover:shadow-2xl">
-                                                    <div class="w-2 rounded-l-xl bg-gradient-to-b from-[#2563EB] to-[#1e40af] mr-4"></div>
-                                                    <div class="bg-[#1A1A1B] rounded-xl p-6 border border-[#3F3F46] flex-1 flex flex-col">
-                                                        <div class="flex items-center gap-3 mb-2">
-                                                            <div class="w-10 h-10 bg-gradient-to-r from-[#2563EB] to-[#1e40af] rounded-full flex items-center justify-center">
-                                                                <span class="text-white font-bold font-['Share_Tech_Mono']">{{ substr($review->user->name, 0, 1) }}</span>
-                                                            </div>
-                                                            <div>
-                                                                <span class="text-white font-semibold font-['Inter']">{{ $review->user->name }}</span>
-                                                                <div class="text-[#A1A1AA] text-xs font-['Inter']">{{ $review->created_at->format('M d, Y') }}</div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="flex items-center gap-2 mb-2">
-                                                            <span class="text-yellow-400 font-bold text-xl font-['Share_Tech_Mono']">{{ $review->rating }}/10</span>
-                                                            <div class="flex">
-                                                                @for($i = 1; $i <= 5; $i++)
-                                                                    <svg class="w-5 h-5 {{ ($review->rating/2) >= $i ? 'text-[#FFC107]' : 'text-[#3F3F46]' }}" fill="currentColor" viewBox="0 0 20 20">
-                                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                                    </svg>
-                                                                @endfor
-                                                            </div>
-                                                        </div>
-                                                        <div class="font-bold text-lg mb-1 text-white font-['Inter']">{{ $review->title }}</div>
-                                                        <div class="text-[#A1A1AA] leading-relaxed font-['Inter']">
-                                                            @if($review->content)
-                                                                <p>{{ Str::limit($review->content, 150) }}</p>
-                                                                @if(strlen($review->content) > 150 && $review->slug)
-                                                                    <a href="{{ route('games.reviews.show', [$product, $review]) }}" class="text-[#2563EB] hover:text-blue-400 font-semibold mt-2 inline-block">
-                                                                        Read Full Review →
-                                                                    </a>
-                                                                @endif
-                                                            @else
-                                                                <p>{{ $review->review ?? 'No review content available.' }}</p>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                    <div class="ml-auto flex gap-2 mb-4">
+                                        <button @click="view = 'grid'" :class="view === 'grid' ? 'bg-[#2563EB] text-white' : 'bg-[#232326] text-[#A1A1AA]'" class="px-3 py-1 rounded font-bold text-xs transition">Grid</button>
+                                        <button @click="view = 'list'" :class="view === 'list' ? 'bg-[#2563EB] text-white' : 'bg-[#232326] text-[#A1A1AA]'" class="px-3 py-1 rounded font-bold text-xs transition">List</button>
+                                    </div>
+                                    <template x-if="view === 'grid'">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                            @foreach($userReviews->forPage(1, 1000) as $i => $review)
+                                                <template x-if="page === Math.ceil(({{ $i+1 }} / perPage))">
+                                                    @include('partials.review_card', ['review' => $review, 'type' => 'community'])
+                                                </template>
                                             @endforeach
                                         </div>
-                                    @else
-                                        <div class="text-center py-12">
-                                            <h3 class="text-xl font-bold text-white">No Reviews Yet</h3>
+                                    </template>
+                                    <template x-if="view === 'list'">
+                                        <div class="space-y-6">
+                                            @foreach($userReviews->forPage(1, 1000) as $i => $review)
+                                                <template x-if="page === Math.ceil(({{ $i+1 }} / perPage))">
+                                                    @include('partials.review_card', ['review' => $review, 'type' => 'community'])
+                                                </template>
+                                            @endforeach
                                         </div>
-                                    @endif
+                                    </template>
+                                    <div class="flex justify-center mt-6 gap-2">
+                                        <button @click="if(page > 1) page--" :disabled="page === 1" class="px-3 py-1 rounded bg-[#232326] text-[#A1A1AA] font-bold text-xs disabled:opacity-50">Prev</button>
+                                        <span class="text-[#A1A1AA] font-bold text-xs">Page <span x-text="page"></span></span>
+                                        <button @click="if(page < Math.ceil({{ $userReviews->count() }} / perPage)) page++" :disabled="page === Math.ceil({{ $userReviews->count() }} / perPage)" class="px-3 py-1 rounded bg-[#232326] text-[#A1A1AA] font-bold text-xs disabled:opacity-50">Next</button>
+                                    </div>
                                 </section>
                             </div>
                         </div>
