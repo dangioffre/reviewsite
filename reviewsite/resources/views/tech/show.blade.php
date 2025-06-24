@@ -261,6 +261,12 @@
                 <!-- Right Column: Review Form -->
                 <div class="lg:col-span-1">
                     <div class="sticky top-8">
+                        <!-- Star Rating Component -->
+                        <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl mb-8">
+                            <h3 class="text-xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Rate This Product</h3>
+                            <x-star-rating :product="$product" :userRating="$userRating" />
+                        </div>
+                        
                         @auth
                         <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl text-center">
                             <div class="text-4xl mb-4">✍️</div>

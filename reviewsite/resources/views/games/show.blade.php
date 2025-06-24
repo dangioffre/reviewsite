@@ -111,35 +111,9 @@
                             </div>
                             @endif
                             
-                            <!-- Community Rating -->
-                            <div class="flex items-center justify-between mb-4" id="community-rating-display">
-                                <div class="flex items-center">
-                                    <div class="bg-green-500 text-black text-lg font-bold px-2 py-1 rounded mr-3">
-                                        <span id="community-rating-value">{{ $product->community_rating ? number_format($product->community_rating, 1) : '0.0' }}</span>
-                                    </div>
-                                    <div>
-                                        <div class="text-white font-semibold text-sm">User Rating</div>
-                                        <div class="text-[#A1A1AA] text-xs">
-                                            <span id="community-rating-count">{{ $product->community_reviews_count ?? 0 }}</span> 
-                                            user <span id="community-rating-plural">{{ Str::plural('rating', $product->community_reviews_count ?? 0) }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- Star Rating Component -->
+                            <x-star-rating :product="$product" :userRating="$userRating" />
                             
-                            <!-- Star Rating Display -->
-                            <div class="flex justify-center mb-4" id="star-rating-container">
-                                @for($i = 1; $i <= 10; $i++)
-                                    <button 
-                                        class="star-rating text-2xl mx-1 transition-colors duration-200 cursor-pointer {{ ($userRating && $userRating >= $i) || (!$userRating && $product->community_rating && $product->community_rating >= $i) ? 'text-yellow-400' : 'text-gray-600 hover:text-yellow-300' }}"
-                                        data-rating="{{ $i }}"
-                                        @guest onclick="showLoginPrompt()" @endguest
-                                        @auth onclick="rateGame({{ $i }})" @endauth
-                                    >
-                                        ★
-                                    </button>
-                                @endfor
-                            </div>
                             <livewire:game-status-buttons :product="$product" />
                             
                             <!-- Action Buttons -->

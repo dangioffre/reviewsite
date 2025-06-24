@@ -132,6 +132,11 @@ class TechController extends Controller
             // Update existing rating
             $existingReview->rating = $request->rating;
             $existingReview->save();
+            
+            // Determine message based on review type
+            $message = $existingReview->title === 'Quick Rating' 
+                ? 'Rating updated successfully!' 
+                : 'Your review rating has been updated!';
         } else {
             // Create new rating (simple review with just rating)
             Review::create([
@@ -143,6 +148,8 @@ class TechController extends Controller
                 'is_staff_review' => false,
                 'is_published' => true,
             ]);
+            
+            $message = 'Rating submitted successfully!';
         }
 
         // Recalculate the community rating
@@ -156,7 +163,7 @@ class TechController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Rating submitted successfully!',
+            'message' => $message,
             'communityRating' => round($communityRating, 1),
             'communityCount' => $communityCount,
             'userRating' => $request->rating

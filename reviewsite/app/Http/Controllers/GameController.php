@@ -88,8 +88,10 @@ class GameController extends Controller
         if (Auth::check()) {
             $userRating = $product->reviews()
                 ->where('user_id', Auth::id())
-                ->where('is_staff_review', false)
                 ->value('rating');
+                
+            // Debug: Log the user rating being passed
+            \Log::info('User rating for product ' . $product->id . ': ' . $userRating);
         }
         
         return view('games.show', compact('product', 'staffReviews', 'userReviews', 'averageUserRating', 'userRating'));
@@ -105,16 +107,60 @@ class GameController extends Controller
             'rating' => 'required|integer|min:1|max:10',
         ]);
 
-        // Check if user already has a rating for this product
+        // Check if user already has a rating for this product (prioritize written reviews over quick ratings)
         $existingReview = Review::where('product_id', $product->id)
             ->where('user_id', Auth::id())
-            ->where('is_staff_review', false)
+            ->orderByRaw("CASE WHEN title = 'Quick Rating' THEN 1 ELSE 0 END") // Prioritize non-quick ratings
+            ->orderBy('created_at', 'desc') // Then by most recent
             ->first();
+
+        // Debug information - get ALL reviews for this user and product
+        $allUserReviews = Review::where('product_id', $product->id)
+            ->where('user_id', Auth::id())
+            ->get(['id', 'title', 'rating', 'is_staff_review', 'is_published', 'created_at']);
+            
+        // Also check for any reviews without the is_staff_review filter
+        $allReviewsForProduct = Review::where('product_id', $product->id)
+            ->where('user_id', Auth::id())
+            ->get(['id', 'title', 'rating', 'is_staff_review', 'is_published', 'created_at']);
+            
+        $debugInfo = [
+            'product_id' => $product->id,
+            'user_id' => Auth::id(),
+            'existing_review_found' => $existingReview ? true : false,
+            'existing_review_title' => $existingReview ? $existingReview->title : null,
+            'existing_review_rating' => $existingReview ? $existingReview->rating : null,
+            'new_rating' => $request->rating,
+            'all_user_reviews' => $allUserReviews->toArray(),
+            'all_reviews_for_product' => $allReviewsForProduct->toArray(),
+        ];
 
         if ($existingReview) {
             // Update existing rating
+            $oldRating = $existingReview->rating;
             $existingReview->rating = $request->rating;
             $existingReview->save();
+            
+            // Clean up any duplicate quick ratings (keep only the written review)
+            if ($existingReview->title !== 'Quick Rating') {
+                Review::where('product_id', $product->id)
+                    ->where('user_id', Auth::id())
+                    ->where('title', 'Quick Rating')
+                    ->delete();
+            }
+            
+            // Determine message based on review type
+            if ($existingReview->is_staff_review) {
+                $message = 'Your review rating has been updated!';
+            } elseif ($existingReview->title === 'Quick Rating') {
+                $message = 'Rating updated successfully!';
+            } else {
+                $message = 'Your review rating has been updated!';
+            }
+                
+            $debugInfo['action'] = 'updated_existing';
+            $debugInfo['old_rating'] = $oldRating;
+            $debugInfo['review_type'] = $existingReview->is_staff_review ? 'staff' : 'user';
         } else {
             // Create new rating (simple review with just rating)
             Review::create([
@@ -126,23 +172,33 @@ class GameController extends Controller
                 'is_staff_review' => false,
                 'is_published' => true,
             ]);
+            
+            $message = 'Rating submitted successfully!';
+            $debugInfo['action'] = 'created_new';
         }
 
-        // Recalculate the community rating
+        // Recalculate the community rating (include user's own reviews in community rating)
         $communityRating = $product->reviews()
-            ->where('is_staff_review', false)
+            ->where(function($query) {
+                $query->where('is_staff_review', false)
+                      ->orWhere('user_id', Auth::id()); // Include user's own reviews
+            })
             ->avg('rating');
 
         $communityCount = $product->reviews()
-            ->where('is_staff_review', false)
+            ->where(function($query) {
+                $query->where('is_staff_review', false)
+                      ->orWhere('user_id', Auth::id()); // Include user's own reviews
+            })
             ->count();
 
         return response()->json([
             'success' => true,
-            'message' => 'Rating submitted successfully!',
+            'message' => $message,
             'communityRating' => round($communityRating, 1),
             'communityCount' => $communityCount,
-            'userRating' => $request->rating
+            'userRating' => $request->rating,
+            'debug' => $debugInfo
         ]);
     }
 

@@ -128,3 +128,29 @@ Route::post('/register', function (Illuminate\Http\Request $request) {
 
     return redirect('/');
 })->name('register.post');
+
+Route::get('/debug/reviews', function () {
+    $reviews = \App\Models\Review::all(['id', 'product_id', 'user_id', 'title', 'rating', 'is_staff_review', 'created_at']);
+    return response()->json($reviews);
+})->name('debug.reviews');
+
+Route::get('/debug/rate-test/{product}', function (\App\Models\Product $product) {
+    $userId = auth()->id() ?? 1; // Use user ID 1 if not logged in for testing
+    
+    // Check for existing reviews
+    $existingReview = \App\Models\Review::where('product_id', $product->id)
+        ->where('user_id', $userId)
+        ->first();
+        
+    $allReviews = \App\Models\Review::where('product_id', $product->id)
+        ->where('user_id', $userId)
+        ->get(['id', 'title', 'rating', 'is_staff_review', 'is_published', 'created_at']);
+        
+    return response()->json([
+        'product_id' => $product->id,
+        'user_id' => $userId,
+        'existing_review' => $existingReview ? $existingReview->toArray() : null,
+        'all_reviews' => $allReviews->toArray(),
+        'product_slug' => $product->slug,
+    ]);
+})->name('debug.rate-test');
