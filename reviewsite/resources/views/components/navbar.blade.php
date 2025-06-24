@@ -40,6 +40,11 @@
                           {{ request()->routeIs('posts.*') ? 'text-white border-b-2 border-[#E53E3E] pb-1' : '' }}">
                     News
                 </a>
+                <a href="{{ route('lists.index') }}" 
+                   class="text-[#A1A1AA] hover:text-white transition-colors font-['Inter'] font-medium
+                          {{ request()->routeIs('lists.*') ? 'text-white border-b-2 border-[#E53E3E] pb-1' : '' }}">
+                    Lists
+                </a>
             </div>
 
             <!-- Auth Actions -->
@@ -101,6 +106,11 @@
                    class="block px-3 py-2 text-[#A1A1AA] hover:text-white transition-colors font-['Inter']
                           {{ request()->routeIs('posts.*') ? 'text-white bg-[#E53E3E] bg-opacity-20 rounded-md' : '' }}">
                     News
+                </a>
+                <a href="{{ route('lists.index') }}" 
+                   class="block px-3 py-2 text-[#A1A1AA] hover:text-white transition-colors font-['Inter']
+                          {{ request()->routeIs('lists.*') ? 'text-white bg-[#E53E3E] bg-opacity-20 rounded-md' : '' }}">
+                    Lists
                 </a>
             </div>
         </div>

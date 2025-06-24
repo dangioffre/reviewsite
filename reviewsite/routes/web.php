@@ -169,6 +169,151 @@ Route::get('/debug/rate-test/{product}', function (\App\Models\Product $product)
 })->name('debug.rate-test');
 
 // Public List Routes
+Route::get('/lists', function(Illuminate\Http\Request $request) {
+    $query = \App\Models\ListModel::where('is_public', true)
+        ->with(['user', 'items.product.genre', 'items.product.platform', 'items.product.themes', 'items.product.gameModes'])
+        ->withCount(['items', 'followers', 'comments']);
+    
+    // Search by list name or description (case insensitive)
+    if ($request->filled('search')) {
+        $search = strtolower($request->search);
+        $query->where(function($q) use ($search) {
+            $q->whereRaw('LOWER(name) LIKE ?', ['%' . $search . '%'])
+              ->orWhereRaw('LOWER(description) LIKE ?', ['%' . $search . '%']);
+        });
+    }
+    
+    // Filter by category
+    if ($request->filled('category') && $request->category !== 'all') {
+        $query->where('category', $request->category);
+    }
+    
+    // Filter by user (case insensitive)
+    if ($request->filled('user')) {
+        $query->whereHas('user', function($q) use ($request) {
+            $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($request->user) . '%']);
+        });
+    }
+    
+    // Search by games within lists (case insensitive)
+    if ($request->filled('game')) {
+        $query->whereHas('items.product', function($q) use ($request) {
+            $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($request->game) . '%']);
+        });
+    }
+    
+    // Filter by genre (games within lists)
+    if ($request->filled('genre')) {
+        $query->whereHas('items.product.genre', function($q) use ($request) {
+            $q->where('slug', $request->genre);
+        });
+    }
+    
+    // Filter by platform (games within lists)
+    if ($request->filled('platform')) {
+        $query->whereHas('items.product.platform', function($q) use ($request) {
+            $q->where('slug', $request->platform);
+        });
+    }
+    
+    // Filter by publisher (games within lists)
+    if ($request->filled('publisher')) {
+        $query->whereHas('items.product.publishers', function($q) use ($request) {
+            $q->where('slug', $request->publisher);
+        });
+    }
+    
+    // Filter by developer (games within lists)
+    if ($request->filled('developer')) {
+        $query->whereHas('items.product.developers', function($q) use ($request) {
+            $q->where('slug', $request->developer);
+        });
+    }
+    
+    // Filter by game mode (games within lists)
+    if ($request->filled('game_mode')) {
+        $query->whereHas('items.product.gameModes', function($q) use ($request) {
+            $q->where('slug', $request->game_mode);
+        });
+    }
+    
+    // Sort options
+    $sortBy = $request->get('sort', 'created_at');
+    $sortDirection = $request->get('direction', 'desc');
+    
+    switch ($sortBy) {
+        case 'name':
+            $query->orderBy('name', $sortDirection);
+            break;
+        case 'items_count':
+            $query->orderBy('items_count', $sortDirection);
+            break;
+        case 'followers_count':
+            $query->orderBy('followers_count', $sortDirection);
+            break;
+        case 'comments_count':
+            $query->orderBy('comments_count', $sortDirection);
+            break;
+        case 'updated_at':
+            $query->orderBy('updated_at', $sortDirection);
+            break;
+        default:
+            $query->orderBy('created_at', $sortDirection);
+    }
+    
+    $lists = $query->paginate(12)->appends($request->query());
+    
+    // Get filter options
+    $categories = \App\Models\ListModel::$categories;
+    $genres = \App\Models\Genre::where('is_active', true)->where('type', 'game')->get();
+    $platforms = \App\Models\Platform::where('is_active', true)->get();
+    $publishers = \App\Models\Publisher::where('is_active', true)->get();
+    $developers = \App\Models\Developer::where('is_active', true)->get();
+    $gameModes = \App\Models\GameMode::where('is_active', true)->where('type', 'game')->get();
+    
+    return view('lists.index', compact('lists', 'categories', 'genres', 'platforms', 'publishers', 'developers', 'gameModes'));
+})->name('lists.index');
+
+// API routes for autocomplete
+Route::get('/api/search/games', function(Illuminate\Http\Request $request) {
+    if (!$request->filled('q') || strlen($request->q) < 2) {
+        return response()->json([]);
+    }
+    
+    $games = \App\Models\Product::where('type', 'game')
+        ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($request->q) . '%'])
+        ->limit(10)
+        ->get(['name', 'slug'])
+        ->map(function($game) {
+            return [
+                'name' => $game->name,
+                'slug' => $game->slug
+            ];
+        });
+    
+    return response()->json($games);
+})->name('api.search.games');
+
+Route::get('/api/search/users', function(Illuminate\Http\Request $request) {
+    if (!$request->filled('q') || strlen($request->q) < 2) {
+        return response()->json([]);
+    }
+    
+    $users = \App\Models\User::whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($request->q) . '%'])
+        ->whereHas('lists', function($query) {
+            $query->where('is_public', true);
+        })
+        ->limit(10)
+        ->get(['name'])
+        ->map(function($user) {
+            return [
+                'name' => $user->name
+            ];
+        });
+    
+    return response()->json($users);
+})->name('api.search.users');
+
 Route::get('/lists/{slug}', function($slug, Illuminate\Http\Request $request) {
     $list = \App\Models\ListModel::where('slug', $slug)
         ->where('is_public', true)
