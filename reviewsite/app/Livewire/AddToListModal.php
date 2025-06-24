@@ -19,6 +19,7 @@ class AddToListModal extends Component
     public $lists = [];
     public $showCreate = false;
     public $newListName = '';
+    public $newListDescription = '';
     public $successMessage = '';
 
     public function mount($productId, $buttonText = 'Add to lists', $buttonClass = '', $iconSize = 'w-4 h-4')
@@ -82,6 +83,7 @@ class AddToListModal extends Component
 
         $list = auth()->user()->lists()->create([
             'name' => $this->newListName,
+            'description' => $this->newListDescription,
             'slug' => Str::slug($this->newListName),
             'is_public' => false,
         ]);
@@ -94,6 +96,7 @@ class AddToListModal extends Component
         Log::info('List created successfully: ' . $list->name);
 
         $this->newListName = '';
+        $this->newListDescription = '';
         $this->showCreate = false;
         $this->successMessage = 'List created and game added!';
         $this->refreshLists();

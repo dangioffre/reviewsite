@@ -134,6 +134,21 @@
                             @enderror
                         </div>
                         
+                        <div class="space-y-2">
+                            <label class="block text-white font-semibold font-['Inter'] text-sm">Description <span class="text-[#A1A1AA] font-normal">(Optional)</span></label>
+                            <textarea wire:model.defer="newListDescription" placeholder="Tell others what this list is about..." 
+                                      rows="3"
+                                      class="w-full bg-[#18181B] border border-[#3F3F46] rounded-xl px-4 py-3 text-white placeholder-[#71717A] focus:outline-none focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] transition-all font-['Inter'] resize-none"></textarea>
+                            @error('newListDescription')
+                                <div class="text-[#E53E3E] text-sm mt-2 font-['Inter'] flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Category Selection -->
                             <div class="space-y-2">
@@ -223,6 +238,10 @@
                     </div>
                 </div>
             @endif
+
+
+
+
 
             <!-- Enhanced Lists Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
@@ -719,6 +738,68 @@
                             </div>
                         @endif
                         
+                        <!-- Edit Description (Owner Only) -->
+                        @if($isOwner)
+                            <div class="bg-[#18181B] border border-[#3F3F46] rounded-xl p-4">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 bg-[#2563EB]/20 rounded-lg flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-white font-semibold font-['Inter']">Description</h4>
+                                        <p class="text-[#A1A1AA] text-xs">
+                                            @if($currentList->description)
+                                                {{ Str::limit($currentList->description, 50) }}
+                                            @else
+                                                No description set
+                                            @endif
+                                        </p>
+                                    </div>
+                                </div>
+                                <button wire:click="testDescriptionButton" 
+                                        class="w-full bg-[#F59E0B] hover:bg-[#D97706] text-white py-1 px-3 rounded-lg text-xs font-semibold transition-colors mb-2">
+                                    TEST BUTTON
+                                </button>
+                                <button wire:click="startEditingDescription({{ $currentList->id }})" 
+                                        class="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white py-2 px-3 rounded-lg text-sm font-semibold transition-colors"
+                                        onclick="console.log('Description button clicked for list {{ $currentList->id }}')">
+                                    {{ $currentList->description ? 'Edit Description' : 'Add Description' }}
+                                </button>
+                            </div>
+                        @endif
+                        
+                        <!-- Description Edit Modal -->
+                        @if($editingDescriptionListId === $currentList->id)
+                            <div class="bg-gradient-to-br from-[#1A1A1B] to-[#27272A] rounded-xl border border-[#3F3F46] p-6 mb-6">
+                                <h4 class="text-lg font-bold text-white font-['Share_Tech_Mono'] mb-4">Edit List Description</h4>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-white font-semibold mb-2 font-['Inter'] text-sm">Description</label>
+                                        <textarea wire:model="editingDescriptionValue" 
+                                                  placeholder="Tell others what this list is about..."
+                                                  rows="4"
+                                                  class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-4 py-3 text-white placeholder-[#71717A] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent font-['Inter'] resize-none"></textarea>
+                                        <div class="text-[#A1A1AA] text-xs mt-1 font-['Inter']">
+                                            Maximum 1000 characters
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex gap-3">
+                                        <button wire:click="saveDescription" 
+                                                class="bg-[#22C55E] hover:bg-[#16A34A] text-white px-6 py-2 rounded-lg font-semibold text-sm transition-colors font-['Inter']">
+                                            Save Description
+                                        </button>
+                                        <button wire:click="cancelDescriptionEdit" 
+                                                class="px-6 py-2 text-[#A1A1AA] hover:text-white transition-colors font-['Inter'] text-sm">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                        
                         <!-- Change Category -->
                         @if($canChangeCategory)
                             <div class="bg-[#18181B] border border-[#3F3F46] rounded-xl p-4">
@@ -827,7 +908,14 @@
                         <!-- List Info -->
                         <div class="space-y-3">
                             <h3 class="text-lg font-bold text-white font-['Share_Tech_Mono']">List Details</h3>
-                            <div class="space-y-2 text-sm">
+                            <div class="space-y-3 text-sm">
+                                @if($currentList->description)
+                                    <div class="bg-[#18181B] border border-[#3F3F46] rounded-lg p-3">
+                                        <span class="text-[#A1A1AA] text-xs font-semibold uppercase tracking-wide">Description</span>
+                                        <p class="text-white mt-1 leading-relaxed">{{ $currentList->description }}</p>
+                                    </div>
+                                @endif
+                                
                                 @if($currentList->category && $currentList->category !== 'general')
                                     <div class="flex items-center gap-2">
                                         <span class="text-[#A1A1AA]">Category:</span>

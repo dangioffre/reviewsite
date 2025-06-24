@@ -16,6 +16,7 @@ class UserLists extends Component
     public $pendingInvitations = [];
     public $showCreate = false;
     public $newListName = '';
+    public $newListDescription = '';
     public $editingList = null;
     public $editingName = '';
     public $viewingList = null;
@@ -34,6 +35,10 @@ class UserLists extends Component
     // Category editing
     public $editingCategoryListId = null;
     public $editingCategoryValue = 'general';
+    
+    // Description editing
+    public $editingDescriptionListId = null;
+    public $editingDescriptionValue = '';
 
     public $showCollaborationManager = false;
     public $managingListId = null;
@@ -45,6 +50,13 @@ class UserLists extends Component
         'can_manage_users' => false,
         'can_change_privacy' => false,
         'can_change_category' => false,
+    ];
+
+    protected $rules = [
+        'newListName' => 'required|string|max:255',
+        'newListDescription' => 'nullable|string|max:1000',
+        'editingName' => 'required|string|max:255',
+        'editingDescriptionValue' => 'nullable|string|max:1000',
     ];
 
     public function mount()
@@ -133,6 +145,7 @@ class UserLists extends Component
 
         auth()->user()->lists()->create([
             'name' => $this->newListName,
+            'description' => $this->newListDescription,
             'slug' => Str::slug($this->newListName),
             'is_public' => false,
             'category' => $this->selectedCategory,
@@ -143,6 +156,7 @@ class UserLists extends Component
         ]);
 
         $this->newListName = '';
+        $this->newListDescription = '';
         $this->showCreate = false;
         $this->selectedCategory = 'general';
         $this->selectedSortBy = 'date_added';
@@ -448,6 +462,58 @@ class UserLists extends Component
     {
         $this->editingCategoryListId = null;
         $this->editingCategoryValue = 'general';
+    }
+    
+    public function testDescriptionButton()
+    {
+        Log::info('Test description button clicked!');
+        $this->successMessage = 'Test button works! Description functionality should work too.';
+    }
+
+    public function startEditingDescription($listId)
+    {
+        Log::info('startEditingDescription called with listId: ' . $listId);
+        
+        $list = $this->findListById($listId);
+        
+        if (!$list || $list->user_id !== auth()->id()) {
+            $this->successMessage = 'You do not have permission to edit the description for this list.';
+            return;
+        }
+        
+        $this->editingDescriptionListId = $listId;
+        $this->editingDescriptionValue = $list->description ?? '';
+        
+        Log::info('Description editing started for list: ' . $list->name);
+        Log::info('editingDescriptionListId set to: ' . $this->editingDescriptionListId);
+        Log::info('editingDescriptionValue set to: ' . $this->editingDescriptionValue);
+    }
+    
+    public function saveDescription()
+    {
+        $this->validate([
+            'editingDescriptionValue' => 'nullable|string|max:1000',
+        ]);
+        
+        $list = $this->findListById($this->editingDescriptionListId);
+        
+        if (!$list || $list->user_id !== auth()->id()) {
+            $this->successMessage = 'You do not have permission to edit the description for this list.';
+            return;
+        }
+        
+        $list->update(['description' => $this->editingDescriptionValue]);
+        
+        $this->editingDescriptionListId = null;
+        $this->editingDescriptionValue = '';
+        $this->successMessage = 'List description updated!';
+        $this->refreshLists();
+    }
+    
+    public function cancelDescriptionEdit()
+    {
+        $this->editingDescriptionListId = null;
+        $this->editingDescriptionValue = '';
     }
 
     // Collaboration Methods

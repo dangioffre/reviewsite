@@ -33,6 +33,19 @@
                     <p class="text-[#A1A1AA] font-['Inter'] text-lg max-w-2xl mx-auto">
                         A curated collection of games shared by the community
                     </p>
+                    
+                    <!-- Description -->
+                    @if($list->description)
+                        <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-xl border border-[#3F3F46] p-6 max-w-4xl mx-auto mt-6">
+                            <div class="flex items-center gap-2 mb-3">
+                                <svg class="w-5 h-5 text-[#7C3AED]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span class="text-[#A1A1AA] text-sm font-semibold uppercase tracking-wide font-['Inter']">About This List</span>
+                            </div>
+                            <p class="text-white leading-relaxed font-['Inter'] text-center">{{ $list->description }}</p>
+                        </div>
+                    @endif
                 </div>
                 
                 <!-- Creator & Basic Info -->

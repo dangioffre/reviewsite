@@ -10,7 +10,7 @@ class ListModel extends Model
     use HasFactory;
     protected $table = 'lists';
     protected $fillable = [
-        'user_id', 'name', 'slug', 'is_public', 'category', 'sort_by', 'sort_direction',
+        'user_id', 'name', 'description', 'slug', 'is_public', 'category', 'sort_by', 'sort_direction',
         'cloned_from', 'allow_collaboration', 'allow_comments', 'followers_count', 'comments_count'
     ];
 

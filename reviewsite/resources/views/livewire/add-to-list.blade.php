@@ -93,6 +93,12 @@
                         <div class="text-[#E53E3E] text-xs mt-1 font-['Inter']">{{ $message }}</div>
                     @enderror
                 </div>
+                <div>
+                    <textarea wire:model.defer="newListDescription" placeholder="Description (optional)..." rows="2" class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-4 py-3 text-white placeholder-[#71717A] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent font-['Inter'] resize-none"></textarea>
+                    @error('newListDescription')
+                        <div class="text-[#E53E3E] text-xs mt-1 font-['Inter']">{{ $message }}</div>
+                    @enderror
+                </div>
                 <div class="flex gap-2">
                     <button type="submit" class="flex-1 bg-[#7C3AED] hover:bg-[#6D28D9] text-white py-2 px-4 rounded-lg font-semibold text-sm transition-colors font-['Inter']">
                         Create

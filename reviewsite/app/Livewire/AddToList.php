@@ -14,6 +14,7 @@ class AddToList extends Component
     public $lists = [];
     public $showCreate = false;
     public $newListName = '';
+    public $newListDescription = '';
     public $successMessage = '';
     public $testCount = 0;
 
@@ -69,6 +70,7 @@ class AddToList extends Component
 
         $list = auth()->user()->lists()->create([
             'name' => $this->newListName,
+            'description' => $this->newListDescription,
             'slug' => Str::slug($this->newListName),
             'is_public' => false,
         ]);
@@ -81,6 +83,7 @@ class AddToList extends Component
         Log::info('List created successfully: ' . $list->name);
 
         $this->newListName = '';
+        $this->newListDescription = '';
         $this->showCreate = false;
         $this->successMessage = 'List created and game added!';
         $this->refreshLists();
