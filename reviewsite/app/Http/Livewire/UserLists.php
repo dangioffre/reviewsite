@@ -7,6 +7,8 @@ use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
+use App\Models\ListCollaborator;
 
 class UserLists extends Component
 {
@@ -33,7 +35,17 @@ class UserLists extends Component
     public $editingCategoryListId = null;
     public $editingCategoryValue = 'general';
 
-
+    public $showCollaborationManager = false;
+    public $managingListId = null;
+    public $inviteEmail = '';
+    public $invitePermissions = [
+        'can_add_games' => true,
+        'can_delete_games' => true,
+        'can_rename_list' => false,
+        'can_manage_users' => false,
+        'can_change_privacy' => false,
+        'can_change_category' => false,
+    ];
 
     public function mount()
     {
@@ -78,15 +90,25 @@ class UserLists extends Component
                 if ($collaboration) {
                     // Create a role summary based on permissions
                     $permissions = [];
-                    if ($collaboration->can_add_games) $permissions[] = 'Add';
-                    if ($collaboration->can_delete_games) $permissions[] = 'Delete';
+                    if ($collaboration->can_add_games) $permissions[] = 'Add Games';
+                    if ($collaboration->can_delete_games) $permissions[] = 'Remove Games';
                     if ($collaboration->can_rename_list) $permissions[] = 'Rename';
-                    if ($collaboration->can_manage_users) $permissions[] = 'Manage';
+                    if ($collaboration->can_manage_users) $permissions[] = 'Manage Users';
                     if ($collaboration->can_change_privacy) $permissions[] = 'Privacy';
                     if ($collaboration->can_change_category) $permissions[] = 'Category';
                     
                     $list->user_role = empty($permissions) ? 'view' : 'collaborator';
-                    $list->permissions_summary = empty($permissions) ? 'View Only' : implode(', ', $permissions);
+                    
+                    // Create a more user-friendly summary
+                    if (empty($permissions)) {
+                        $list->permissions_summary = 'View Only';
+                    } elseif (count($permissions) >= 4) {
+                        $list->permissions_summary = 'Full Access';
+                    } elseif (in_array('Add Games', $permissions) && in_array('Remove Games', $permissions)) {
+                        $list->permissions_summary = 'Edit Games';
+                    } else {
+                        $list->permissions_summary = implode(', ', array_slice($permissions, 0, 2)) . (count($permissions) > 2 ? ' +' . (count($permissions) - 2) . ' more' : '');
+                    }
                 } else {
                     $list->user_role = 'view';
                     $list->permissions_summary = 'View Only';
@@ -133,11 +155,10 @@ class UserLists extends Component
 
     public function startEditing($listId)
     {
-        $list = $this->lists->find($listId);
+        $list = $this->findListById($listId);
         
-        // Check permissions
-        if (!$this->canEditList($list)) {
-            $this->successMessage = 'You do not have permission to edit this list.';
+        if (!$list || !$this->canRenameList($list)) {
+            $this->successMessage = 'You do not have permission to rename this list.';
             return;
         }
         
@@ -151,10 +172,10 @@ class UserLists extends Component
             'editingName' => 'required|string|max:255',
         ]);
 
-        // Find the list (could be owned or collaborative)
         $list = $this->findListById($this->editingList);
-        if (!$list || !$this->canEditList($list)) {
-            $this->successMessage = 'You do not have permission to edit this list.';
+        
+        if (!$list || !$this->canRenameList($list)) {
+            $this->successMessage = 'You do not have permission to rename this list.';
             return;
         }
 
@@ -181,8 +202,8 @@ class UserLists extends Component
         
         $list = $this->findListById($listId);
         
-        if (!$list || $list->user_id !== auth()->id()) {
-            $this->successMessage = 'You can only change privacy settings for your own lists.';
+        if (!$list || !$this->canChangePrivacy($list)) {
+            $this->successMessage = 'You do not have permission to change privacy settings for this list.';
             return;
         }
         
@@ -246,25 +267,25 @@ class UserLists extends Component
 
     public function searchGames()
     {
-        Log::info('Search called with term: ' . $this->searchTerm);
-        
         if (strlen($this->searchTerm) < 2) {
             $this->searchResults = [];
-            Log::info('Search term too short, clearing results');
             return;
         }
 
-        $this->searchResults = Product::where('type', 'game')
-            ->where(function($query) {
-                $query->where('name', 'like', '%' . $this->searchTerm . '%')
-                      ->orWhere('description', 'like', '%' . $this->searchTerm . '%');
-            })
-            ->with(['genre', 'platform'])
-            ->limit(10)
-            ->get();
-            
-        Log::info('Search results count: ' . $this->searchResults->count());
-        Log::info('Search results: ' . $this->searchResults->pluck('name')->toJson());
+        try {
+            $this->searchResults = Product::where('type', 'game')
+                ->where(function($query) {
+                    $query->where('name', 'ILIKE', '%' . $this->searchTerm . '%')
+                          ->orWhere('description', 'ILIKE', '%' . $this->searchTerm . '%');
+                })
+                ->with(['genre', 'platform'])
+                ->limit(10)
+                ->get();
+                
+        } catch (\Exception $e) {
+            Log::error('Search error: ' . $e->getMessage());
+            $this->searchResults = [];
+        }
     }
 
     public function addGameToList($gameId)
@@ -306,7 +327,6 @@ class UserLists extends Component
 
     public function updatedSearchTerm()
     {
-        Log::info('updatedSearchTerm called with: ' . $this->searchTerm);
         $this->searchGames();
     }
 
@@ -396,14 +416,26 @@ class UserLists extends Component
 
     public function startEditingCategory($listId)
     {
-        $list = auth()->user()->lists()->findOrFail($listId);
+        $list = $this->findListById($listId);
+        
+        if (!$list || !$this->canChangeCategory($list)) {
+            $this->successMessage = 'You do not have permission to change the category for this list.';
+            return;
+        }
+        
         $this->editingCategoryListId = $listId;
         $this->editingCategoryValue = $list->category ?? 'general';
     }
     
     public function saveCategory()
     {
-        $list = auth()->user()->lists()->findOrFail($this->editingCategoryListId);
+        $list = $this->findListById($this->editingCategoryListId);
+        
+        if (!$list || !$this->canChangeCategory($list)) {
+            $this->successMessage = 'You do not have permission to change the category for this list.';
+            return;
+        }
+        
         $list->update(['category' => $this->editingCategoryValue]);
         
         $this->editingCategoryListId = null;
@@ -547,85 +579,55 @@ class UserLists extends Component
         $this->refreshLists();
     }
 
-    // Helper methods for permission checking
+    // Permission checking methods
     private function canEditList($list)
     {
-        if (!$list) return false;
-        
-        // Owner can always edit
         if ($list->user_id === auth()->id()) {
             return true;
         }
         
-        // Check if user is a collaborator with add or delete games permissions
-        $collaboration = $list->collaborators->where('user_id', auth()->id())->first();
-        return $collaboration && 
-               $collaboration->isAccepted() && 
-               ($collaboration->can_add_games || $collaboration->can_delete_games);
+        $collaboration = $list->collaborators()->where('user_id', auth()->id())->whereNotNull('accepted_at')->first();
+        return $collaboration && ($collaboration->can_add_games || $collaboration->can_delete_games);
     }
     
     private function canManageList($list)
     {
-        if (!$list) return false;
-        
-        // Owner can always manage
         if ($list->user_id === auth()->id()) {
             return true;
         }
         
-        // Check if user is a collaborator with manage users permissions
-        $collaboration = $list->collaborators->where('user_id', auth()->id())->first();
-        return $collaboration && 
-               $collaboration->isAccepted() && 
-               $collaboration->can_manage_users;
+        $collaboration = $list->collaborators()->where('user_id', auth()->id())->whereNotNull('accepted_at')->first();
+        return $collaboration && $collaboration->can_manage_users;
     }
-
-    private function canRenameList($list)
-    {
-        if (!$list) return false;
-        
-        // Owner can always rename
-        if ($list->user_id === auth()->id()) {
-            return true;
-        }
-        
-        // Check if user is a collaborator with rename permissions
-        $collaboration = $list->collaborators->where('user_id', auth()->id())->first();
-        return $collaboration && 
-               $collaboration->isAccepted() && 
-               $collaboration->can_rename_list;
-    }
-
+    
     private function canChangePrivacy($list)
     {
-        if (!$list) return false;
-        
-        // Owner can always change privacy
         if ($list->user_id === auth()->id()) {
             return true;
         }
         
-        // Check if user is a collaborator with privacy permissions
-        $collaboration = $list->collaborators->where('user_id', auth()->id())->first();
-        return $collaboration && 
-               $collaboration->isAccepted() && 
-               $collaboration->can_change_privacy;
+        $collaboration = $list->collaborators()->where('user_id', auth()->id())->whereNotNull('accepted_at')->first();
+        return $collaboration && $collaboration->can_change_privacy;
     }
-
+    
     private function canChangeCategory($list)
     {
-        if (!$list) return false;
-        
-        // Owner can always change category
         if ($list->user_id === auth()->id()) {
             return true;
         }
         
-        // Check if user is a collaborator with category permissions
-        $collaboration = $list->collaborators->where('user_id', auth()->id())->first();
-        return $collaboration && 
-               $collaboration->isAccepted() && 
-               $collaboration->can_change_category;
+        $collaboration = $list->collaborators()->where('user_id', auth()->id())->whereNotNull('accepted_at')->first();
+        return $collaboration && $collaboration->can_change_category;
+    }
+    
+    private function canRenameList($list)
+    {
+        if ($list->user_id === auth()->id()) {
+            return true;
+        }
+        
+        $collaboration = $list->collaborators()->where('user_id', auth()->id())->whereNotNull('accepted_at')->first();
+        return $collaboration && $collaboration->can_rename_list;
     }
 
     // Only owners can delete lists
@@ -687,6 +689,104 @@ class UserLists extends Component
         $collaborator->delete();
         $this->successMessage = "You've declined the invitation to '{$listName}'.";
         $this->refreshLists();
+    }
+
+    public function openCollaborationManager($listId)
+    {
+        $this->managingListId = $listId;
+        $this->showCollaborationManager = true;
+    }
+
+    public function closeCollaborationManager()
+    {
+        $this->showCollaborationManager = false;
+        $this->managingListId = null;
+        $this->inviteEmail = '';
+        $this->invitePermissions = [
+            'can_add_games' => true,
+            'can_delete_games' => true,
+            'can_rename_list' => false,
+            'can_manage_users' => false,
+            'can_change_privacy' => false,
+            'can_change_category' => false,
+        ];
+    }
+
+    public function sendInvitation()
+    {
+        $this->validate([
+            'inviteEmail' => 'required|email|exists:users,email',
+        ]);
+
+        $list = $this->findListById($this->managingListId);
+        if (!$list || !$this->canManageUsers($list)) {
+            $this->successMessage = 'You do not have permission to manage users for this list.';
+            return;
+        }
+
+        $user = User::where('email', $this->inviteEmail)->first();
+        
+        // Check if user already has collaboration
+        if ($list->collaborators()->where('user_id', $user->id)->exists()) {
+            $this->successMessage = 'User is already a collaborator or has a pending invitation.';
+            return;
+        }
+
+        $list->collaborators()->create([
+            'user_id' => $user->id,
+            'invited_by_owner' => true,
+            'can_add_games' => $this->invitePermissions['can_add_games'],
+            'can_delete_games' => $this->invitePermissions['can_delete_games'],
+            'can_rename_list' => $this->invitePermissions['can_rename_list'],
+            'can_manage_users' => $this->invitePermissions['can_manage_users'],
+            'can_change_privacy' => $this->invitePermissions['can_change_privacy'],
+            'can_change_category' => $this->invitePermissions['can_change_category'],
+            'invited_at' => now(),
+        ]);
+
+        $this->successMessage = 'Invitation sent successfully!';
+        $this->inviteEmail = '';
+        $this->refreshLists();
+    }
+
+    public function updateCollaboratorPermissions($collaboratorId, $permissions)
+    {
+        $collaboration = ListCollaborator::findOrFail($collaboratorId);
+        $list = $collaboration->list;
+        
+        if (!$this->canManageUsers($list)) {
+            $this->successMessage = 'You do not have permission to manage users for this list.';
+            return;
+        }
+
+        $collaboration->update($permissions);
+        $this->successMessage = 'Permissions updated successfully!';
+        $this->refreshLists();
+    }
+
+    public function removeCollaboratorFromManager($collaboratorId)
+    {
+        $collaboration = ListCollaborator::findOrFail($collaboratorId);
+        $list = $collaboration->list;
+        
+        if (!$this->canManageUsers($list)) {
+            $this->successMessage = 'You do not have permission to manage users for this list.';
+            return;
+        }
+
+        $collaboration->delete();
+        $this->successMessage = 'Collaborator removed successfully!';
+        $this->refreshLists();
+    }
+
+    private function canManageUsers($list)
+    {
+        if ($list->user_id === auth()->id()) {
+            return true;
+        }
+        
+        $collaboration = $list->collaborators()->where('user_id', auth()->id())->first();
+        return $collaboration && $collaboration->can_manage_users;
     }
 
     public function render()

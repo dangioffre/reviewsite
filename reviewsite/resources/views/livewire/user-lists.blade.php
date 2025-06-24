@@ -299,68 +299,83 @@
                             @endif
                             
                             <!-- Features & Status -->
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <!-- Visibility Status -->
-                                    @if($list->is_public)
-                                        <span class="inline-flex items-center gap-1 bg-[#22C55E]/20 text-[#22C55E] px-2 py-1 rounded-lg text-xs font-semibold border border-[#22C55E]/30">
-                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                                            </svg>
-                                            Public
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center gap-1 bg-[#71717A]/20 text-[#71717A] px-2 py-1 rounded-lg text-xs font-semibold border border-[#71717A]/30">
-                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                                            </svg>
-                                            Private
-                                        </span>
-                                    @endif
-                                    
-                                    <!-- User Role Indicator -->
-                                    @if(isset($list->user_role) && $list->user_role !== 'owner')
-                                        <span class="inline-flex items-center gap-1 bg-[#7C3AED]/20 text-[#7C3AED] px-2 py-1 rounded-lg text-xs font-semibold border border-[#7C3AED]/30">
-                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
-                                            </svg>
-                                            Collaborator
-                                        </span>
-                                        @if(isset($list->permissions_summary))
-                                            <span class="inline-flex items-center gap-1 bg-[#059669]/20 text-[#059669] px-2 py-1 rounded-lg text-xs font-medium border border-[#059669]/30">
-                                                {{ $list->permissions_summary }}
+                            <div class="space-y-3">
+                                <!-- Top Row: Visibility and User Role -->
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <!-- Visibility Status -->
+                                        @if($list->is_public)
+                                            <span class="inline-flex items-center gap-1 bg-[#22C55E]/20 text-[#22C55E] px-2 py-1 rounded-lg text-xs font-semibold border border-[#22C55E]/30">
+                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                                                </svg>
+                                                Public
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 bg-[#71717A]/20 text-[#71717A] px-2 py-1 rounded-lg text-xs font-semibold border border-[#71717A]/30">
+                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                                                </svg>
+                                                Private
                                             </span>
                                         @endif
-                                    @elseif($list->allow_collaboration)
-                                        <span class="inline-flex items-center gap-1 bg-[#2563EB]/20 text-[#2563EB] px-2 py-1 rounded-lg text-xs font-semibold border border-[#2563EB]/30">
-                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
-                                            </svg>
-                                            Collaborative
-                                        </span>
-                                    @endif
+                                        
+                                        <!-- User Role Indicator -->
+                                        @if(isset($list->user_role) && $list->user_role !== 'owner')
+                                            <span class="inline-flex items-center gap-1 bg-[#7C3AED]/20 text-[#7C3AED] px-2 py-1 rounded-lg text-xs font-semibold border border-[#7C3AED]/30 cursor-help" 
+                                                  title="@if(isset($list->permissions_summary))Permissions: {{ $list->permissions_summary }}@endif">
+                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                                                </svg>
+                                                @if(isset($list->permissions_summary) && $list->permissions_summary !== 'View Only')
+                                                    Collaborator
+                                                @else
+                                                    View Only
+                                                @endif
+                                            </span>
+                                        @elseif($list->allow_collaboration)
+                                            <span class="inline-flex items-center gap-1 bg-[#2563EB]/20 text-[#2563EB] px-2 py-1 rounded-lg text-xs font-semibold border border-[#2563EB]/30">
+                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                                                </svg>
+                                                Collaborative
+                                            </span>
+                                        @endif
+                                    </div>
+                                    
+                                    <!-- Special Indicators -->
+                                    <div class="flex items-center gap-2">
+                                        @if($list->allow_comments)
+                                            <div class="w-6 h-6 bg-[#22C55E]/20 rounded-lg flex items-center justify-center" title="Comments Enabled">
+                                                <svg class="w-3 h-3 text-[#22C55E]" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
+                                                </svg>
+                                            </div>
+                                        @endif
+                                        
+                                        @if($list->cloned_from)
+                                            <div class="w-6 h-6 bg-[#F59E0B]/20 rounded-lg flex items-center justify-center" title="Cloned List">
+                                                <svg class="w-3 h-3 text-[#F59E0B]" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z"/>
+                                                    <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5z"/>
+                                                </svg>
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                                 
-                                <!-- Special Indicators -->
-                                <div class="flex items-center gap-2">
-                                    @if($list->allow_comments)
-                                        <div class="w-6 h-6 bg-[#22C55E]/20 rounded-lg flex items-center justify-center" title="Comments Enabled">
-                                            <svg class="w-3 h-3 text-[#22C55E]" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
+                                <!-- Bottom Row: Permissions Summary for Collaborators -->
+                                @if(isset($list->user_role) && $list->user_role !== 'owner' && isset($list->permissions_summary) && $list->permissions_summary !== 'View Only')
+                                    <div class="flex items-center">
+                                        <span class="inline-flex items-center gap-1 bg-[#059669]/20 text-[#059669] px-2 py-1 rounded-lg text-xs font-medium border border-[#059669]/30">
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                             </svg>
-                                        </div>
-                                    @endif
-                                    
-                                    @if($list->cloned_from)
-                                        <div class="w-6 h-6 bg-[#F59E0B]/20 rounded-lg flex items-center justify-center" title="Cloned List">
-                                            <svg class="w-3 h-3 text-[#F59E0B]" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z"/>
-                                                <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5z"/>
-                                            </svg>
-                                        </div>
-                                    @endif
-                                </div>
+                                            {{ $list->permissions_summary }}
+                                        </span>
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
@@ -377,25 +392,35 @@
                             </button>
 
                             <!-- Quick Actions -->
-                            <div class="grid grid-cols-2 gap-2">
-                                @if($editingList !== $list->id && (($list->user_role ?? 'owner') === 'owner' || in_array($list->user_role ?? 'owner', ['admin', 'edit'])))
-                                    <button wire:click="startEditing({{ $list->id }})" 
-                                            class="bg-[#18181B] hover:bg-[#27272A] text-[#A1A1AA] hover:text-white py-2 px-3 rounded-lg transition-all duration-200 font-['Inter'] text-sm flex items-center justify-center border border-[#3F3F46] hover:border-[#52525B]">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
-                                        Rename
-                                    </button>
-                                @endif
-                                
-                                <button wire:click="duplicateList({{ $list->id }})" 
-                                        class="bg-[#7C3AED]/10 hover:bg-[#7C3AED]/20 text-[#7C3AED] hover:text-[#6D28D9] py-2 px-3 rounded-lg transition-all duration-200 font-['Inter'] text-sm flex items-center justify-center border border-[#7C3AED]/30 hover:border-[#7C3AED]/50">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                    </svg>
-                                    Clone
-                                </button>
-                            </div>
+                            @php
+                                $canRename = $editingList !== $list->id && (($list->user_role ?? 'owner') === 'owner' || in_array($list->user_role ?? 'owner', ['admin', 'edit']));
+                                $canClone = ($list->user_role ?? 'owner') === 'owner';
+                                $hasQuickActions = $canRename || $canClone;
+                            @endphp
+                            
+                            @if($hasQuickActions)
+                                <div class="grid {{ ($canRename && $canClone) ? 'grid-cols-2' : 'grid-cols-1' }} gap-2">
+                                    @if($canRename)
+                                        <button wire:click="startEditing({{ $list->id }})" 
+                                                class="bg-[#18181B] hover:bg-[#27272A] text-[#A1A1AA] hover:text-white py-2 px-3 rounded-lg transition-all duration-200 font-['Inter'] text-sm flex items-center justify-center border border-[#3F3F46] hover:border-[#52525B]">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                            Rename
+                                        </button>
+                                    @endif
+                                    
+                                    @if($canClone)
+                                        <button wire:click="duplicateList({{ $list->id }})" 
+                                                class="bg-[#7C3AED]/10 hover:bg-[#7C3AED]/20 text-[#7C3AED] hover:text-[#6D28D9] py-2 px-3 rounded-lg transition-all duration-200 font-['Inter'] text-sm flex items-center justify-center border border-[#7C3AED]/30 hover:border-[#7C3AED]/50">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                            </svg>
+                                            Clone
+                                        </button>
+                                    @endif
+                                </div>
+                            @endif
                             
                             <!-- Dropdown Menu for More Actions -->
                             <div class="relative" x-data="{ open: false }">
@@ -603,36 +628,198 @@
                         @php
                             $userRole = $currentList->user_role ?? 'owner';
                             $canEdit = $userRole === 'owner' || in_array($userRole, ['edit', 'admin']);
+                            $collaboration = $currentList->collaborators->where('user_id', auth()->id())->first();
+                            $canManageUsers = $userRole === 'owner' || ($collaboration && $collaboration->can_manage_users);
+                            $canChangePrivacy = $userRole === 'owner' || ($collaboration && $collaboration->can_change_privacy);
+                            $canChangeCategory = $userRole === 'owner' || ($collaboration && $collaboration->can_change_category);
+                            $canRename = $userRole === 'owner' || ($collaboration && $collaboration->can_rename_list);
                         @endphp
                         
-                        @if($canEdit)
-                            <button wire:click="$set('showSearch', true)" 
-                                    class="bg-[#7C3AED] hover:bg-[#6D28D9] text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors font-['Inter'] flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
-                                Add Games
-                            </button>
-                        @else
-                            <div class="bg-[#3F3F46] text-[#A1A1AA] px-4 py-2 rounded-lg text-sm font-['Inter'] flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                                View Only ({{ ucfirst($userRole) }})
-                            </div>
-                        @endif
-                        
-                        <button wire:click="duplicateList({{ $currentList->id }})" 
-                                class="bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors font-['Inter'] flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
-                            Duplicate
-                        </button>
+
                     </div>
                 </div>
                 
+                <!-- Management Panel -->
+                <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl border border-[#3F3F46] p-6 mb-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-white font-['Share_Tech_Mono']">List Management</h3>
+                            <p class="text-[#A1A1AA] font-['Inter'] text-sm">Manage settings and collaborations</p>
+                        </div>
+                        @if($userRole !== 'owner')
+                            <div class="bg-[#7C3AED]/20 text-[#7C3AED] px-3 py-1 rounded-lg text-xs font-semibold border border-[#7C3AED]/30">
+                                <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                                </svg>
+                                {{ $collaboration ? $collaboration->getPermissionSummary() : 'Collaborator' }}
+                            </div>
+                        @endif
+                    </div>
+                    
+                    <!-- Management Actions Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Rename List -->
+                        @if($canRename)
+                            <div class="bg-[#18181B] border border-[#3F3F46] rounded-xl p-4">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 bg-[#2563EB]/20 rounded-lg flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-white font-semibold font-['Inter']">Rename List</h4>
+                                        <p class="text-[#A1A1AA] text-xs">Change the list name</p>
+                                    </div>
+                                </div>
+                                @if($editingList === $currentList->id)
+                                    <form wire:submit.prevent="saveEdit" class="space-y-3">
+                                        <input type="text" wire:model.defer="editingName" 
+                                               class="w-full bg-[#27272A] border border-[#3F3F46] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]" />
+                                        <div class="flex gap-2">
+                                            <button type="submit" class="bg-[#22C55E] hover:bg-[#16A34A] text-white px-3 py-1.5 rounded text-xs font-semibold transition-colors">Save</button>
+                                            <button type="button" wire:click="cancelEdit" class="text-[#A1A1AA] hover:text-white px-3 py-1.5 text-xs transition-colors">Cancel</button>
+                                        </div>
+                                    </form>
+                                @else
+                                    <button wire:click="startEditing({{ $currentList->id }})" 
+                                            class="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white py-2 px-3 rounded-lg text-sm font-semibold transition-colors">
+                                        Rename
+                                    </button>
+                                @endif
+                            </div>
+                        @endif
+                        
+                        <!-- Change Privacy -->
+                        @if($canChangePrivacy)
+                            <div class="bg-[#18181B] border border-[#3F3F46] rounded-xl p-4">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 bg-[#22C55E]/20 rounded-lg flex items-center justify-center">
+                                        @if($currentList->is_public)
+                                            <svg class="w-5 h-5 text-[#22C55E]" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                                            </svg>
+                                        @else
+                                            <svg class="w-5 h-5 text-[#71717A]" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                                            </svg>
+                                        @endif
+                                    </div>
+                                    <div>
+                                        <h4 class="text-white font-semibold font-['Inter']">Privacy</h4>
+                                        <p class="text-[#A1A1AA] text-xs">Currently {{ $currentList->is_public ? 'Public' : 'Private' }}</p>
+                                    </div>
+                                </div>
+                                <button wire:click="togglePublic({{ $currentList->id }})" 
+                                        class="w-full {{ $currentList->is_public ? 'bg-[#71717A] hover:bg-[#52525B]' : 'bg-[#22C55E] hover:bg-[#16A34A]' }} text-white py-2 px-3 rounded-lg text-sm font-semibold transition-colors">
+                                    Make {{ $currentList->is_public ? 'Private' : 'Public' }}
+                                </button>
+                            </div>
+                        @endif
+                        
+                        <!-- Change Category -->
+                        @if($canChangeCategory)
+                            <div class="bg-[#18181B] border border-[#3F3F46] rounded-xl p-4">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 bg-[#F59E0B]/20 rounded-lg flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-white font-semibold font-['Inter']">Category</h4>
+                                        <p class="text-[#A1A1AA] text-xs">{{ $categories[$currentList->category] ?? 'General' }}</p>
+                                    </div>
+                                </div>
+                                @if($editingCategoryListId === $currentList->id)
+                                    <div class="space-y-3">
+                                        <select wire:model="editingCategoryValue" 
+                                                class="w-full bg-[#27272A] border border-[#3F3F46] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#F59E0B]">
+                                            @foreach($categories as $key => $label)
+                                                <option value="{{ $key }}">{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                        <div class="flex gap-2">
+                                            <button wire:click="saveCategory" class="bg-[#22C55E] hover:bg-[#16A34A] text-white px-3 py-1.5 rounded text-xs font-semibold transition-colors">Save</button>
+                                            <button wire:click="cancelCategoryEdit" class="text-[#A1A1AA] hover:text-white px-3 py-1.5 text-xs transition-colors">Cancel</button>
+                                        </div>
+                                    </div>
+                                @else
+                                    <button wire:click="startEditingCategory({{ $currentList->id }})" 
+                                            class="w-full bg-[#F59E0B] hover:bg-[#D97706] text-white py-2 px-3 rounded-lg text-sm font-semibold transition-colors">
+                                        Change Category
+                                    </button>
+                                @endif
+                            </div>
+                        @endif
+                        
+                        <!-- Manage Collaborators -->
+                        @if($canManageUsers && $currentList->allow_collaboration)
+                            <div class="bg-[#18181B] border border-[#3F3F46] rounded-xl p-4">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 bg-[#7C3AED]/20 rounded-lg flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-[#7C3AED]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-white font-semibold font-['Inter']">Collaborators</h4>
+                                        <p class="text-[#A1A1AA] text-xs">{{ $currentList->collaborators->where('accepted_at', '!=', null)->count() }} active</p>
+                                    </div>
+                                </div>
+                                <button wire:click="openCollaborationManager({{ $currentList->id }})" 
+                                        class="w-full bg-[#7C3AED] hover:bg-[#6D28D9] text-white py-2 px-3 rounded-lg text-sm font-semibold transition-colors">
+                                    Manage Users
+                                </button>
+                            </div>
+                        @endif
+                        
+                        <!-- Duplicate (Owner Only) -->
+                        @if($userRole === 'owner')
+                            <div class="bg-[#18181B] border border-[#3F3F46] rounded-xl p-4">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 bg-[#A855F7]/20 rounded-lg flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-[#A855F7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-white font-semibold font-['Inter']">Duplicate</h4>
+                                        <p class="text-[#A1A1AA] text-xs">Create a copy of this list</p>
+                                    </div>
+                                </div>
+                                <button wire:click="duplicateList({{ $currentList->id }})" 
+                                        class="w-full bg-[#A855F7] hover:bg-[#9333EA] text-white py-2 px-3 rounded-lg text-sm font-semibold transition-colors">
+                                    Duplicate List
+                                </button>
+                            </div>
+                        @endif
+                        
+                        <!-- Delete (Owner Only) -->
+                        @if($userRole === 'owner')
+                            <div class="bg-[#18181B] border border-[#EF4444]/30 rounded-xl p-4">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 bg-[#EF4444]/20 rounded-lg flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-[#EF4444]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-[#EF4444] font-semibold font-['Inter']">Delete List</h4>
+                                        <p class="text-[#A1A1AA] text-xs">Permanently remove this list</p>
+                                    </div>
+                                </div>
+                                <button wire:click="deleteList({{ $currentList->id }})" 
+                                        onclick="return confirm('Are you sure you want to delete this list? This action cannot be undone.')"
+                                        class="w-full bg-[#EF4444] hover:bg-[#DC2626] text-white py-2 px-3 rounded-lg text-sm font-semibold transition-colors">
+                                    Delete List
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
                 <!-- Enhanced List Info & Controls -->
                 <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl border border-[#3F3F46] p-6 mb-6">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -716,6 +903,33 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Add Games Button (Right Side) -->
+                @php
+                    $userRole = $currentList->user_role ?? 'owner';
+                    $collaboration = $currentList->collaborators->where('user_id', auth()->id())->first();
+                    $canAddGames = $userRole === 'owner' || ($collaboration && $collaboration->can_add_games);
+                @endphp
+                
+                <div class="flex justify-end mb-6">
+                    @if($canAddGames)
+                        <button wire:click="$set('showSearch', true)" 
+                                class="bg-[#7C3AED] hover:bg-[#6D28D9] text-white px-6 py-3 rounded-lg font-semibold text-sm transition-colors font-['Inter'] flex items-center shadow-lg">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            Add Games
+                        </button>
+                    @else
+                        <div class="bg-[#3F3F46] text-[#A1A1AA] px-6 py-3 rounded-lg text-sm font-['Inter'] flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            View Only Access
+                        </div>
+                    @endif
+                </div>
 
                 <!-- Search Section -->
                 @if($showSearch)
@@ -732,14 +946,13 @@
                         
                         <div class="relative mb-4">
                             <input type="text" wire:model.live="searchTerm" placeholder="Search for games..." 
-                                   class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-4 py-3 pl-10 pr-20 text-white placeholder-[#71717A] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent font-['Inter']" />
+                                   class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-4 py-3 pl-10 text-white placeholder-[#71717A] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent font-['Inter']" />
                             <svg class="w-5 h-5 text-[#71717A] absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
-                            <button wire:click="searchGames" class="absolute right-2 top-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-3 py-1.5 rounded text-xs">
-                                Search
-                            </button>
                         </div>
+                        
+
 
                         @if(count($searchResults) > 0)
                             <div class="space-y-2 max-h-60 overflow-y-auto">
@@ -891,6 +1104,147 @@
                 @endif
             </div>
         @endif
+    @endif
+    
+    <!-- Collaboration Manager Modal -->
+    @if($showCollaborationManager && $managingListId)
+        @php
+            $managingList = $lists->firstWhere('id', $managingListId);
+        @endphp
+        
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" wire:click="closeCollaborationManager">
+            <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl border border-[#3F3F46] p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto mx-4" wire:click.stop>
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-2xl font-bold text-white font-['Share_Tech_Mono']">Manage Collaborators</h3>
+                        <p class="text-[#A1A1AA] font-['Inter']">{{ $managingList->name ?? 'List' }}</p>
+                    </div>
+                    <button wire:click="closeCollaborationManager" 
+                            class="text-[#A1A1AA] hover:text-white transition-colors p-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Invite New Collaborator -->
+                <div class="bg-[#18181B] border border-[#3F3F46] rounded-xl p-6 mb-6">
+                    <h4 class="text-lg font-bold text-white font-['Share_Tech_Mono'] mb-4">Invite New Collaborator</h4>
+                    
+                    <form wire:submit.prevent="sendInvitation" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-white mb-2">Email Address</label>
+                            <input type="email" wire:model="inviteEmail" placeholder="Enter user's email address"
+                                   class="w-full bg-[#27272A] border border-[#3F3F46] rounded-lg px-4 py-3 text-white placeholder-[#71717A] focus:outline-none focus:ring-2 focus:ring-[#7C3AED] focus:border-transparent">
+                            @error('inviteEmail') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-white mb-3">Permissions</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="checkbox" wire:model="invitePermissions.can_add_games" 
+                                           class="w-4 h-4 text-[#7C3AED] bg-[#27272A] border-[#3F3F46] rounded focus:ring-[#7C3AED] focus:ring-2">
+                                    <span class="text-sm text-white">Add Games</span>
+                                </label>
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="checkbox" wire:model="invitePermissions.can_delete_games" 
+                                           class="w-4 h-4 text-[#7C3AED] bg-[#27272A] border-[#3F3F46] rounded focus:ring-[#7C3AED] focus:ring-2">
+                                    <span class="text-sm text-white">Remove Games</span>
+                                </label>
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="checkbox" wire:model="invitePermissions.can_rename_list" 
+                                           class="w-4 h-4 text-[#7C3AED] bg-[#27272A] border-[#3F3F46] rounded focus:ring-[#7C3AED] focus:ring-2">
+                                    <span class="text-sm text-white">Rename List</span>
+                                </label>
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="checkbox" wire:model="invitePermissions.can_manage_users" 
+                                           class="w-4 h-4 text-[#7C3AED] bg-[#27272A] border-[#3F3F46] rounded focus:ring-[#7C3AED] focus:ring-2">
+                                    <span class="text-sm text-white">Manage Users</span>
+                                </label>
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="checkbox" wire:model="invitePermissions.can_change_privacy" 
+                                           class="w-4 h-4 text-[#7C3AED] bg-[#27272A] border-[#3F3F46] rounded focus:ring-[#7C3AED] focus:ring-2">
+                                    <span class="text-sm text-white">Change Privacy</span>
+                                </label>
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="checkbox" wire:model="invitePermissions.can_change_category" 
+                                           class="w-4 h-4 text-[#7C3AED] bg-[#27272A] border-[#3F3F46] rounded focus:ring-[#7C3AED] focus:ring-2">
+                                    <span class="text-sm text-white">Change Category</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" 
+                                class="bg-[#7C3AED] hover:bg-[#6D28D9] text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                            Send Invitation
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Current Collaborators -->
+                @if($managingList && $managingList->collaborators->count() > 0)
+                    <div class="bg-[#18181B] border border-[#3F3F46] rounded-xl p-6">
+                        <h4 class="text-lg font-bold text-white font-['Share_Tech_Mono'] mb-4">Current Collaborators</h4>
+                        
+                        <div class="space-y-4">
+                            @foreach($managingList->collaborators as $collaborator)
+                                <div class="bg-[#27272A] border border-[#3F3F46] rounded-lg p-4">
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-10 h-10 bg-[#7C3AED] rounded-full flex items-center justify-center">
+                                                <span class="text-white font-bold text-sm">
+                                                    {{ strtoupper(substr($collaborator->user->name, 0, 1)) }}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <div class="text-white font-semibold">{{ $collaborator->user->name }}</div>
+                                                <div class="text-[#A1A1AA] text-sm">{{ $collaborator->user->email }}</div>
+                                                @if($collaborator->accepted_at)
+                                                    <div class="text-[#22C55E] text-xs">Active since {{ $collaborator->accepted_at->format('M j, Y') }}</div>
+                                                @else
+                                                    <div class="text-[#F59E0B] text-xs">Invitation pending</div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-center space-x-2">
+                                            <!-- Permission Summary -->
+                                            <div class="text-right">
+                                                <div class="text-sm text-[#7C3AED] font-semibold">
+                                                    {{ $collaborator->getPermissionSummary() }}
+                                                </div>
+                                                <div class="text-xs text-[#A1A1AA]">
+                                                    @php
+                                                        $permissions = [];
+                                                        if ($collaborator->can_add_games) $permissions[] = 'Add';
+                                                        if ($collaborator->can_delete_games) $permissions[] = 'Remove';
+                                                        if ($collaborator->can_rename_list) $permissions[] = 'Rename';
+                                                        if ($collaborator->can_manage_users) $permissions[] = 'Manage';
+                                                        if ($collaborator->can_change_privacy) $permissions[] = 'Privacy';
+                                                        if ($collaborator->can_change_category) $permissions[] = 'Category';
+                                                    @endphp
+                                                    {{ implode(', ', $permissions) ?: 'View Only' }}
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Remove Button -->
+                                            <button wire:click="removeCollaboratorFromManager({{ $collaborator->id }})"
+                                                    onclick="return confirm('Remove this collaborator from the list?')"
+                                                    class="text-[#EF4444] hover:text-[#DC2626] p-2 rounded hover:bg-[#EF4444]/20 transition-colors">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
     @endif
 </div>
 
