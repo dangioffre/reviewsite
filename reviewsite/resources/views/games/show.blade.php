@@ -34,23 +34,6 @@
                     <h1 class="text-4xl lg:text-6xl font-bold text-white mb-4 font-['Share_Tech_Mono'] leading-tight">
                         {{ $product->name }}
                     </h1>
-                    
-                    <!-- Tags -->
-                    <div class="flex flex-wrap items-center gap-3">
-                        <span class="inline-flex items-center bg-gradient-to-r from-[#E53E3E] to-[#DC2626] text-white text-sm font-bold px-4 py-2 rounded-full uppercase tracking-wider font-['Share_Tech_Mono']">
-                            {{ $product->type }}
-                        </span>
-                        @if($product->platform)
-                            <span class="inline-flex items-center text-white text-sm font-bold px-4 py-2 rounded-full uppercase tracking-wider font-['Share_Tech_Mono']" style="background: linear-gradient(135deg, {{ $product->platform->color ?? '#2563EB' }}, {{ $product->platform->color ?? '#2563EB' }}dd);">
-                                {{ $product->platform->name }}
-                            </span>
-                        @endif
-                        @if($product->genre)
-                            <span class="inline-flex items-center text-white text-sm font-bold px-4 py-2 rounded-full uppercase tracking-wider font-['Share_Tech_Mono']" style="background: linear-gradient(135deg, {{ $product->genre->color ?? '#10B981' }}, {{ $product->genre->color ?? '#10B981' }}dd);">
-                                {{ $product->genre->name }}
-                            </span>
-                        @endif
-                    </div>
                 </div>
 
                 <!-- Clean Media Section -->
@@ -73,7 +56,7 @@
                             <!-- YouTube Video -->
                             <div class="flex-1">
                                 @if($product->video_url)
-                                    <div class="bg-[#1A1A1B] rounded-xl overflow-hidden border border-[#3F3F46]/20 aspect-video">
+                                    <div class="bg-gradient-to-br from-[#232326] to-[#18181B] rounded-2xl overflow-hidden border-4 border-[#2563EB]/30 shadow-2xl aspect-video">
                                         <iframe 
                                             src="{{ $product->video_url }}" 
                                             class="w-full h-full"
@@ -97,7 +80,7 @@
                     
                     <!-- Right Side: Ratings Section -->
                     <div class="lg:col-span-3">
-                        <div class="bg-[#1A1A1B] border border-[#3F3F46]/20 rounded-xl p-6">
+                        <div class="bg-gradient-to-br from-[#232326] to-[#18181B] border border-[#3F3F46]/40 rounded-2xl p-8 shadow-2xl">
                             <!-- Staff Rating -->
                             @if($product->staff_rating)
                             <div class="flex items-center justify-between mb-4">
@@ -117,9 +100,9 @@
                             <livewire:game-status-buttons :product="$product" />
                             
                             <!-- Action Buttons -->
-                            <div class="space-y-3">
+                            <div class="space-y-3 mt-6">
                                 <!-- Add to Lists Button -->
-                                <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-colors duration-200 flex items-center justify-center">
+                                <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-colors duration-200 flex items-center justify-center shadow-md">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                     </svg>
@@ -128,14 +111,14 @@
                                 
                                 <!-- Write Review Button -->
                                 @auth
-                                <a href="{{ route('games.reviews.create', $product) }}" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-colors duration-200 flex items-center justify-center">
+                                <a href="{{ route('games.reviews.create', $product) }}" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-colors duration-200 flex items-center justify-center shadow-md">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                                     </svg>
                                     Write a review
                                 </a>
                                 @else
-                                <button onclick="showLoginPrompt()" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-colors duration-200 flex items-center justify-center">
+                                <button onclick="showLoginPrompt()" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-colors duration-200 flex items-center justify-center shadow-md">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                                     </svg>
