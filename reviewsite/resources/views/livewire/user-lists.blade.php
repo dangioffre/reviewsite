@@ -626,7 +626,8 @@
                     </div>
                     <div class="flex gap-3">
                         @php
-                            $userRole = $currentList->user_role ?? 'owner';
+                            $isOwner = $currentList->user_id === auth()->id();
+                            $userRole = $isOwner ? 'owner' : ($currentList->user_role ?? 'view');
                             $canEdit = $userRole === 'owner' || in_array($userRole, ['edit', 'admin']);
                             $collaboration = $currentList->collaborators->where('user_id', auth()->id())->first();
                             $canManageUsers = $userRole === 'owner' || ($collaboration && $collaboration->can_manage_users);
@@ -646,7 +647,7 @@
                             <h3 class="text-xl font-bold text-white font-['Share_Tech_Mono']">List Management</h3>
                             <p class="text-[#A1A1AA] font-['Inter'] text-sm">Manage settings and collaborations</p>
                         </div>
-                        @if($userRole !== 'owner')
+                        @if(!$isOwner)
                             <div class="bg-[#7C3AED]/20 text-[#7C3AED] px-3 py-1 rounded-lg text-xs font-semibold border border-[#7C3AED]/30">
                                 <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
@@ -776,7 +777,7 @@
                         @endif
                         
                         <!-- Duplicate (Owner Only) -->
-                        @if($userRole === 'owner')
+                        @if($isOwner)
                             <div class="bg-[#18181B] border border-[#3F3F46] rounded-xl p-4">
                                 <div class="flex items-center gap-3 mb-3">
                                     <div class="w-10 h-10 bg-[#A855F7]/20 rounded-lg flex items-center justify-center">
@@ -797,7 +798,7 @@
                         @endif
                         
                         <!-- Delete (Owner Only) -->
-                        @if($userRole === 'owner')
+                        @if($isOwner)
                             <div class="bg-[#18181B] border border-[#EF4444]/30 rounded-xl p-4">
                                 <div class="flex items-center gap-3 mb-3">
                                     <div class="w-10 h-10 bg-[#EF4444]/20 rounded-lg flex items-center justify-center">
@@ -906,7 +907,8 @@
                 
                 <!-- Add Games Button (Right Side) -->
                 @php
-                    $userRole = $currentList->user_role ?? 'owner';
+                    $isOwner = $currentList->user_id === auth()->id();
+                    $userRole = $isOwner ? 'owner' : ($currentList->user_role ?? 'view');
                     $collaboration = $currentList->collaborators->where('user_id', auth()->id())->first();
                     $canAddGames = $userRole === 'owner' || ($collaboration && $collaboration->can_add_games);
                 @endphp
@@ -1055,7 +1057,8 @@
                                         
                                         <!-- Remove Button (only for editors and above) -->
                                         @php
-                                            $userRole = $currentList->user_role ?? 'owner';
+                                            $isOwner = $currentList->user_id === auth()->id();
+                                            $userRole = $isOwner ? 'owner' : ($currentList->user_role ?? 'view');
                                             $canEdit = $userRole === 'owner' || in_array($userRole, ['edit', 'admin']);
                                         @endphp
                                         
@@ -1080,7 +1083,8 @@
                         </svg>
                         <h3 class="text-xl font-bold text-white font-['Share_Tech_Mono'] mb-2">No games in this list</h3>
                         @php
-                            $userRole = $currentList->user_role ?? 'owner';
+                            $isOwner = $currentList->user_id === auth()->id();
+                            $userRole = $isOwner ? 'owner' : ($currentList->user_role ?? 'view');
                             $canEdit = $userRole === 'owner' || in_array($userRole, ['edit', 'admin']);
                         @endphp
                         
