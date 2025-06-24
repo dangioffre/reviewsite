@@ -41,16 +41,18 @@
                 <p>{{ $review->review ?? 'No review content available.' }}</p>
             @endif
         </div>
-        <x-like-button 
-            :review="$review"
-            :like-url="$review->product->type === 'game' ? route('games.reviews.like', [$review->product, $review]) : route('tech.reviews.like', [$review->product, $review])"
-            :liked="auth()->check() && $review->isLikedBy(auth()->user())"
-            :count="$review->likes_count"
-            :can-like="auth()->check()"
-        />
-        <a href="{{ route($showRoute, [$review->product, $review]) }}" class="text-[#2563EB] hover:text-blue-400 font-semibold mt-2 inline-block">
-            View Full Review &rarr;
-        </a>
+        <div class="flex items-center justify-between mt-2">
+            <a href="{{ route($showRoute, [$review->product, $review]) }}" class="text-[#2563EB] hover:text-blue-400 font-semibold inline-block">
+                View Full Review &rarr;
+            </a>
+            <x-like-button 
+                :review="$review"
+                :like-url="$review->product->type === 'game' ? route('games.reviews.like', [$review->product, $review]) : route('tech.reviews.like', [$review->product, $review])"
+                :liked="auth()->check() && $review->isLikedBy(auth()->user())"
+                :count="$review->likes_count"
+                :can-like="auth()->check()"
+            />
+        </div>
     </div>
 </div>
 
