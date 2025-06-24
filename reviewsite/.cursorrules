@@ -1,0 +1,185 @@
+# Blade Component Development Rules
+
+## When creating new UI features, ALWAYS implement them as Blade components
+
+### Component Structure Guidelines
+
+1. **Component Location**: Place all components in `resources/views/components/`
+2. **Naming Convention**: Use kebab-case for component names (e.g., `user-profile.blade.php`)
+3. **Props Declaration**: Always declare props at the top of the component using `@props([])`
+4. **Default Values**: Provide sensible default values for optional props
+
+### Component Template Structure
+
+```blade
+@props([
+    'prop1' => 'default_value',
+    'prop2' => null,
+    'prop3' => false,
+])
+
+<div class="component-wrapper">
+    <!-- Component content -->
+</div>
+```
+
+### Styling Guidelines
+
+1. **Use Tailwind CSS**: All styling should use Tailwind classes
+2. **Responsive Design**: Include responsive breakpoints where appropriate
+3. **Dark Mode Support**: Consider dark mode variants when applicable
+4. **Accessibility**: Include proper ARIA attributes and keyboard navigation
+
+### Interactive Components
+
+For components with JavaScript functionality:
+
+1. **Alpine.js Integration**: Use Alpine.js for reactive behavior
+2. **x-data Structure**: Define Alpine.js data at the component level
+3. **Event Handling**: Use `@click`, `@submit`, etc. for user interactions
+4. **CSRF Protection**: Include CSRF tokens for forms and AJAX requests
+
+### Component Categories
+
+#### Form Components
+- Input fields, buttons, form groups
+- Include validation states and error messages
+- Support for different input types (text, email, password, etc.)
+
+#### Display Components
+- Cards, badges, status indicators
+- Data presentation (tables, lists, grids)
+- Media components (images, videos, icons)
+
+#### Navigation Components
+- Menus, breadcrumbs, pagination
+- Tabs, accordions, modals
+- Search and filter components
+
+#### Feedback Components
+- Alerts, notifications, toasts
+- Loading states, progress indicators
+- Success/error messages
+
+### Component Usage Examples
+
+#### Basic Component
+```blade
+@props(['title' => '', 'description' => ''])
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+    @if($title)
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            {{ $title }}
+        </h3>
+    @endif
+    
+    @if($description)
+        <p class="text-gray-600 dark:text-gray-300">
+            {{ $description }}
+        </p>
+    @endif
+    
+    {{ $slot }}
+</div>
+```
+
+#### Interactive Component
+```blade
+@props(['item', 'actionUrl' => '', 'canAction' => false])
+
+<div class="interactive-component" 
+     x-data="componentData('{{ $actionUrl }}', {{ $canAction ? 'true' : 'false' }})">
+    <button @click="performAction" 
+            :disabled="!canAction"
+            class="btn-primary">
+        {{ $slot }}
+    </button>
+</div>
+
+<script>
+function componentData(actionUrl, canAction) {
+    return {
+        canAction: canAction,
+        performAction() {
+            if (!this.canAction) return;
+            
+            fetch(actionUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle response
+            });
+        }
+    }
+}
+</script>
+```
+
+### Component Testing
+
+1. **Props Testing**: Test all prop combinations and default values
+2. **Responsive Testing**: Verify component behavior across screen sizes
+3. **Accessibility Testing**: Ensure keyboard navigation and screen reader compatibility
+4. **Browser Testing**: Test in multiple browsers for consistency
+
+### Documentation Requirements
+
+For each component, include:
+1. **Props Documentation**: List all available props with types and descriptions
+2. **Usage Examples**: Provide practical examples of how to use the component
+3. **Styling Notes**: Document any custom CSS or Tailwind classes used
+4. **Dependencies**: List any JavaScript libraries or external dependencies
+
+### File Organization
+
+```
+resources/views/components/
+├── forms/
+│   ├── input.blade.php
+│   ├── button.blade.php
+│   └── form-group.blade.php
+├── display/
+│   ├── card.blade.php
+│   ├── badge.blade.php
+│   └── status.blade.php
+├── navigation/
+│   ├── menu.blade.php
+│   ├── pagination.blade.php
+│   └── breadcrumb.blade.php
+└── feedback/
+    ├── alert.blade.php
+    ├── toast.blade.php
+    └── loading.blade.php
+```
+
+### Best Practices
+
+1. **Reusability**: Design components to be reusable across different contexts
+2. **Composition**: Use component composition over complex single components
+3. **Performance**: Minimize DOM manipulation and optimize for rendering
+4. **Maintainability**: Keep components focused and single-purpose
+5. **Consistency**: Follow established patterns from existing components like `like-button.blade.php` and `star-rating.blade.php`
+
+### When to Create a Component
+
+Create a Blade component when:
+- The UI element will be used in multiple places
+- The element has complex logic or state management
+- The element requires consistent styling across the application
+- The element needs to be easily testable and maintainable
+- The element represents a distinct piece of functionality
+
+### Integration with Existing Components
+
+When creating new components, ensure they work well with existing components:
+- Follow the same prop naming conventions
+- Use consistent styling patterns
+- Maintain compatibility with the current theme
+- Integrate with existing Alpine.js patterns
+- Follow the established error handling and validation patterns 

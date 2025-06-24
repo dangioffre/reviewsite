@@ -53,4 +53,14 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(\App\Models\Review::class, 'review_likes')->withTimestamps();
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function gameStatuses()
+    {
+        return $this->hasMany(GameUserStatus::class);
+    }
 }
