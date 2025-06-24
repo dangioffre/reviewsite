@@ -274,38 +274,41 @@
             <!-- Social Actions & Comments Section -->
             @auth
                 <div class="mt-12 space-y-6">
-                    <!-- Enhanced Community Actions -->
-                    <div class="bg-gradient-to-br from-[#27272A]/80 to-[#1A1A1B]/80 backdrop-blur-sm rounded-2xl border border-[#3F3F46] p-8 hover:border-[#52525B] transition-all duration-300">
-                        <div class="text-center mb-8">
-                            <div class="w-16 h-16 bg-gradient-to-r from-[#7C3AED] to-[#A855F7] rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <!-- Enhanced Community Section -->
+                    <div class="bg-gradient-to-br from-[#27272A]/80 to-[#1A1A1B]/80 backdrop-blur-sm rounded-2xl border border-[#3F3F46] p-6 hover:border-[#52525B] transition-all duration-300">
+                        <!-- Compact Header -->
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 bg-gradient-to-r from-[#7C3AED] to-[#A855F7] rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
                                 </svg>
                             </div>
-                            <h3 class="text-2xl font-bold text-white font-['Share_Tech_Mono'] mb-2">Join the Community</h3>
-                            <p class="text-[#A1A1AA] font-['Inter']">Connect with fellow gamers and stay updated on this collection</p>
+                            <div>
+                                <h3 class="text-lg font-bold text-white font-['Share_Tech_Mono']">Join the Community</h3>
+                                <p class="text-[#A1A1AA] font-['Inter'] text-sm">Connect with fellow gamers and stay updated</p>
+                            </div>
                         </div>
                         
-                        <!-- Stats Display -->
-                        <div class="grid grid-cols-2 gap-4 mb-8">
-                            <div class="bg-[#18181B] rounded-xl p-4 text-center border border-[#3F3F46]">
-                                <div class="text-2xl font-bold text-[#F59E0B] font-['Share_Tech_Mono'] mb-1">{{ $list->followers_count }}</div>
+                        <!-- Compact Stats -->
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="bg-[#18181B] rounded-lg p-3 text-center border border-[#3F3F46]">
+                                <div class="text-xl font-bold text-[#F59E0B] font-['Share_Tech_Mono']">{{ $list->followers_count }}</div>
                                 <div class="text-xs text-[#A1A1AA] font-['Inter']">{{ $list->followers_count === 1 ? 'Follower' : 'Followers' }}</div>
                             </div>
-                            <div class="bg-[#18181B] rounded-xl p-4 text-center border border-[#3F3F46]">
-                                <div class="text-2xl font-bold text-[#22C55E] font-['Share_Tech_Mono'] mb-1">{{ $list->comments_count }}</div>
+                            <div class="bg-[#18181B] rounded-lg p-3 text-center border border-[#3F3F46]">
+                                <div class="text-xl font-bold text-[#22C55E] font-['Share_Tech_Mono']">{{ $list->comments_count }}</div>
                                 <div class="text-xs text-[#A1A1AA] font-['Inter']">{{ $list->comments_count === 1 ? 'Comment' : 'Comments' }}</div>
                             </div>
                         </div>
                         
-                        <!-- Action Buttons -->
-                        <div class="space-y-4">
+                        <!-- Compact Action Buttons -->
+                        <div class="space-y-3">
                             @if(!$list->isFollowedBy(auth()->id()))
                                 <form action="{{ route('lists.follow', $list->id) }}" method="POST">
                                     @csrf
                                     <button type="submit" 
-                                            class="w-full bg-gradient-to-r from-[#F59E0B] to-[#D97706] hover:from-[#D97706] hover:to-[#B45309] text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 font-['Inter'] flex items-center justify-center gap-3 shadow-lg hover:shadow-xl group">
-                                        <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            class="w-full bg-gradient-to-r from-[#F59E0B] to-[#D97706] hover:from-[#D97706] hover:to-[#B45309] text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 font-['Inter'] flex items-center justify-center gap-2 shadow-lg hover:shadow-xl group">
+                                        <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                         </svg>
                                         Follow This List
@@ -316,8 +319,8 @@
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" 
-                                            class="w-full bg-gradient-to-r from-[#71717A] to-[#52525B] hover:from-[#52525B] hover:to-[#3F3F46] text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 font-['Inter'] flex items-center justify-center gap-3 shadow-lg hover:shadow-xl group">
-                                        <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            class="w-full bg-gradient-to-r from-[#71717A] to-[#52525B] hover:from-[#52525B] hover:to-[#3F3F46] text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 font-['Inter'] flex items-center justify-center gap-2 shadow-lg hover:shadow-xl group">
+                                        <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                         Unfollow List
@@ -332,23 +335,23 @@
                                 
                                 @if($existingCollaboration)
                                     @if($existingCollaboration->isPending())
-                                        <div class="w-full bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white px-8 py-4 rounded-xl font-bold font-['Inter'] flex items-center justify-center gap-3 shadow-lg">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div class="w-full bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white px-6 py-3 rounded-lg font-semibold font-['Inter'] flex items-center justify-center gap-2 shadow-lg">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                             Collaboration Request Pending
                                         </div>
                                     @else
-                                        <div class="w-full bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-white px-8 py-4 rounded-xl font-bold font-['Inter'] flex items-center justify-center gap-3 shadow-lg">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div class="w-full bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-white px-6 py-3 rounded-lg font-semibold font-['Inter'] flex items-center justify-center gap-2 shadow-lg">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                             You're a Collaborator
                                         </div>
-                                        <div class="w-full bg-[#18181B] border border-[#3F3F46] rounded-xl px-4 py-3 mt-2">
+                                        <div class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-3 py-2">
                                             <div class="text-center">
-                                                <span class="text-[#A1A1AA] text-sm font-['Inter']">Your permissions:</span>
-                                                <div class="text-[#22C55E] text-sm font-semibold mt-1">{{ $existingCollaboration->getPermissionSummary() }}</div>
+                                                <span class="text-[#A1A1AA] text-xs font-['Inter']">Your permissions:</span>
+                                                <div class="text-[#22C55E] text-xs font-semibold">{{ $existingCollaboration->getPermissionSummary() }}</div>
                                             </div>
                                         </div>
                                     @endif
@@ -356,8 +359,8 @@
                                     <form action="{{ route('lists.collaborate', $list->id) }}" method="POST">
                                         @csrf
                                         <button type="submit" 
-                                                class="w-full bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] hover:from-[#1D4ED8] hover:to-[#1E40AF] text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 font-['Inter'] flex items-center justify-center gap-3 shadow-lg hover:shadow-xl group">
-                                            <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                class="w-full bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] hover:from-[#1D4ED8] hover:to-[#1E40AF] text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 font-['Inter'] flex items-center justify-center gap-2 shadow-lg hover:shadow-xl group">
+                                            <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                             </svg>
                                             Request Collaboration
@@ -368,39 +371,37 @@
                         </div>
                     </div>
 
-                    <!-- Enhanced Comments Section -->
+                    <!-- Compact Comments Section -->
                     @if($list->allow_comments)
-                        <div class="bg-gradient-to-br from-[#27272A]/80 to-[#1A1A1B]/80 backdrop-blur-sm rounded-2xl border border-[#3F3F46] p-8 hover:border-[#52525B] transition-all duration-300">
-                            <div class="text-center mb-8">
-                                <div class="w-16 h-16 bg-gradient-to-r from-[#22C55E] to-[#16A34A] rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <div class="bg-gradient-to-br from-[#27272A]/80 to-[#1A1A1B]/80 backdrop-blur-sm rounded-2xl border border-[#3F3F46] p-6 hover:border-[#52525B] transition-all duration-300">
+                            <!-- Compact Header -->
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 bg-gradient-to-r from-[#22C55E] to-[#16A34A] rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
                                     </svg>
                                 </div>
-                                <h3 class="text-2xl font-bold text-white font-['Share_Tech_Mono'] mb-2">Discussion</h3>
-                                <p class="text-[#A1A1AA] font-['Inter']">Share your thoughts and connect with other gamers</p>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white font-['Share_Tech_Mono']">Discussion</h3>
+                                    <p class="text-[#A1A1AA] font-['Inter'] text-sm">Share your thoughts and connect with other gamers</p>
+                                </div>
                             </div>
                             
-                            <!-- Enhanced Add Comment Form -->
-                            <form action="{{ route('lists.comments.store', $list->id) }}" method="POST" class="mb-8">
+                            <!-- Compact Add Comment Form -->
+                            <form action="{{ route('lists.comments.store', $list->id) }}" method="POST" class="mb-6">
                                 @csrf
-                                <div class="space-y-4">
+                                <div class="space-y-3">
                                     <div class="relative">
                                         <textarea name="content" 
                                                   placeholder="Share your thoughts about this list..." 
-                                                  rows="4"
-                                                  class="w-full bg-[#18181B] border border-[#3F3F46] rounded-xl px-6 py-4 text-white placeholder-[#71717A] focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent font-['Inter'] resize-none transition-all duration-200"
+                                                  rows="3"
+                                                  class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-4 py-3 text-white placeholder-[#71717A] focus:outline-none focus:ring-2 focus:ring-[#22C55E] focus:border-transparent font-['Inter'] resize-none transition-all duration-200"
                                                   required></textarea>
-                                        <div class="absolute bottom-4 right-4">
-                                            <svg class="w-5 h-5 text-[#71717A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                                            </svg>
-                                        </div>
                                     </div>
                                     <div class="flex justify-end">
                                         <button type="submit" 
-                                                class="bg-gradient-to-r from-[#22C55E] to-[#16A34A] hover:from-[#16A34A] hover:to-[#15803D] text-white px-8 py-3 rounded-xl font-bold transition-all duration-300 font-['Inter'] flex items-center gap-2 shadow-lg hover:shadow-xl">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                class="bg-gradient-to-r from-[#22C55E] to-[#16A34A] hover:from-[#16A34A] hover:to-[#15803D] text-white px-6 py-2 rounded-lg font-semibold transition-all duration-300 font-['Inter'] flex items-center gap-2 shadow-lg hover:shadow-xl">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                                             </svg>
                                             Post Comment
