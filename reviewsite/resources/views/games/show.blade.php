@@ -221,7 +221,7 @@
                         <div x-show="activeTab === 'reviews'" style="display: none;" class="prose prose-invert max-w-none">
                             <div class="space-y-12">
                                 @if($staffReviews->count() > 0)
-                                <section x-data="{ view: 'grid', page: 1, perPage: 10 }" class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                                <section x-data="{ view: 'grid', page: 1, perPage: 4 }" class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
                                     <div class="flex items-center gap-4 mb-6">
                                         <div class="w-12 h-12 bg-[#E53E3E] bg-opacity-20 rounded-lg flex items-center justify-center">
                                             <svg class="w-6 h-6 text-[#E53E3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -235,9 +235,9 @@
                                         </div>
                                     </div>
                                     <template x-if="view === 'grid'">
-                                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                                            @foreach($staffReviews->forPage(1, 1000) as $i => $review)
-                                                <template x-if="page === Math.ceil(({{ $i+1 }} / perPage))">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                                            @foreach($staffReviews as $i => $review)
+                                                <template x-if="(page - 1) * perPage <= {{ $i }} && {{ $i }} < page * perPage">
                                                     @include('partials.review_card', ['review' => $review, 'type' => 'staff'])
                                                 </template>
                                             @endforeach
@@ -245,8 +245,8 @@
                                     </template>
                                     <template x-if="view === 'list'">
                                         <div class="space-y-6">
-                                            @foreach($staffReviews->forPage(1, 1000) as $i => $review)
-                                                <template x-if="page === Math.ceil(({{ $i+1 }} / perPage))">
+                                            @foreach($staffReviews as $i => $review)
+                                                <template x-if="(page - 1) * perPage <= {{ $i }} && {{ $i }} < page * perPage">
                                                     @include('partials.review_card', ['review' => $review, 'type' => 'staff'])
                                                 </template>
                                             @endforeach
@@ -259,16 +259,16 @@
                                     </div>
                                 </section>
                                 @endif
-                                <section x-data="{ view: 'grid', page: 1, perPage: 10 }" class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                                <section x-data="{ view: 'grid', page: 1, perPage: 16 }" class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
                                     <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Community Reviews</h2>
                                     <div class="ml-auto flex gap-2 mb-4">
                                         <button @click="view = 'grid'" :class="view === 'grid' ? 'bg-[#2563EB] text-white' : 'bg-[#232326] text-[#A1A1AA]'" class="px-3 py-1 rounded font-bold text-xs transition">Grid</button>
                                         <button @click="view = 'list'" :class="view === 'list' ? 'bg-[#2563EB] text-white' : 'bg-[#232326] text-[#A1A1AA]'" class="px-3 py-1 rounded font-bold text-xs transition">List</button>
                                     </div>
                                     <template x-if="view === 'grid'">
-                                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                                            @foreach($userReviews->forPage(1, 1000) as $i => $review)
-                                                <template x-if="page === Math.ceil(({{ $i+1 }} / perPage))">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                                            @foreach($userReviews as $i => $review)
+                                                <template x-if="(page - 1) * perPage <= {{ $i }} && {{ $i }} < page * perPage">
                                                     @include('partials.review_card', ['review' => $review, 'type' => 'community'])
                                                 </template>
                                             @endforeach
@@ -276,8 +276,8 @@
                                     </template>
                                     <template x-if="view === 'list'">
                                         <div class="space-y-6">
-                                            @foreach($userReviews->forPage(1, 1000) as $i => $review)
-                                                <template x-if="page === Math.ceil(({{ $i+1 }} / perPage))">
+                                            @foreach($userReviews as $i => $review)
+                                                <template x-if="(page - 1) * perPage <= {{ $i }} && {{ $i }} < page * perPage">
                                                     @include('partials.review_card', ['review' => $review, 'type' => 'community'])
                                                 </template>
                                             @endforeach

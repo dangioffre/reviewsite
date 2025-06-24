@@ -197,6 +197,7 @@ class StaffReviewSeeder extends Seeder
                 'content' => $selectedTemplate,
                 'rating' => $selectedRating,
                 'is_staff_review' => true,
+                'is_published' => true,
                 'created_at' => now()->subDays(rand(1, 30))->subHours(rand(0, 23))->subMinutes(rand(0, 59)),
             ]);
 

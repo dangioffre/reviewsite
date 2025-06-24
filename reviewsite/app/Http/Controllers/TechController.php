@@ -86,16 +86,21 @@ class TechController extends Controller
 
     public function show(Product $product)
     {
-        // Ensure the product is hardware or accessory
-        if (!in_array($product->type, ['hardware', 'accessory'])) {
-            abort(404);
-        }
-
-        $product->load(['genre', 'platform', 'reviews.user']);
+        $product->load(['genre', 'platform']);
         
-        // Separate staff and user reviews
-        $staffReviews = $product->reviews->where('is_staff_review', true);
-        $userReviews = $product->reviews->where('is_staff_review', false)->sortByDesc('created_at');
+        // Separate staff and user reviews using Eloquent queries for better performance
+        $staffReviews = $product->reviews()
+            ->where('is_staff_review', true)
+            ->where('is_published', true)
+            ->with('user')
+            ->get();
+            
+        $userReviews = $product->reviews()
+            ->where('is_staff_review', false)
+            ->where('is_published', true)
+            ->with('user')
+            ->orderByDesc('created_at')
+            ->get();
         
         // Calculate average user rating
         $averageUserRating = $userReviews->avg('rating');
