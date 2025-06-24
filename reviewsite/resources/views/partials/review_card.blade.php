@@ -34,14 +34,14 @@
             </div>
         </div>
         <div class="font-bold text-lg mb-1 text-white font-['Inter']">{{ $review->title }}</div>
-        <div class="text-[#A1A1AA] leading-relaxed font-['Inter'] mb-2">
+        <div class="text-[#A1A1AA] leading-relaxed font-['Inter'] mb-2 flex-1">
             @if(isset($review->content) && $review->content)
                 <p>{{ Str::limit($review->content, 150) }}</p>
             @else
                 <p>{{ $review->review ?? 'No review content available.' }}</p>
             @endif
         </div>
-        <div class="flex items-center justify-between mt-2">
+        <div class="mt-auto pt-4 flex items-center justify-between">
             <a href="{{ route($showRoute, [$review->product, $review]) }}" class="text-[#2563EB] hover:text-blue-400 font-semibold inline-block">
                 View Full Review &rarr;
             </a>
