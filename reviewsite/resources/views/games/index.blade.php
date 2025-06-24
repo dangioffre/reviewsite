@@ -348,7 +348,9 @@
                                                 </a>
                                                 
                                                 <!-- Share Button -->
-                                                <button class="p-3 bg-[#27272A] hover:bg-[#3F3F46] border border-[#3F3F46] hover:border-[#E53E3E] rounded-xl transition-all duration-300 group/share">
+                                                <button onclick="copyGameLink('{{ route('games.show', $product) }}', '{{ $product->name }}')" 
+                                                        class="p-3 bg-[#27272A] hover:bg-[#3F3F46] border border-[#3F3F46] hover:border-[#E53E3E] rounded-xl transition-all duration-300 group/share"
+                                                        title="Copy link to {{ $product->name }}">
                                                     <svg class="w-5 h-5 text-[#A1A1AA] group-hover/share:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                                                     </svg>
@@ -497,4 +499,87 @@
             @endif
         </div>
     </div>
-</x-layouts.app> 
+</x-layouts.app>
+
+<!-- Toast Notification -->
+<div id="toast-notification" class="fixed top-4 right-4 z-50 transform translate-x-full transition-transform duration-300 ease-in-out">
+    <div class="bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-white px-6 py-4 rounded-xl shadow-lg border border-[#22C55E]/30 flex items-center gap-3">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span id="toast-message" class="font-['Inter'] font-semibold"></span>
+    </div>
+</div>
+
+<script>
+function copyGameLink(gameUrl, gameName) {
+    // Use the modern clipboard API if available
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(gameUrl).then(function() {
+            showToast(`Link to "${gameName}" copied to clipboard!`);
+        }).catch(function(err) {
+            // Fallback for clipboard API failure
+            fallbackCopyTextToClipboard(gameUrl, gameName);
+        });
+    } else {
+        // Fallback for older browsers
+        fallbackCopyTextToClipboard(gameUrl, gameName);
+    }
+}
+
+function fallbackCopyTextToClipboard(text, gameName) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    
+    // Avoid scrolling to bottom
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    textArea.style.opacity = "0";
+    
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            showToast(`Link to "${gameName}" copied to clipboard!`);
+        } else {
+            showToast('Failed to copy link. Please try again.', 'error');
+        }
+    } catch (err) {
+        showToast('Failed to copy link. Please try again.', 'error');
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast-notification');
+    const toastMessage = document.getElementById('toast-message');
+    const toastContainer = toast.firstElementChild;
+    
+    // Update message
+    toastMessage.textContent = message;
+    
+    // Update colors based on type
+    if (type === 'error') {
+        toastContainer.className = 'bg-gradient-to-r from-[#DC2626] to-[#B91C1C] text-white px-6 py-4 rounded-xl shadow-lg border border-[#DC2626]/30 flex items-center gap-3';
+        toastContainer.querySelector('svg').innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
+    } else {
+        toastContainer.className = 'bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-white px-6 py-4 rounded-xl shadow-lg border border-[#22C55E]/30 flex items-center gap-3';
+        toastContainer.querySelector('svg').innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>';
+    }
+    
+    // Show toast
+    toast.classList.remove('translate-x-full');
+    toast.classList.add('translate-x-0');
+    
+    // Hide toast after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('translate-x-0');
+        toast.classList.add('translate-x-full');
+    }, 3000);
+}
+</script> 
