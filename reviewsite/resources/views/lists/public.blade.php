@@ -1,11 +1,19 @@
 <x-layouts.app>
-@php
-    $list = \App\Models\ListModel::where('slug', $slug)->where('is_public', true)->with(['items.product', 'user'])->first();
-@endphp
-
 @if($list)
     <div class="min-h-screen bg-[#151515] py-8">
         <div class="max-w-6xl mx-auto px-4">
+            <!-- Flash Messages -->
+            @if(session('success'))
+                <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+                    {{ session('error') }}
+                </div>
+            @endif
             <!-- Enhanced Header -->
             <div class="text-center mb-12">
                 <!-- Main Title Section -->
@@ -243,6 +251,13 @@
                 </div>
             @endif
 
+            <!-- Collaboration Manager -->
+            @if(isset($showCollaborationManager) && $showCollaborationManager)
+                <div class="mt-12 mb-8">
+                    @livewire('collaboration-manager', ['list' => $list])
+                </div>
+            @endif
+
             <!-- Social Actions & Comments Section -->
             @auth
                 <div class="mt-12 space-y-6">
@@ -298,13 +313,44 @@
                             @endif
                             
                             @if($list->allow_collaboration && $list->user_id !== auth()->id())
-                                <button onclick="requestCollaboration()" 
-                                        class="w-full bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] hover:from-[#1D4ED8] hover:to-[#1E40AF] text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 font-['Inter'] flex items-center justify-center gap-3 shadow-lg hover:shadow-xl group">
-                                    <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                    Request Collaboration
-                                </button>
+                                @php
+                                    $existingCollaboration = $list->collaborators->where('user_id', auth()->id())->first();
+                                @endphp
+                                
+                                @if($existingCollaboration)
+                                    @if($existingCollaboration->isPending())
+                                        <div class="w-full bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white px-8 py-4 rounded-xl font-bold font-['Inter'] flex items-center justify-center gap-3 shadow-lg">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Collaboration Request Pending
+                                        </div>
+                                    @else
+                                        <div class="w-full bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-white px-8 py-4 rounded-xl font-bold font-['Inter'] flex items-center justify-center gap-3 shadow-lg">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            You're a Collaborator
+                                        </div>
+                                        <div class="w-full bg-[#18181B] border border-[#3F3F46] rounded-xl px-4 py-3 mt-2">
+                                            <div class="text-center">
+                                                <span class="text-[#A1A1AA] text-sm font-['Inter']">Your permissions:</span>
+                                                <div class="text-[#22C55E] text-sm font-semibold mt-1">{{ $existingCollaboration->getPermissionSummary() }}</div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @else
+                                    <form action="{{ route('lists.collaborate', $list->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" 
+                                                class="w-full bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] hover:from-[#1D4ED8] hover:to-[#1E40AF] text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 font-['Inter'] flex items-center justify-center gap-3 shadow-lg hover:shadow-xl group">
+                                            <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                            Request Collaboration
+                                        </button>
+                                    </form>
+                                @endif
                             @endif
                         </div>
                     </div>
@@ -554,8 +600,6 @@ function toggleReply(commentId) {
     }
 }
 
-function requestCollaboration() {
-    alert('Collaboration request feature coming soon! For now, you can contact the list owner directly.');
-}
+
 </script>
 </x-layouts.app> 

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 class UserLists extends Component
 {
     public $lists = [];
+    public $pendingInvitations = [];
     public $showCreate = false;
     public $newListName = '';
     public $editingList = null;
@@ -37,15 +38,69 @@ class UserLists extends Component
     public function mount()
     {
         $this->refreshLists();
+        $this->loadPendingInvitations();
+    }
+
+    public function loadPendingInvitations()
+    {
+        // Get invitations sent to the current user that haven't been accepted yet
+        $this->pendingInvitations = \App\Models\ListCollaborator::where('user_id', auth()->id())
+            ->whereNull('accepted_at')
+            ->where('invited_by_owner', true) // Only owner invitations, not user requests
+            ->with(['list.user'])
+            ->get();
     }
 
     public function refreshLists()
     {
-        $this->lists = auth()->user()->lists()
-            ->withCount('items')
-            ->with(['items.product'])
+        // Get user's own lists
+        $ownLists = auth()->user()->lists()
+            ->withCount(['items', 'followers', 'comments'])
+            ->with(['items.product', 'collaborators.user'])
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($list) {
+                $list->user_role = 'owner';
+                return $list;
+            });
+
+        // Get lists where user is a collaborator
+        $collaborativeLists = \App\Models\ListModel::whereHas('collaborators', function ($query) {
+                $query->where('user_id', auth()->id())
+                      ->whereNotNull('accepted_at');
+            })
+            ->withCount(['items', 'followers', 'comments'])
+            ->with(['items.product', 'collaborators.user', 'user'])
+            ->orderBy('updated_at', 'desc')
+            ->get()
+            ->map(function ($list) {
+                $collaboration = $list->collaborators->where('user_id', auth()->id())->first();
+                if ($collaboration) {
+                    // Create a role summary based on permissions
+                    $permissions = [];
+                    if ($collaboration->can_add_games) $permissions[] = 'Add';
+                    if ($collaboration->can_delete_games) $permissions[] = 'Delete';
+                    if ($collaboration->can_rename_list) $permissions[] = 'Rename';
+                    if ($collaboration->can_manage_users) $permissions[] = 'Manage';
+                    if ($collaboration->can_change_privacy) $permissions[] = 'Privacy';
+                    if ($collaboration->can_change_category) $permissions[] = 'Category';
+                    
+                    $list->user_role = empty($permissions) ? 'view' : 'collaborator';
+                    $list->permissions_summary = empty($permissions) ? 'View Only' : implode(', ', $permissions);
+                } else {
+                    $list->user_role = 'view';
+                    $list->permissions_summary = 'View Only';
+                }
+                return $list;
+            });
+
+        // Combine and sort all lists
+        $this->lists = $ownLists->concat($collaborativeLists)
+            ->sortByDesc('updated_at')
+            ->values();
+            
+        // Also refresh pending invitations
+        $this->loadPendingInvitations();
     }
 
     public function createList()
@@ -79,6 +134,13 @@ class UserLists extends Component
     public function startEditing($listId)
     {
         $list = $this->lists->find($listId);
+        
+        // Check permissions
+        if (!$this->canEditList($list)) {
+            $this->successMessage = 'You do not have permission to edit this list.';
+            return;
+        }
+        
         $this->editingList = $listId;
         $this->editingName = $list->name;
     }
@@ -89,7 +151,13 @@ class UserLists extends Component
             'editingName' => 'required|string|max:255',
         ]);
 
-        $list = auth()->user()->lists()->findOrFail($this->editingList);
+        // Find the list (could be owned or collaborative)
+        $list = $this->findListById($this->editingList);
+        if (!$list || !$this->canEditList($list)) {
+            $this->successMessage = 'You do not have permission to edit this list.';
+            return;
+        }
+
         $list->update([
             'name' => $this->editingName,
             'slug' => Str::slug($this->editingName),
@@ -109,17 +177,35 @@ class UserLists extends Component
 
     public function togglePublic($listId)
     {
-        $list = auth()->user()->lists()->findOrFail($listId);
+        Log::info('togglePublic called for list ID: ' . $listId);
+        
+        $list = $this->findListById($listId);
+        
+        if (!$list || $list->user_id !== auth()->id()) {
+            $this->successMessage = 'You can only change privacy settings for your own lists.';
+            return;
+        }
+        
+        Log::info('Found list: ' . $list->name . ', current public status: ' . ($list->is_public ? 'true' : 'false'));
+        
         $list->update(['is_public' => !$list->is_public]);
         
         $status = $list->is_public ? 'public' : 'private';
         $this->successMessage = "List is now {$status}!";
+        Log::info('Updated list to: ' . $status);
+        
         $this->refreshLists();
     }
 
     public function deleteList($listId)
     {
-        $list = auth()->user()->lists()->findOrFail($listId);
+        $list = $this->findListById($listId);
+        
+        if (!$list || $list->user_id !== auth()->id()) {
+            $this->successMessage = 'You can only delete your own lists.';
+            return;
+        }
+        
         $list->delete();
         
         $this->successMessage = 'List deleted successfully!';
@@ -183,7 +269,12 @@ class UserLists extends Component
 
     public function addGameToList($gameId)
     {
-        $list = auth()->user()->lists()->findOrFail($this->viewingList);
+        $list = $this->findListById($this->viewingList);
+        
+        if (!$list || !$this->canEditList($list)) {
+            $this->successMessage = 'You do not have permission to edit this list.';
+            return;
+        }
         
         // Check if game is already in the list
         if (!$list->items()->where('product_id', $gameId)->exists()) {
@@ -200,7 +291,13 @@ class UserLists extends Component
 
     public function removeGameFromList($gameId)
     {
-        $list = auth()->user()->lists()->findOrFail($this->viewingList);
+        $list = $this->findListById($this->viewingList);
+        
+        if (!$list || !$this->canEditList($list)) {
+            $this->successMessage = 'You do not have permission to edit this list.';
+            return;
+        }
+        
         $list->items()->where('product_id', $gameId)->delete();
         
         $this->successMessage = 'Game removed from list!';
@@ -319,6 +416,277 @@ class UserLists extends Component
     {
         $this->editingCategoryListId = null;
         $this->editingCategoryValue = 'general';
+    }
+
+    // Collaboration Methods
+    public function requestCollaboration($listId)
+    {
+        $list = ListModel::where('is_public', true)->where('allow_collaboration', true)->findOrFail($listId);
+        
+        // Check if user already has a collaboration request/invitation
+        $existingCollaboration = $list->collaborators()->where('user_id', auth()->id())->first();
+        
+        if ($existingCollaboration) {
+            if ($existingCollaboration->isPending()) {
+                $this->successMessage = 'You already have a pending collaboration request for this list.';
+            } else {
+                $this->successMessage = 'You are already a collaborator on this list.';
+            }
+            return;
+        }
+        
+        // Create collaboration request with default permissions
+        $list->collaborators()->create([
+            'user_id' => auth()->id(),
+            'invited_by_owner' => false, // This is a user request
+            'can_add_games' => true,
+            'can_delete_games' => true,
+            'can_rename_list' => false,
+            'can_manage_users' => false,
+            'can_change_privacy' => false,
+            'can_change_category' => false,
+            'invited_at' => now(),
+            // accepted_at remains null for pending requests
+        ]);
+        
+        $this->successMessage = 'Collaboration request sent! The list owner will be notified.';
+    }
+
+    public function acceptCollaborationRequest($collaboratorId)
+    {
+        $collaborator = \App\Models\ListCollaborator::findOrFail($collaboratorId);
+        
+        // Verify the current user owns the list
+        if ($collaborator->list->user_id !== auth()->id()) {
+            $this->successMessage = 'You can only manage collaborators for your own lists.';
+            return;
+        }
+        
+        $collaborator->accept();
+        $this->successMessage = 'Collaboration request accepted!';
+        $this->refreshLists();
+    }
+
+    public function rejectCollaborationRequest($collaboratorId)
+    {
+        $collaborator = \App\Models\ListCollaborator::findOrFail($collaboratorId);
+        
+        // Verify the current user owns the list
+        if ($collaborator->list->user_id !== auth()->id()) {
+            $this->successMessage = 'You can only manage collaborators for your own lists.';
+            return;
+        }
+        
+        $collaborator->delete();
+        $this->successMessage = 'Collaboration request rejected.';
+        $this->refreshLists();
+    }
+
+    public function removeCollaborator($collaboratorId)
+    {
+        $collaborator = \App\Models\ListCollaborator::findOrFail($collaboratorId);
+        
+        // Verify the current user owns the list
+        if ($collaborator->list->user_id !== auth()->id()) {
+            $this->successMessage = 'You can only manage collaborators for your own lists.';
+            return;
+        }
+        
+        $collaborator->delete();
+        $this->successMessage = 'Collaborator removed from list.';
+        $this->refreshLists();
+    }
+
+    public function inviteCollaborator($listId, $email, $permissions = null)
+    {
+        $list = auth()->user()->lists()->findOrFail($listId);
+        
+        // Find user by email
+        $user = \App\Models\User::where('email', $email)->first();
+        
+        if (!$user) {
+            $this->successMessage = 'User with that email address not found.';
+            return;
+        }
+        
+        // Check if already a collaborator
+        $existingCollaboration = $list->collaborators()->where('user_id', $user->id)->first();
+        
+        if ($existingCollaboration) {
+            $this->successMessage = 'User is already a collaborator or has a pending invitation.';
+            return;
+        }
+        
+        // Set default permissions if none provided
+        if (!$permissions) {
+            $permissions = [
+                'can_add_games' => true,
+                'can_delete_games' => true,
+                'can_rename_list' => false,
+                'can_manage_users' => false,
+                'can_change_privacy' => false,
+                'can_change_category' => false,
+            ];
+        }
+        
+        // Create invitation (sent by owner)
+        $list->collaborators()->create([
+            'user_id' => $user->id,
+            'invited_by_owner' => true, // This is an owner invitation
+            'can_add_games' => $permissions['can_add_games'] ?? true,
+            'can_delete_games' => $permissions['can_delete_games'] ?? true,
+            'can_rename_list' => $permissions['can_rename_list'] ?? false,
+            'can_manage_users' => $permissions['can_manage_users'] ?? false,
+            'can_change_privacy' => $permissions['can_change_privacy'] ?? false,
+            'can_change_category' => $permissions['can_change_category'] ?? false,
+            'invited_at' => now(),
+            // accepted_at remains null for pending invitations
+        ]);
+        
+        $this->successMessage = "Collaboration invitation sent to {$user->name}!";
+        $this->refreshLists();
+    }
+
+    // Helper methods for permission checking
+    private function canEditList($list)
+    {
+        if (!$list) return false;
+        
+        // Owner can always edit
+        if ($list->user_id === auth()->id()) {
+            return true;
+        }
+        
+        // Check if user is a collaborator with add or delete games permissions
+        $collaboration = $list->collaborators->where('user_id', auth()->id())->first();
+        return $collaboration && 
+               $collaboration->isAccepted() && 
+               ($collaboration->can_add_games || $collaboration->can_delete_games);
+    }
+    
+    private function canManageList($list)
+    {
+        if (!$list) return false;
+        
+        // Owner can always manage
+        if ($list->user_id === auth()->id()) {
+            return true;
+        }
+        
+        // Check if user is a collaborator with manage users permissions
+        $collaboration = $list->collaborators->where('user_id', auth()->id())->first();
+        return $collaboration && 
+               $collaboration->isAccepted() && 
+               $collaboration->can_manage_users;
+    }
+
+    private function canRenameList($list)
+    {
+        if (!$list) return false;
+        
+        // Owner can always rename
+        if ($list->user_id === auth()->id()) {
+            return true;
+        }
+        
+        // Check if user is a collaborator with rename permissions
+        $collaboration = $list->collaborators->where('user_id', auth()->id())->first();
+        return $collaboration && 
+               $collaboration->isAccepted() && 
+               $collaboration->can_rename_list;
+    }
+
+    private function canChangePrivacy($list)
+    {
+        if (!$list) return false;
+        
+        // Owner can always change privacy
+        if ($list->user_id === auth()->id()) {
+            return true;
+        }
+        
+        // Check if user is a collaborator with privacy permissions
+        $collaboration = $list->collaborators->where('user_id', auth()->id())->first();
+        return $collaboration && 
+               $collaboration->isAccepted() && 
+               $collaboration->can_change_privacy;
+    }
+
+    private function canChangeCategory($list)
+    {
+        if (!$list) return false;
+        
+        // Owner can always change category
+        if ($list->user_id === auth()->id()) {
+            return true;
+        }
+        
+        // Check if user is a collaborator with category permissions
+        $collaboration = $list->collaborators->where('user_id', auth()->id())->first();
+        return $collaboration && 
+               $collaboration->isAccepted() && 
+               $collaboration->can_change_category;
+    }
+
+    // Only owners can delete lists
+    private function canDeleteList($list)
+    {
+        if (!$list) return false;
+        return $list->user_id === auth()->id();
+    }
+
+    private function findListById($listId)
+    {
+        // Try to find in user's own lists first
+        $list = auth()->user()->lists()->find($listId);
+        
+        // If not found, try collaborative lists
+        if (!$list) {
+            $list = \App\Models\ListModel::whereHas('collaborators', function ($query) use ($listId) {
+                $query->where('user_id', auth()->id())
+                      ->whereNotNull('accepted_at');
+            })->find($listId);
+        }
+        
+        return $list;
+    }
+
+    // Methods for handling invitations received by the user
+    public function acceptInvitation($collaboratorId)
+    {
+        $collaborator = \App\Models\ListCollaborator::where('id', $collaboratorId)
+            ->where('user_id', auth()->id())
+            ->where('invited_by_owner', true)
+            ->whereNull('accepted_at')
+            ->first();
+            
+        if (!$collaborator) {
+            $this->successMessage = 'Invitation not found or already processed.';
+            return;
+        }
+        
+        $collaborator->accept();
+        $this->successMessage = "You've joined the list '{$collaborator->list->name}'!";
+        $this->refreshLists();
+    }
+    
+    public function declineInvitation($collaboratorId)
+    {
+        $collaborator = \App\Models\ListCollaborator::where('id', $collaboratorId)
+            ->where('user_id', auth()->id())
+            ->where('invited_by_owner', true)
+            ->whereNull('accepted_at')
+            ->first();
+            
+        if (!$collaborator) {
+            $this->successMessage = 'Invitation not found or already processed.';
+            return;
+        }
+        
+        $listName = $collaborator->list->name;
+        $collaborator->delete();
+        $this->successMessage = "You've declined the invitation to '{$listName}'.";
+        $this->refreshLists();
     }
 
     public function render()

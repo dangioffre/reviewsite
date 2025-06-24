@@ -169,9 +169,23 @@ Route::get('/debug/rate-test/{product}', function (\App\Models\Product $product)
 })->name('debug.rate-test');
 
 // Public List Routes
-Route::get('/lists/{slug}', function($slug) {
-    // TODO: Replace with controller logic
-    return view('lists.public', ['slug' => $slug]);
+Route::get('/lists/{slug}', function($slug, Illuminate\Http\Request $request) {
+    $list = \App\Models\ListModel::where('slug', $slug)
+        ->where('is_public', true)
+        ->with(['user', 'items.product', 'collaborators.user', 'comments.user'])
+        ->withCount(['followers', 'comments'])
+        ->firstOrFail();
+    
+    $showCollaborationManager = $request->get('manage') === 'collaboration' && 
+                               auth()->check() && 
+                               $list->user_id === auth()->id() && 
+                               $list->allow_collaboration;
+    
+    return view('lists.public', [
+        'slug' => $slug,
+        'list' => $list,
+        'showCollaborationManager' => $showCollaborationManager
+    ]);
 })->name('lists.public');
 
 // List Interaction Routes (require authentication)
@@ -242,6 +256,40 @@ Route::middleware('auth')->group(function () {
         
         return redirect()->back()->with('success', $message);
     })->name('lists.comments.like');
+    
+    // Collaboration request route
+    Route::post('/lists/{list}/collaborate', function(\App\Models\ListModel $list) {
+        if (!$list->is_public || !$list->allow_collaboration) {
+            abort(404);
+        }
+        
+        // Check if user already has a collaboration request/invitation
+        $existingCollaboration = $list->collaborators()->where('user_id', auth()->id())->first();
+        
+        if ($existingCollaboration) {
+            if ($existingCollaboration->isPending()) {
+                return redirect()->back()->with('error', 'You already have a pending collaboration request for this list.');
+            } else {
+                return redirect()->back()->with('error', 'You are already a collaborator on this list.');
+            }
+        }
+        
+        // Create collaboration request with default permissions
+        $list->collaborators()->create([
+            'user_id' => auth()->id(),
+            'invited_by_owner' => false, // This is a user request, not an owner invitation
+            'can_add_games' => true,
+            'can_delete_games' => true,
+            'can_rename_list' => false,
+            'can_manage_users' => false,
+            'can_change_privacy' => false,
+            'can_change_category' => false,
+            'invited_at' => now(),
+            // accepted_at remains null for pending requests
+        ]);
+        
+        return redirect()->back()->with('success', 'Collaboration request sent! The list owner will be notified.');
+    })->name('lists.collaborate');
 });
 
 

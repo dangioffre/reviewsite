@@ -34,12 +34,29 @@ class AddToList extends Component
     public function refreshLists()
     {
         Log::info('Refreshing lists for user: ' . auth()->id());
-        $this->lists = auth()->user()->lists()
+        
+        // Get user's own lists
+        $ownLists = auth()->user()->lists()
             ->with(['items' => function($query) {
                 $query->where('product_id', $this->productId);
             }])
             ->get();
-        Log::info('Found ' . $this->lists->count() . ' lists');
+
+        // Get collaborative lists where user can add games
+        $collaborativeLists = \App\Models\ListModel::whereHas('collaborators', function ($query) {
+                $query->where('user_id', auth()->id())
+                      ->whereNotNull('accepted_at')
+                      ->where('can_add_games', true);
+            })
+            ->with(['items' => function($query) {
+                $query->where('product_id', $this->productId);
+            }, 'user'])
+            ->get();
+
+        // Combine both types of lists
+        $this->lists = $ownLists->concat($collaborativeLists);
+        
+        Log::info('Found ' . $this->lists->count() . ' lists (own + collaborative)');
     }
 
     public function createList()
@@ -73,7 +90,23 @@ class AddToList extends Component
     {
         Log::info('Adding product ' . $this->productId . ' to list ' . $listId);
         
-        $list = auth()->user()->lists()->findOrFail($listId);
+        // Try to find in user's own lists first
+        $list = auth()->user()->lists()->find($listId);
+        
+        // If not found, try collaborative lists where user can add games
+        if (!$list) {
+            $list = \App\Models\ListModel::whereHas('collaborators', function ($query) use ($listId) {
+                $query->where('user_id', auth()->id())
+                      ->whereNotNull('accepted_at')
+                      ->where('can_add_games', true);
+            })->find($listId);
+        }
+        
+        if (!$list) {
+            Log::error('List not found or user does not have permission to add games');
+            $this->successMessage = 'List not found or you do not have permission to add games to this list.';
+            return;
+        }
         
         // Check if already in list
         if (!$list->items()->where('product_id', $this->productId)->exists()) {
@@ -93,7 +126,23 @@ class AddToList extends Component
     {
         Log::info('Removing product ' . $this->productId . ' from list ' . $listId);
         
-        $list = auth()->user()->lists()->findOrFail($listId);
+        // Try to find in user's own lists first
+        $list = auth()->user()->lists()->find($listId);
+        
+        // If not found, try collaborative lists where user can delete games
+        if (!$list) {
+            $list = \App\Models\ListModel::whereHas('collaborators', function ($query) use ($listId) {
+                $query->where('user_id', auth()->id())
+                      ->whereNotNull('accepted_at')
+                      ->where('can_delete_games', true);
+            })->find($listId);
+        }
+        
+        if (!$list) {
+            Log::error('List not found or user does not have permission to remove games');
+            $this->successMessage = 'List not found or you do not have permission to remove games from this list.';
+            return;
+        }
         
         $list->items()->where('product_id', $this->productId)->delete();
         
