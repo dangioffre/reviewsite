@@ -5,6 +5,10 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use League\CommonMark\CommonMarkConverter;
+use Livewire\Livewire;
+use App\Http\Livewire\UserLists;
+use App\Livewire\AddToList;
+use App\Livewire\AddToListModal;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,5 +37,10 @@ class AppServiceProvider extends ServiceProvider
                 'allow_unsafe_links' => false,
             ]);
         });
+
+        // Register Livewire components
+        Livewire::component('user-lists', UserLists::class);
+        Livewire::component('add-to-list', AddToList::class);
+        Livewire::component('add-to-list-modal', AddToListModal::class);
     }
 }

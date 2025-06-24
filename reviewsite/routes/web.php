@@ -8,6 +8,7 @@ use App\Http\Controllers\GameController;
 use App\Http\Controllers\TechController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -15,7 +16,7 @@ Route::resource('posts', PostController::class);
 
 // Game system (replacing review system)
 Route::get('/games', [GameController::class, 'index'])->name('games.index');
-Route::get('/games/{product}', [GameController::class, 'show'])->name('games.show');
+Route::get('/games/{product:slug}', [GameController::class, 'show'])->name('games.show');
 Route::post('/games/{product}/rate', [GameController::class, 'rate'])->name('games.rate');
 
 // Game filtering routes
@@ -138,6 +139,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/likes', [App\Http\Controllers\DashboardController::class, 'likes'])->name('dashboard.likes');
     Route::get('/dashboard/reviews-and-likes', [App\Http\Controllers\DashboardController::class, 'reviewsAndLikes'])->name('dashboard.reviews-and-likes');
     Route::get('/dashboard/collection', [App\Http\Controllers\DashboardController::class, 'collection'])->name('dashboard.collection');
+    Route::get('/dashboard/lists', function() { return view('dashboard.lists'); })->name('dashboard.lists');
 });
 
 Route::get('/debug/reviews', function () {
@@ -165,3 +167,13 @@ Route::get('/debug/rate-test/{product}', function (\App\Models\Product $product)
         'product_slug' => $product->slug,
     ]);
 })->name('debug.rate-test');
+
+Route::get('/lists/{slug}', function($slug) {
+    // TODO: Replace with controller logic
+    return view('lists.public', ['slug' => $slug]);
+})->name('lists.public');
+
+// Test route for Livewire debugging
+Route::get('/test-livewire', function () {
+    return view('test-livewire');
+})->name('test.livewire');
