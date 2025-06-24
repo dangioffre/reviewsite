@@ -173,7 +173,4 @@ Route::get('/lists/{slug}', function($slug) {
     return view('lists.public', ['slug' => $slug]);
 })->name('lists.public');
 
-// Test route for Livewire debugging
-Route::get('/test-livewire', function () {
-    return view('test-livewire');
-})->name('test.livewire');
+
