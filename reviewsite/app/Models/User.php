@@ -48,4 +48,9 @@ class User extends Authenticatable
             'is_admin' => 'boolean',
         ];
     }
+
+    public function likedReviews()
+    {
+        return $this->belongsToMany(\App\Models\Review::class, 'review_likes')->withTimestamps();
+    }
 }

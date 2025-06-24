@@ -125,4 +125,19 @@ class Review extends Model
         }
         return $this->negative_points ?? [];
     }
+
+    public function likes()
+    {
+        return $this->belongsToMany(User::class, 'review_likes')->withTimestamps();
+    }
+
+    public function getLikesCountAttribute()
+    {
+        return $this->likes()->count();
+    }
+
+    public function isLikedBy(User $user)
+    {
+        return $this->likes()->where('user_id', $user->id)->exists();
+    }
 }

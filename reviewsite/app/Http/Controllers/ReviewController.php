@@ -211,4 +211,29 @@ class ReviewController extends Controller
         return redirect()->route($redirectRoute, $product)
             ->with('success', 'Review deleted successfully.');
     }
+
+    /**
+     * Toggle like for a review (AJAX).
+     */
+    public function toggleLike(Product $product, Review $review)
+    {
+        if (!auth()->check()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        if ($review->product_id !== $product->id) {
+            return response()->json(['error' => 'Invalid review for this product'], 404);
+        }
+        $user = auth()->user();
+        $liked = $review->isLikedBy($user);
+        if ($liked) {
+            $review->likes()->detach($user->id);
+        } else {
+            $review->likes()->attach($user->id);
+        }
+        $newCount = $review->likes()->count();
+        return response()->json([
+            'liked' => !$liked,
+            'likes_count' => $newCount,
+        ]);
+    }
 }

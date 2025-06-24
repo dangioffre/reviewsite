@@ -31,6 +31,7 @@ Route::get('/games/{product}/{review}', [ReviewController::class, 'show'])->name
 Route::get('/games/{product}/{review}/edit', [ReviewController::class, 'edit'])->name('games.reviews.edit');
 Route::put('/games/{product}/{review}', [ReviewController::class, 'update'])->name('games.reviews.update');
 Route::delete('/games/{product}/{review}', [ReviewController::class, 'destroy'])->name('games.reviews.destroy');
+Route::post('/games/{product}/{review}/like', [ReviewController::class, 'toggleLike'])->name('games.reviews.like');
 
 // Game Review Reports
 Route::get('/games/{product}/{review}/report', [ReportController::class, 'show'])->name('games.reviews.report.show');
@@ -53,6 +54,7 @@ Route::get('/tech/{product}/{review}', [ReviewController::class, 'show'])->name(
 Route::get('/tech/{product}/{review}/edit', [ReviewController::class, 'edit'])->name('tech.reviews.edit');
 Route::put('/tech/{product}/{review}', [ReviewController::class, 'update'])->name('tech.reviews.update');
 Route::delete('/tech/{product}/{review}', [ReviewController::class, 'destroy'])->name('tech.reviews.destroy');
+Route::post('/tech/{product}/{review}/like', [ReviewController::class, 'toggleLike'])->name('tech.reviews.like');
 
 // Tech Review Reports
 Route::get('/tech/{product}/{review}/report', [ReportController::class, 'show'])->name('tech.reviews.report.show');

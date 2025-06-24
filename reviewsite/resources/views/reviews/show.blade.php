@@ -61,6 +61,25 @@
                                 <div class="bg-[#27272A]/80 backdrop-blur-sm rounded-full px-4 py-2 border border-[#3F3F46]">
                                     <span class="font-['Inter'] text-white">{{ $review->created_at->format('M j, Y') }}</span>
                                 </div>
+                                <div class="flex items-center gap-2 ml-2" x-data="likeReview(
+                                    {{ $review->id }},
+                                    '{{ $review->product->type === 'game' ? route('games.reviews.like', [$review->product, $review]) : route('tech.reviews.like', [$review->product, $review]) }}',
+                                    {{ (auth()->check() && $review->isLikedBy(auth()->user())) ? 'true' : 'false' }},
+                                    {{ $review->likes_count }},
+                                    {{ auth()->check() ? 'true' : 'false' }}
+                                )">
+                                    <button @click.prevent="toggleLike" :class="[liked ? 'text-blue-500' : 'text-gray-400 hover:text-blue-400', canLike ? 'cursor-pointer' : 'cursor-not-allowed']" class="focus:outline-none transition-colors" :disabled="!canLike">
+                                        <!-- Heroicons solid thumbs-up -->
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M14 9V5a3 3 0 0 0-6 0v4" />
+                                            <path d="M5 15V9a2 2 0 0 1 2-2h7.5a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z" />
+                                        </svg>
+                                    </button>
+                                    <span x-text="count"></span>
+                                    <template x-if="!canLike">
+                                        <span class="ml-2 text-xs text-gray-400">Login to like</span>
+                                    </template>
+                                </div>
                             </div>
                         </div>
 
@@ -439,4 +458,35 @@
             </script>
         @endif
     @endauth
+
+    <script>
+    function likeReview(reviewId, likeUrl, initiallyLiked, initialCount, canLike) {
+        return {
+            liked: initiallyLiked,
+            count: initialCount,
+            canLike: canLike,
+            toggleLike() {
+                if (!this.canLike) {
+                    showLoginPrompt();
+                    return;
+                }
+                fetch(likeUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.liked !== undefined) {
+                        this.liked = data.liked;
+                        this.count = data.likes_count;
+                    }
+                });
+            }
+        }
+    }
+    </script>
 </x-layouts.app> 

@@ -41,8 +41,46 @@
                 <p>{{ $review->review ?? 'No review content available.' }}</p>
             @endif
         </div>
+        <x-like-button 
+            :review="$review"
+            :like-url="$review->product->type === 'game' ? route('games.reviews.like', [$review->product, $review]) : route('tech.reviews.like', [$review->product, $review])"
+            :liked="auth()->check() && $review->isLikedBy(auth()->user())"
+            :count="$review->likes_count"
+            :can-like="auth()->check()"
+        />
         <a href="{{ route($showRoute, [$review->product, $review]) }}" class="text-[#2563EB] hover:text-blue-400 font-semibold mt-2 inline-block">
             View Full Review &rarr;
         </a>
     </div>
-</div> 
+</div>
+
+<script>
+function likeReview(reviewId, likeUrl, initiallyLiked, initialCount, canLike) {
+    return {
+        liked: initiallyLiked,
+        count: initialCount,
+        canLike: canLike,
+        toggleLike() {
+            if (!this.canLike) {
+                showLoginPrompt();
+                return;
+            }
+            fetch(likeUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                },
+                body: JSON.stringify({})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.liked !== undefined) {
+                    this.liked = data.liked;
+                    this.count = data.likes_count;
+                }
+            });
+        }
+    }
+}
+</script> 
