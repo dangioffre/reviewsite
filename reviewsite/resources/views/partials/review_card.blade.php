@@ -1,5 +1,6 @@
 @php
     $isStaff = $type === 'staff';
+    $showRoute = $review->product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show';
 @endphp
 <div class="relative flex group transition-transform duration-200 hover:scale-[1.025] hover:shadow-2xl">
     <div class="w-2 rounded-l-xl {{ $isStaff ? 'bg-gradient-to-b from-[#E53E3E] to-[#DC2626]' : 'bg-gradient-to-b from-[#2563EB] to-[#1e40af]' }} mr-4"></div>
@@ -33,17 +34,15 @@
             </div>
         </div>
         <div class="font-bold text-lg mb-1 text-white font-['Inter']">{{ $review->title }}</div>
-        <div class="text-[#A1A1AA] leading-relaxed font-['Inter']">
+        <div class="text-[#A1A1AA] leading-relaxed font-['Inter'] mb-2">
             @if(isset($review->content) && $review->content)
                 <p>{{ Str::limit($review->content, 150) }}</p>
-                @if(isset($review->slug) && strlen($review->content) > 150)
-                    <a href="{{ route('games.reviews.show', [$review->product, $review]) }}" class="text-[#2563EB] hover:text-blue-400 font-semibold mt-2 inline-block">
-                        Read Full Review →
-                    </a>
-                @endif
             @else
                 <p>{{ $review->review ?? 'No review content available.' }}</p>
             @endif
         </div>
+        <a href="{{ route($showRoute, [$review->product, $review]) }}" class="text-[#2563EB] hover:text-blue-400 font-semibold mt-2 inline-block">
+            View Full Review &rarr;
+        </a>
     </div>
 </div> 
