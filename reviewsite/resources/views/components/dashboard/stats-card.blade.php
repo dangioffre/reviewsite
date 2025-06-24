@@ -10,22 +10,23 @@
 
 @php
     $colorClasses = [
-        'blue' => 'bg-blue-500 text-white',
-        'green' => 'bg-green-500 text-white',
-        'orange' => 'bg-orange-500 text-white',
-        'purple' => 'bg-purple-500 text-white',
-        'red' => 'bg-red-500 text-white',
-        'indigo' => 'bg-indigo-500 text-white',
+        'blue' => 'bg-[#2563EB] text-white',
+        'green' => 'bg-[#22C55E] text-white',
+        'orange' => 'bg-[#F59E42] text-white',
+        'yellow' => 'bg-[#FACC15] text-white',
+        'purple' => 'bg-[#A78BFA] text-white',
+        'red' => 'bg-[#E53E3E] text-white',
+        'indigo' => 'bg-[#6366F1] text-white',
     ];
     
     $trendColors = [
-        'up' => 'text-green-500',
-        'down' => 'text-red-500',
-        'neutral' => 'text-gray-500'
+        'up' => 'text-[#22C55E]',
+        'down' => 'text-[#E53E3E]',
+        'neutral' => 'text-[#A1A1AA]'
     ];
 @endphp
 
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+<div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl p-6 border border-[#3F3F46]">
     <div class="flex items-center justify-between">
         <div class="flex-1">
             <div class="flex items-center gap-3 mb-2">
@@ -46,13 +47,13 @@
                         </svg>
                     </div>
                 @endif
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $title }}</h3>
+                <h3 class="text-lg font-semibold text-white font-['Share_Tech_Mono']">{{ $title }}</h3>
             </div>
             
             <div class="flex items-baseline gap-2">
-                <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ $value }}</span>
+                <span class="text-3xl font-bold text-white font-['Share_Tech_Mono']">{{ $value }}</span>
                 @if($trend !== null)
-                    <span class="text-sm {{ $trendColors[$trendDirection] ?? $trendColors['neutral'] }}">
+                    <span class="text-sm {{ $trendColors[$trendDirection] ?? $trendColors['neutral'] }} font-['Inter']">
                         @if($trendDirection === 'up')
                             <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -68,7 +69,7 @@
             </div>
             
             @if($description)
-                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $description }}</p>
+                <p class="text-sm text-[#A1A1AA] mt-1 font-['Inter']">{{ $description }}</p>
             @endif
         </div>
     </div>
