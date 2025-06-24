@@ -139,15 +139,25 @@ class UserLists extends Component
 
     public function searchGames()
     {
+        Log::info('Search called with term: ' . $this->searchTerm);
+        
         if (strlen($this->searchTerm) < 2) {
             $this->searchResults = [];
+            Log::info('Search term too short, clearing results');
             return;
         }
 
-        $this->searchResults = Product::where('name', 'like', '%' . $this->searchTerm . '%')
-            ->orWhere('description', 'like', '%' . $this->searchTerm . '%')
+        $this->searchResults = Product::where('type', 'game')
+            ->where(function($query) {
+                $query->where('name', 'like', '%' . $this->searchTerm . '%')
+                      ->orWhere('description', 'like', '%' . $this->searchTerm . '%');
+            })
+            ->with(['genre', 'platform'])
             ->limit(10)
             ->get();
+            
+        Log::info('Search results count: ' . $this->searchResults->count());
+        Log::info('Search results: ' . $this->searchResults->pluck('name')->toJson());
     }
 
     public function addGameToList($gameId)
@@ -178,6 +188,7 @@ class UserLists extends Component
 
     public function updatedSearchTerm()
     {
+        Log::info('updatedSearchTerm called with: ' . $this->searchTerm);
         $this->searchGames();
     }
 

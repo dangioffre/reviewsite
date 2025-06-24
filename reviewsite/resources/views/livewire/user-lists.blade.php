@@ -196,25 +196,65 @@
                         </div>
                         
                         <div class="relative mb-4">
-                            <input type="text" wire:model="searchTerm" placeholder="Search for games..." 
-                                   class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-4 py-3 pl-10 text-white placeholder-[#71717A] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent font-['Inter']" />
+                            <input type="text" wire:model.live="searchTerm" placeholder="Search for games..." 
+                                   class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-4 py-3 pl-10 pr-20 text-white placeholder-[#71717A] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent font-['Inter']" />
                             <svg class="w-5 h-5 text-[#71717A] absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
+                            <button wire:click="searchGames" class="absolute right-2 top-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-3 py-1.5 rounded text-xs">
+                                Search
+                            </button>
                         </div>
 
                         @if(count($searchResults) > 0)
                             <div class="space-y-2 max-h-60 overflow-y-auto">
                                 @foreach($searchResults as $game)
-                                    <div class="flex items-center justify-between bg-[#18181B] rounded-lg px-4 py-3 border border-[#3F3F46]">
-                                        <div>
-                                            <div class="text-white font-semibold font-['Share_Tech_Mono'] text-sm">{{ $game->name }}</div>
-                                            <div class="text-[#A1A1AA] text-xs font-['Inter'] mt-1">{{ Str::limit($game->description, 60) }}</div>
+                                    <div class="flex items-center justify-between bg-[#18181B] rounded-lg px-4 py-3 border border-[#3F3F46] hover:bg-[#27272A] transition-colors group">
+                                        <div class="flex items-center flex-1">
+                                            <!-- Game Image -->
+                                            @if($game->image_url)
+                                                <div class="w-16 h-9 rounded-lg overflow-hidden mr-3 flex-shrink-0">
+                                                    <img src="{{ $game->image_url }}" 
+                                                         alt="{{ $game->name }}" 
+                                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200">
+                                                </div>
+                                            @endif
+                                            
+                                            <div class="flex-1">
+                                                <div class="text-white font-semibold font-['Share_Tech_Mono'] text-sm">{{ $game->name }}</div>
+                                                <div class="text-[#A1A1AA] text-xs font-['Inter'] mt-1">{{ Str::limit($game->description, 40) }}</div>
+                                                
+                                                <!-- Game Info -->
+                                                <div class="flex items-center gap-2 mt-1">
+                                                    @if($game->genre)
+                                                        <span class="bg-[#7C3AED]/20 text-[#7C3AED] px-1.5 py-0.5 rounded text-xs">
+                                                            {{ $game->genre->name }}
+                                                        </span>
+                                                    @endif
+                                                    @if($game->platform)
+                                                        <span class="bg-[#2563EB]/20 text-[#2563EB] px-1.5 py-0.5 rounded text-xs">
+                                                            {{ $game->platform->name }}
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </div>
-                                        <button wire:click="addGameToList({{ $game->id }})" 
-                                                class="bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors font-['Inter']">
-                                            Add
-                                        </button>
+                                        
+                                        <div class="flex items-center gap-2 ml-3">
+                                            <a href="{{ route('games.show', $game->slug) }}" 
+                                               target="_blank"
+                                               class="text-[#A1A1AA] hover:text-white transition-colors p-1.5 rounded hover:bg-[#52525B]"
+                                               title="View Game">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                            </a>
+                                            <button wire:click="addGameToList({{ $game->id }})" 
+                                                    class="bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors font-['Inter']">
+                                                Add
+                                            </button>
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>
@@ -230,31 +270,52 @@
                 @if($currentList->items->count() > 0)
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         @foreach($currentList->items as $item)
-                            <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-xl border border-[#3F3F46] p-4 hover:border-[#52525B] transition-all duration-200">
-                                <div class="flex items-start justify-between">
-                                    <div class="flex-1">
-                                        <h4 class="text-white font-semibold font-['Share_Tech_Mono'] text-sm">{{ $item->product->name }}</h4>
-                                        <p class="text-[#A1A1AA] text-xs font-['Inter'] mt-1">{{ Str::limit($item->product->description, 80) }}</p>
-                                        <div class="flex items-center gap-2 mt-2">
-                                            @if($item->product->overall_rating)
-                                                <div class="flex items-center">
-                                                    <svg class="w-3 h-3 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                    </svg>
-                                                    <span class="text-[#A1A1AA] text-xs">{{ number_format($item->product->overall_rating, 1) }}</span>
-                                                </div>
-                                            @endif
+                            <a href="{{ route('games.show', $item->product->slug) }}" target="_blank" class="block group">
+                                <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-xl border border-[#3F3F46] p-4 hover:border-[#52525B] group-hover:border-[#7C3AED] transition-all duration-200 relative overflow-hidden">
+                                    <!-- Game Image -->
+                                    @if($item->product->image_url)
+                                        <div class="mb-3 rounded-lg overflow-hidden aspect-video">
+                                            <img src="{{ $item->product->image_url }}" 
+                                                 alt="{{ $item->product->name }}" 
+                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200">
                                         </div>
+                                    @endif
+                                    
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex-1">
+                                            <h4 class="text-white font-semibold font-['Share_Tech_Mono'] text-sm group-hover:text-[#7C3AED] transition-colors">{{ $item->product->name }}</h4>
+                                            <p class="text-[#A1A1AA] text-xs font-['Inter'] mt-1 leading-relaxed">{{ Str::limit($item->product->description, 60) }}</p>
+                                            
+                                            <!-- Game Info -->
+                                            <div class="flex items-center gap-2 mt-2">
+                                                @if($item->product->overall_rating)
+                                                    <div class="flex items-center">
+                                                        <svg class="w-3 h-3 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                        </svg>
+                                                        <span class="text-[#A1A1AA] text-xs">{{ number_format($item->product->overall_rating, 1) }}</span>
+                                                    </div>
+                                                @endif
+                                                
+                                                @if($item->product->genre)
+                                                    <span class="bg-[#7C3AED]/20 text-[#7C3AED] px-2 py-1 rounded text-xs font-semibold">
+                                                        {{ $item->product->genre->name }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Remove Button -->
+                                        <button wire:click.stop="removeGameFromList({{ $item->product->id }})" 
+                                                onclick="return confirm('Remove this game from the list?')"
+                                                class="ml-3 text-[#E53E3E] hover:text-[#DC2626] transition-colors p-1 rounded hover:bg-[#E53E3E]/20">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
                                     </div>
-                                    <button wire:click="removeGameFromList({{ $item->product->id }})" 
-                                            onclick="return confirm('Remove this game from the list?')"
-                                            class="ml-3 text-[#E53E3E] hover:text-[#DC2626] transition-colors">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                    </button>
                                 </div>
-                            </div>
+                            </a>
                         @endforeach
                     </div>
                 @else

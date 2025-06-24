@@ -16,16 +16,18 @@ class ProductFactory extends Factory
     {
         $type = $this->faker->randomElement(['game', 'hardware']);
         $name = $type === 'game'
-            ? $this->faker->randomElement(['Halo Infinite', 'The Legend of Zelda: Ocarina of Time', 'Super Mario 64', 'Elden Ring', 'Final Fantasy VII'])
-            : $this->faker->randomElement(['Xbox One', 'PlayStation 5', 'Nintendo Switch', 'NVIDIA RTX 4090', 'Steam Deck']);
+            ? $this->faker->randomElement(['Halo Infinite', 'The Legend of Zelda: Tears of the Kingdom', 'Super Mario 64', 'Elden Ring', 'Final Fantasy VII', 'Cyberpunk 2077', 'The Witcher 3', 'God of War', 'Spider-Man 2', 'Baldur\'s Gate 3'])
+            : $this->faker->randomElement(['Xbox Series X', 'PlayStation 5', 'Nintendo Switch', 'NVIDIA RTX 4090', 'Steam Deck']);
         return [
             'name' => $name,
             'type' => $type,
             'description' => $this->faker->paragraph(3),
+            'story' => $this->faker->paragraphs(3, true),
             'image' => 'https://via.placeholder.com/600x400/27272A/FFFFFF?text=' . urlencode($name),
-            'video' => 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-            'staff_review' => $this->faker->paragraph(2),
-            'staff_rating' => $this->faker->numberBetween(7, 10),
+            'video_url' => 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+            'release_date' => $this->faker->dateTimeBetween('-5 years', 'now')->format('Y-m-d'),
+            'genre_id' => null, // Will be set by seeder
+            'platform_id' => null, // Will be set by seeder
         ];
     }
 } 

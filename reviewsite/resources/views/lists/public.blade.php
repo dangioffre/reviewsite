@@ -19,50 +19,67 @@
             @if($list->items && $list->items->count() > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     @foreach($list->items as $item)
-                        <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-xl border border-[#3F3F46] p-6 hover:border-[#52525B] transition-all duration-200">
-                            <div class="mb-4">
-                                <h3 class="text-white font-bold font-['Share_Tech_Mono'] text-lg mb-2">{{ $item->product->name }}</h3>
-                                <p class="text-[#A1A1AA] text-sm font-['Inter'] leading-relaxed">
-                                    {{ Str::limit($item->product->description, 100) }}
-                                </p>
-                            </div>
-
-                            <!-- Game Info -->
-                            <div class="space-y-2 mb-4">
-                                @if($item->product->overall_rating)
-                                    <div class="flex items-center">
-                                        <svg class="w-4 h-4 text-yellow-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                        <span class="text-white font-semibold text-sm">{{ number_format($item->product->overall_rating, 1) }}</span>
-                                        <span class="text-[#A1A1AA] text-xs ml-1">/ 10</span>
+                        <a href="{{ route('games.show', $item->product->slug) }}" target="_blank" class="block group">
+                            <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-xl border border-[#3F3F46] p-6 hover:border-[#52525B] group-hover:border-[#7C3AED] transition-all duration-200 h-full flex flex-col">
+                                <!-- Game Image -->
+                                @if($item->product->image_url)
+                                    <div class="mb-4 rounded-lg overflow-hidden aspect-video">
+                                        <img src="{{ $item->product->image_url }}" 
+                                             alt="{{ $item->product->name }}" 
+                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200">
                                     </div>
                                 @endif
-
-                                @if($item->product->release_date)
-                                    <div class="text-[#A1A1AA] text-xs font-['Inter']">
-                                        Released: {{ \Carbon\Carbon::parse($item->product->release_date)->format('M Y') }}
+                                
+                                <div class="flex-1 flex flex-col">
+                                    <div class="mb-4">
+                                        <h3 class="text-white font-bold font-['Share_Tech_Mono'] text-lg mb-2 group-hover:text-[#7C3AED] transition-colors">{{ $item->product->name }}</h3>
+                                        <p class="text-[#A1A1AA] text-sm font-['Inter'] leading-relaxed">
+                                            {{ Str::limit($item->product->description, 80) }}
+                                        </p>
                                     </div>
-                                @endif
-                            </div>
 
-                            <!-- Genres -->
-                            @if($item->product && $item->product->genres && $item->product->genres->count() > 0)
-                                <div class="flex flex-wrap gap-1 mb-4">
-                                    @foreach($item->product->genres->take(3) as $genre)
-                                        <span class="bg-[#7C3AED]/20 text-[#7C3AED] px-2 py-1 rounded text-xs font-semibold">
-                                            {{ $genre->name }}
-                                        </span>
-                                    @endforeach
+                                    <!-- Game Info -->
+                                    <div class="space-y-2 mb-4">
+                                        @if($item->product->overall_rating)
+                                            <div class="flex items-center">
+                                                <svg class="w-4 h-4 text-yellow-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                </svg>
+                                                <span class="text-white font-semibold text-sm">{{ number_format($item->product->overall_rating, 1) }}</span>
+                                                <span class="text-[#A1A1AA] text-xs ml-1">/ 10</span>
+                                            </div>
+                                        @endif
+
+                                        @if($item->product->release_date)
+                                            <div class="text-[#A1A1AA] text-xs font-['Inter']">
+                                                Released: {{ \Carbon\Carbon::parse($item->product->release_date)->format('M Y') }}
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <!-- Genres -->
+                                    <div class="mt-auto">
+                                        @if($item->product->genre)
+                                            <div class="flex flex-wrap gap-1 mb-3">
+                                                <span class="bg-[#7C3AED]/20 text-[#7C3AED] px-2 py-1 rounded text-xs font-semibold">
+                                                    {{ $item->product->genre->name }}
+                                                </span>
+                                                @if($item->product->platform)
+                                                    <span class="bg-[#2563EB]/20 text-[#2563EB] px-2 py-1 rounded text-xs font-semibold">
+                                                        {{ $item->product->platform->name }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        @endif
+                                        
+                                        <!-- View Game Button -->
+                                        <div class="bg-[#2563EB] group-hover:bg-[#1D4ED8] text-white text-center py-2 px-4 rounded-lg font-semibold text-sm transition-colors font-['Inter']">
+                                            View Game
+                                        </div>
+                                    </div>
                                 </div>
-                            @endif
-
-                            <!-- View Game Button -->
-                            <a href="{{ route('games.show', $item->product->slug) }}" 
-                               class="block w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-center py-2 px-4 rounded-lg font-semibold text-sm transition-colors font-['Inter']">
-                                View Game
-                            </a>
-                        </div>
+                            </div>
+                        </a>
                     @endforeach
                 </div>
             @else
