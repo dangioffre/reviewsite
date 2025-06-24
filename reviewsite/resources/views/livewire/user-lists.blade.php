@@ -758,47 +758,14 @@
                                         </p>
                                     </div>
                                 </div>
-                                <button wire:click="testDescriptionButton" 
-                                        class="w-full bg-[#F59E0B] hover:bg-[#D97706] text-white py-1 px-3 rounded-lg text-xs font-semibold transition-colors mb-2">
-                                    TEST BUTTON
-                                </button>
+
                                 <button wire:click="startEditingDescription({{ $currentList->id }})" 
-                                        class="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white py-2 px-3 rounded-lg text-sm font-semibold transition-colors"
-                                        onclick="console.log('Description button clicked for list {{ $currentList->id }}')">
+                                        class="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white py-2 px-3 rounded-lg text-sm font-semibold transition-colors">
                                     {{ $currentList->description ? 'Edit Description' : 'Add Description' }}
                                 </button>
                             </div>
                         @endif
-                        
-                        <!-- Description Edit Modal -->
-                        @if($editingDescriptionListId === $currentList->id)
-                            <div class="bg-gradient-to-br from-[#1A1A1B] to-[#27272A] rounded-xl border border-[#3F3F46] p-6 mb-6">
-                                <h4 class="text-lg font-bold text-white font-['Share_Tech_Mono'] mb-4">Edit List Description</h4>
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-white font-semibold mb-2 font-['Inter'] text-sm">Description</label>
-                                        <textarea wire:model="editingDescriptionValue" 
-                                                  placeholder="Tell others what this list is about..."
-                                                  rows="4"
-                                                  class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-4 py-3 text-white placeholder-[#71717A] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent font-['Inter'] resize-none"></textarea>
-                                        <div class="text-[#A1A1AA] text-xs mt-1 font-['Inter']">
-                                            Maximum 1000 characters
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="flex gap-3">
-                                        <button wire:click="saveDescription" 
-                                                class="bg-[#22C55E] hover:bg-[#16A34A] text-white px-6 py-2 rounded-lg font-semibold text-sm transition-colors font-['Inter']">
-                                            Save Description
-                                        </button>
-                                        <button wire:click="cancelDescriptionEdit" 
-                                                class="px-6 py-2 text-[#A1A1AA] hover:text-white transition-colors font-['Inter'] text-sm">
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
+
                         
                         <!-- Change Category -->
                         @if($canChangeCategory)
@@ -1335,6 +1302,62 @@
                         </div>
                     </div>
                 @endif
+            </div>
+        </div>
+    @endif
+    
+    <!-- Description Edit Modal -->
+    @if($showDescriptionModal && $editingDescriptionListId)
+        @php
+            $editingList = $lists->firstWhere('id', $editingDescriptionListId);
+        @endphp
+        
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" wire:click="closeDescriptionModal">
+            <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl border border-[#3F3F46] p-6 w-full max-w-2xl mx-4" wire:click.stop>
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-2xl font-bold text-white font-['Share_Tech_Mono']">Edit List Description</h3>
+                        <p class="text-[#A1A1AA] font-['Inter']">{{ $editingList->name ?? 'List' }}</p>
+                    </div>
+                    <button wire:click="closeDescriptionModal" 
+                            class="text-[#A1A1AA] hover:text-white transition-colors p-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <form wire:submit.prevent="saveDescription" class="space-y-6">
+                    <div>
+                        <label class="block text-white font-semibold mb-3 font-['Inter'] text-lg">Description</label>
+                        <textarea wire:model="editingDescriptionValue" 
+                                  placeholder="Tell others what this list is about..."
+                                  rows="6"
+                                  class="w-full bg-[#18181B] border border-[#3F3F46] rounded-xl px-4 py-4 text-white placeholder-[#71717A] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent font-['Inter'] resize-none text-base leading-relaxed"></textarea>
+                        <div class="flex justify-between items-center mt-2">
+                            <div class="text-[#A1A1AA] text-sm font-['Inter']">
+                                Maximum 1000 characters
+                            </div>
+                            <div class="text-[#A1A1AA] text-sm font-['Inter']">
+                                {{ strlen($editingDescriptionValue ?? '') }}/1000
+                            </div>
+                        </div>
+                        @error('editingDescriptionValue') 
+                            <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    
+                    <div class="flex gap-4 pt-4">
+                        <button type="submit" 
+                                class="bg-[#22C55E] hover:bg-[#16A34A] text-white px-8 py-3 rounded-xl font-semibold text-base transition-colors font-['Inter'] flex-1">
+                            Save Description
+                        </button>
+                        <button type="button" wire:click="closeDescriptionModal" 
+                                class="px-8 py-3 text-[#A1A1AA] hover:text-white transition-colors font-['Inter'] text-base border border-[#3F3F46] rounded-xl hover:border-[#52525B]">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     @endif

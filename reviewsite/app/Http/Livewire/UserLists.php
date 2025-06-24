@@ -39,6 +39,7 @@ class UserLists extends Component
     // Description editing
     public $editingDescriptionListId = null;
     public $editingDescriptionValue = '';
+    public $showDescriptionModal = false;
 
     public $showCollaborationManager = false;
     public $managingListId = null;
@@ -464,12 +465,6 @@ class UserLists extends Component
         $this->editingCategoryValue = 'general';
     }
     
-    public function testDescriptionButton()
-    {
-        Log::info('Test description button clicked!');
-        $this->successMessage = 'Test button works! Description functionality should work too.';
-    }
-
     public function startEditingDescription($listId)
     {
         Log::info('startEditingDescription called with listId: ' . $listId);
@@ -483,10 +478,9 @@ class UserLists extends Component
         
         $this->editingDescriptionListId = $listId;
         $this->editingDescriptionValue = $list->description ?? '';
+        $this->showDescriptionModal = true;
         
-        Log::info('Description editing started for list: ' . $list->name);
-        Log::info('editingDescriptionListId set to: ' . $this->editingDescriptionListId);
-        Log::info('editingDescriptionValue set to: ' . $this->editingDescriptionValue);
+        Log::info('Description modal opened for list: ' . $list->name);
     }
     
     public function saveDescription()
@@ -502,18 +496,25 @@ class UserLists extends Component
             return;
         }
         
-        $list->update(['description' => $this->editingDescriptionValue]);
+        $list->update([
+            'description' => $this->editingDescriptionValue ?: null,
+        ]);
         
-        $this->editingDescriptionListId = null;
-        $this->editingDescriptionValue = '';
-        $this->successMessage = 'List description updated!';
+        $this->successMessage = 'List description updated successfully!';
+        $this->closeDescriptionModal();
         $this->refreshLists();
     }
     
-    public function cancelDescriptionEdit()
+    public function closeDescriptionModal()
     {
+        $this->showDescriptionModal = false;
         $this->editingDescriptionListId = null;
         $this->editingDescriptionValue = '';
+    }
+
+    public function cancelDescriptionEdit()
+    {
+        $this->closeDescriptionModal();
     }
 
     // Collaboration Methods
