@@ -20,6 +20,17 @@ class UserLists extends Component
     public $searchResults = [];
     public $showSearch = false;
     public $successMessage = '';
+    
+    // New properties for enhanced features
+    public $selectedCategory = 'general';
+    public $selectedSortBy = 'date_added';
+    public $selectedSortDirection = 'desc';
+    public $allowCollaboration = false;
+    public $allowComments = true;
+    
+    // Category editing
+    public $editingCategoryListId = null;
+    public $editingCategoryValue = 'general';
 
 
 
@@ -47,10 +58,20 @@ class UserLists extends Component
             'name' => $this->newListName,
             'slug' => Str::slug($this->newListName),
             'is_public' => false,
+            'category' => $this->selectedCategory,
+            'sort_by' => $this->selectedSortBy,
+            'sort_direction' => $this->selectedSortDirection,
+            'allow_collaboration' => $this->allowCollaboration,
+            'allow_comments' => $this->allowComments,
         ]);
 
         $this->newListName = '';
         $this->showCreate = false;
+        $this->selectedCategory = 'general';
+        $this->selectedSortBy = 'date_added';
+        $this->selectedSortDirection = 'desc';
+        $this->allowCollaboration = false;
+        $this->allowComments = true;
         $this->successMessage = 'List created successfully!';
         $this->refreshLists();
     }
@@ -192,8 +213,119 @@ class UserLists extends Component
         $this->searchGames();
     }
 
+    // New methods for enhanced features
+    public function duplicateList($listId)
+    {
+        $originalList = auth()->user()->lists()->with('items.product')->findOrFail($listId);
+        
+        $newList = auth()->user()->lists()->create([
+            'name' => $originalList->name . ' (Copy)',
+            'slug' => Str::slug($originalList->name . ' Copy') . '-' . Str::random(6),
+            'is_public' => false, // Always create as private
+            'category' => $originalList->category,
+            'sort_by' => $originalList->sort_by,
+            'sort_direction' => $originalList->sort_direction,
+            'cloned_from' => $originalList->id,
+            'allow_collaboration' => $originalList->allow_collaboration,
+            'allow_comments' => $originalList->allow_comments,
+        ]);
+        
+        // Copy all items
+        foreach ($originalList->items as $item) {
+            $newList->items()->create([
+                'product_id' => $item->product_id,
+                'sort_order' => $item->sort_order,
+            ]);
+        }
+        
+        $this->successMessage = 'List duplicated successfully!';
+        $this->refreshLists();
+    }
+
+    public function updateListSort($listId, $sortBy, $direction = null)
+    {
+        $list = auth()->user()->lists()->findOrFail($listId);
+        
+        // Ensure direction is always valid
+        if ($direction && in_array($direction, ['asc', 'desc'])) {
+            // Use provided direction if valid
+            $newDirection = $direction;
+        } elseif ($list->sort_by === $sortBy) {
+            // Toggle direction if same sort field
+            $newDirection = $list->sort_direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            // Default to 'asc' for new sort field
+            $newDirection = 'asc';
+        }
+        
+        $list->update([
+            'sort_by' => $sortBy,
+            'sort_direction' => $newDirection,
+        ]);
+        
+        $this->successMessage = 'List sorting updated!';
+        $this->refreshLists();
+    }
+
+    public function followList($listId)
+    {
+        $list = ListModel::where('is_public', true)->findOrFail($listId);
+        
+        if (!$list->isFollowedBy(auth()->id())) {
+            $list->followers()->create(['user_id' => auth()->id()]);
+            $list->increment('followers_count');
+            $this->successMessage = 'Now following this list!';
+        } else {
+            $list->followers()->where('user_id', auth()->id())->delete();
+            $list->decrement('followers_count');
+            $this->successMessage = 'Unfollowed list.';
+        }
+        
+        $this->refreshLists();
+    }
+    
+    public function unfollowList($listId)
+    {
+        $list = ListModel::where('is_public', true)->findOrFail($listId);
+        
+        if ($list->isFollowedBy(auth()->id())) {
+            $list->followers()->where('user_id', auth()->id())->delete();
+            $list->decrement('followers_count');
+            $this->successMessage = 'Unfollowed list.';
+        }
+        
+        $this->refreshLists();
+    }
+
+    public function startEditingCategory($listId)
+    {
+        $list = auth()->user()->lists()->findOrFail($listId);
+        $this->editingCategoryListId = $listId;
+        $this->editingCategoryValue = $list->category ?? 'general';
+    }
+    
+    public function saveCategory()
+    {
+        $list = auth()->user()->lists()->findOrFail($this->editingCategoryListId);
+        $list->update(['category' => $this->editingCategoryValue]);
+        
+        $this->editingCategoryListId = null;
+        $this->editingCategoryValue = 'general';
+        $this->successMessage = 'List category updated!';
+        $this->refreshLists();
+    }
+    
+    public function cancelCategoryEdit()
+    {
+        $this->editingCategoryListId = null;
+        $this->editingCategoryValue = 'general';
+    }
+
     public function render()
     {
-        return view('livewire.user-lists');
+        return view('livewire.user-lists', [
+            'categories' => ListModel::$categories,
+            'sortOptions' => ListModel::$sortOptions,
+        ]);
     }
 } 

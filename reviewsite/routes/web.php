@@ -168,9 +168,80 @@ Route::get('/debug/rate-test/{product}', function (\App\Models\Product $product)
     ]);
 })->name('debug.rate-test');
 
+// Public List Routes
 Route::get('/lists/{slug}', function($slug) {
     // TODO: Replace with controller logic
     return view('lists.public', ['slug' => $slug]);
 })->name('lists.public');
+
+// List Interaction Routes (require authentication)
+Route::middleware('auth')->group(function () {
+    Route::post('/lists/{list}/follow', function(\App\Models\ListModel $list) {
+        if (!$list->is_public) {
+            abort(404);
+        }
+        
+        if (!$list->isFollowedBy(auth()->id())) {
+            $list->followers()->create(['user_id' => auth()->id()]);
+            $list->increment('followers_count');
+        }
+        
+        return redirect()->back()->with('success', 'Now following this list!');
+    })->name('lists.follow');
+    
+    Route::delete('/lists/{list}/unfollow', function(\App\Models\ListModel $list) {
+        if (!$list->is_public) {
+            abort(404);
+        }
+        
+        if ($list->isFollowedBy(auth()->id())) {
+            $list->followers()->where('user_id', auth()->id())->delete();
+            $list->decrement('followers_count');
+        }
+        
+        return redirect()->back()->with('success', 'Unfollowed list.');
+    })->name('lists.unfollow');
+    
+    // Comment Routes
+    Route::post('/lists/{list}/comments', function(\App\Models\ListModel $list, Illuminate\Http\Request $request) {
+        if (!$list->is_public || !$list->allow_comments) {
+            abort(404);
+        }
+        
+        $request->validate([
+            'content' => 'required|string|max:1000',
+            'parent_id' => 'nullable|exists:list_comments,id'
+        ]);
+        
+        $comment = $list->comments()->create([
+            'user_id' => auth()->id(),
+            'content' => $request->content,
+            'parent_id' => $request->parent_id,
+        ]);
+        
+        // Update comment count only for top-level comments
+        if (!$request->parent_id) {
+            $list->increment('comments_count');
+        }
+        
+        return redirect()->back()->with('success', 'Comment posted!');
+    })->name('lists.comments.store');
+    
+    Route::post('/comments/{comment}/like', function(\App\Models\ListComment $comment) {
+        $existingLike = $comment->likes()->where('user_id', auth()->id())->first();
+        
+        if ($existingLike) {
+            $existingLike->delete();
+            $comment->decrement('likes_count');
+            $message = 'Like removed.';
+        } else {
+            $comment->likes()->create(['user_id' => auth()->id()]);
+            $comment->increment('likes_count');
+            $message = 'Comment liked!';
+        }
+        
+        return redirect()->back()->with('success', $message);
+    })->name('lists.comments.like');
+});
 
 
