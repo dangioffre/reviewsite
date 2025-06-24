@@ -186,25 +186,57 @@
                                     <div class="grid md:grid-cols-2 gap-x-12 gap-y-4">
                                         <div><span class="font-bold text-white">Name:</span> <span class="text-[#A1A1AA]">{{ $product->name }}</span></div>
                                         @if($product->genre)
-                                            <div><span class="font-bold text-white">Primary Genre:</span> <span class="text-[#A1A1AA]">{{ $product->genre->name }}</span></div>
+                                            <div><span class="font-bold text-white">Primary Genre:</span>
+                                                <a href="{{ route('games.by-genre', $product->genre->slug) }}" class="inline-block bg-green-600/20 text-green-400 px-3 py-1 rounded-full text-sm hover:bg-green-600/40 transition-colors ml-1">
+                                                    {{ $product->genre->name }}
+                                                </a>
+                                            </div>
                                         @endif
                                         @if($product->platform)
-                                            <div><span class="font-bold text-white">Primary Platform:</span> <span class="text-[#A1A1AA]">{{ $product->platform->name }}</span></div>
+                                            <div><span class="font-bold text-white">Primary Platform:</span>
+                                                <a href="{{ route('games.by-platform', $product->platform->slug) }}" class="inline-block bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm hover:bg-blue-600/40 transition-colors ml-1">
+                                                    {{ $product->platform->name }}
+                                                </a>
+                                            </div>
                                         @endif
                                         @if($product->release_date)
                                             <div><span class="font-bold text-white">Release Date:</span> <span class="text-[#A1A1AA]">{{ $product->release_date->format('F d, Y') }}</span></div>
                                         @endif
                                         @if($product->themes && $product->themes->count())
-                                            <div><span class="font-bold text-white">Theme:</span> <span class="text-[#A1A1AA]">{{ $product->themes->pluck('name')->join(', ') }}</span></div>
+                                            <div><span class="font-bold text-white">Theme:</span>
+                                                @foreach($product->themes as $theme)
+                                                    <a href="{{ route('games.by-theme', $theme->slug) }}" class="inline-block bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-sm hover:bg-yellow-500/40 transition-colors ml-1">
+                                                        {{ $theme->name }}
+                                                    </a>
+                                                @endforeach
+                                            </div>
                                         @endif
                                         @if($product->developers && $product->developers->count())
-                                            <div><span class="font-bold text-white">Developer:</span> <span class="text-[#A1A1AA]">{{ $product->developers->pluck('name')->join(', ') }}</span></div>
+                                            <div><span class="font-bold text-white">Developer:</span>
+                                                @foreach($product->developers as $developer)
+                                                    <a href="{{ route('games.by-developer', $developer->slug) }}" class="inline-block bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full text-sm hover:bg-purple-500/40 transition-colors ml-1">
+                                                        {{ $developer->name }}
+                                                    </a>
+                                                @endforeach
+                                            </div>
                                         @endif
                                         @if($product->publishers && $product->publishers->count())
-                                            <div><span class="font-bold text-white">Publisher:</span> <span class="text-[#A1A1AA]">{{ $product->publishers->pluck('name')->join(', ') }}</span></div>
+                                            <div><span class="font-bold text-white">Publisher:</span>
+                                                @foreach($product->publishers as $publisher)
+                                                    <a href="{{ route('games.by-publisher', $publisher->slug) }}" class="inline-block bg-pink-500/20 text-pink-400 px-3 py-1 rounded-full text-sm hover:bg-pink-500/40 transition-colors ml-1">
+                                                        {{ $publisher->name }}
+                                                    </a>
+                                                @endforeach
+                                            </div>
                                         @endif
                                         @if($product->gameModes && $product->gameModes->count())
-                                            <div><span class="font-bold text-white">Game Mode:</span> <span class="text-[#A1A1AA]">{{ $product->gameModes->pluck('name')->join(', ') }}</span></div>
+                                            <div><span class="font-bold text-white">Game Mode:</span>
+                                                @foreach($product->gameModes as $mode)
+                                                    <a href="{{ route('games.by-mode', $mode->slug) }}" class="inline-block bg-cyan-500/20 text-cyan-400 px-3 py-1 rounded-full text-sm hover:bg-cyan-500/40 transition-colors ml-1">
+                                                        {{ $mode->name }}
+                                                    </a>
+                                                @endforeach
+                                            </div>
                                         @endif
                                     </div>
                                 </div>

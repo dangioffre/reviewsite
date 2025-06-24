@@ -59,4 +59,9 @@ class Genre extends Model
     {
         return $query->where('type', 'hardware');
     }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 }

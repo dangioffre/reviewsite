@@ -6,6 +6,10 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\Genre;
 use App\Models\Platform;
+use App\Models\Theme;
+use App\Models\Developer;
+use App\Models\Publisher;
+use App\Models\GameMode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -216,10 +220,7 @@ class GameController extends Controller
     {
         $products = Product::with(['genre', 'platform', 'reviews'])
             ->where('type', 'game')
-            ->where(function($query) use ($genre) {
-                $query->where('genre_id', $genre->id)
-                      ->orWhereJsonContains('genres', $genre->name);
-            })
+            ->where('genre_id', $genre->id)
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
@@ -235,10 +236,7 @@ class GameController extends Controller
     {
         $products = Product::with(['genre', 'platform', 'reviews'])
             ->where('type', 'game')
-            ->where(function($query) use ($platform) {
-                $query->where('platform_id', $platform->id)
-                      ->orWhereJsonContains('platforms', $platform->name);
-            })
+            ->where('platform_id', $platform->id)
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
@@ -250,13 +248,12 @@ class GameController extends Controller
         return view('games.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
     }
 
-    public function byDeveloper($developer)
+    public function byDeveloper(Developer $developer)
     {
         $products = Product::with(['genre', 'platform', 'reviews'])
             ->where('type', 'game')
-            ->where(function($query) use ($developer) {
-                $query->where('developer', $developer)
-                      ->orWhereJsonContains('developers', $developer);
+            ->whereHas('developers', function($query) use ($developer) {
+                $query->where('developers.id', $developer->id);
             })
             ->orderBy('created_at', 'desc')
             ->paginate(12);
@@ -264,18 +261,17 @@ class GameController extends Controller
         $genres = Genre::active()->get();
         $platforms = Platform::active()->get();
         $filterType = 'Developer';
-        $filterValue = $developer;
+        $filterValue = $developer->name;
 
         return view('games.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
     }
 
-    public function byPublisher($publisher)
+    public function byPublisher(Publisher $publisher)
     {
         $products = Product::with(['genre', 'platform', 'reviews'])
             ->where('type', 'game')
-            ->where(function($query) use ($publisher) {
-                $query->where('publisher', $publisher)
-                      ->orWhereJsonContains('publishers', $publisher);
+            ->whereHas('publishers', function($query) use ($publisher) {
+                $query->where('publishers.id', $publisher->id);
             })
             ->orderBy('created_at', 'desc')
             ->paginate(12);
@@ -283,18 +279,17 @@ class GameController extends Controller
         $genres = Genre::active()->get();
         $platforms = Platform::active()->get();
         $filterType = 'Publisher';
-        $filterValue = $publisher;
+        $filterValue = $publisher->name;
 
         return view('games.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
     }
 
-    public function byTheme($theme)
+    public function byTheme(Theme $theme)
     {
         $products = Product::with(['genre', 'platform', 'reviews'])
             ->where('type', 'game')
-            ->where(function($query) use ($theme) {
-                $query->where('theme', $theme)
-                      ->orWhereJsonContains('themes', $theme);
+            ->whereHas('themes', function($query) use ($theme) {
+                $query->where('themes.id', $theme->id);
             })
             ->orderBy('created_at', 'desc')
             ->paginate(12);
@@ -302,18 +297,17 @@ class GameController extends Controller
         $genres = Genre::active()->get();
         $platforms = Platform::active()->get();
         $filterType = 'Theme';
-        $filterValue = $theme;
+        $filterValue = $theme->name;
 
         return view('games.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
     }
 
-    public function byGameMode($mode)
+    public function byGameMode(GameMode $mode)
     {
         $products = Product::with(['genre', 'platform', 'reviews'])
             ->where('type', 'game')
-            ->where(function($query) use ($mode) {
-                $query->where('game_modes', 'like', '%' . $mode . '%')
-                      ->orWhereJsonContains('game_modes_list', $mode);
+            ->whereHas('gameModes', function($query) use ($mode) {
+                $query->where('game_modes.id', $mode->id);
             })
             ->orderBy('created_at', 'desc')
             ->paginate(12);
@@ -321,7 +315,7 @@ class GameController extends Controller
         $genres = Genre::active()->get();
         $platforms = Platform::active()->get();
         $filterType = 'Game Mode';
-        $filterValue = $mode;
+        $filterValue = $mode->name;
 
         return view('games.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
     }
