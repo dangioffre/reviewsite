@@ -53,6 +53,13 @@ class UserLists extends Component
         'can_change_category' => false,
     ];
 
+    // Delete confirmation modal
+    public $showDeleteModal = false;
+    public $deletingListId = null;
+    public $deletingListName = '';
+
+
+
     protected $rules = [
         'newListName' => 'required|string|max:255',
         'newListDescription' => 'nullable|string|max:1000',
@@ -233,24 +240,49 @@ class UserLists extends Component
         $this->refreshLists();
     }
 
-    public function deleteList($listId)
+    public function setDeleteTarget($listId)
     {
         $list = $this->findListById($listId);
+        if ($list && $list->user_id === auth()->id()) {
+            $this->deletingListId = $listId;
+            $this->deletingListName = $list->name;
+            $this->showDeleteModal = true;
+        }
+    }
+
+    public function deleteList()
+    {
+        if (!$this->deletingListId) {
+            return;
+        }
+
+        $list = $this->findListById($this->deletingListId);
         
         if (!$list || $list->user_id !== auth()->id()) {
             $this->successMessage = 'You can only delete your own lists.';
+            $this->closeDeleteModal();
             return;
         }
         
+        $listName = $list->name;
         $list->delete();
         
-        $this->successMessage = 'List deleted successfully!';
+        $this->successMessage = "'{$listName}' has been deleted successfully!";
         $this->refreshLists();
         
         // Close view if we're viewing the deleted list
-        if ($this->viewingList == $listId) {
+        if ($this->viewingList == $this->deletingListId) {
             $this->viewingList = null;
         }
+
+        $this->closeDeleteModal();
+    }
+
+    public function closeDeleteModal()
+    {
+        $this->showDeleteModal = false;
+        $this->deletingListId = null;
+        $this->deletingListName = '';
     }
 
     public function viewList($listId)
@@ -854,6 +886,31 @@ class UserLists extends Component
         
         $collaboration = $list->collaborators()->where('user_id', auth()->id())->first();
         return $collaboration && $collaboration->can_manage_users;
+    }
+
+    public function toggleCollaboration($listId)
+    {
+        $list = $this->findListById($listId);
+        
+        if (!$list || $list->user_id !== auth()->id()) {
+            $this->successMessage = 'You do not have permission to change collaboration settings for this list.';
+            return;
+        }
+
+        $list->update([
+            'allow_collaboration' => !$list->allow_collaboration
+        ]);
+
+        $status = $list->allow_collaboration ? 'enabled' : 'disabled';
+        $this->successMessage = "Collaboration has been {$status} for this list.";
+        
+        // If disabling collaboration, remove all existing collaborators
+        if (!$list->allow_collaboration) {
+            $list->collaborators()->delete();
+            $this->successMessage = "Collaboration has been disabled and all collaborators have been removed.";
+        }
+        
+        $this->refreshLists();
     }
 
     public function render()

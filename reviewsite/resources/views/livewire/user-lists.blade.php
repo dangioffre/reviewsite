@@ -531,10 +531,9 @@
                                     
                                     @if(($list->user_role ?? 'owner') === 'owner')
                                         <div class="border-t border-[#3F3F46]">
-                                            <button wire:click="deleteList({{ $list->id }})" 
-                                                    @click="open = false"
-                                                    onclick="return confirm('Are you sure you want to delete this list? This action cannot be undone.')"
-                                                    class="w-full text-left px-4 py-3 text-[#E53E3E] hover:bg-[#E53E3E]/10 transition-colors font-['Inter'] text-sm flex items-center">
+                                            <button wire:click="setDeleteTarget({{ $list->id }})" 
+                                                    class="w-full text-left px-4 py-3 text-[#E53E3E] hover:bg-[#E53E3E]/10 transition-colors font-['Inter'] text-sm flex items-center"
+                                                    data-list-id="{{ $list->id }}">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
@@ -803,8 +802,8 @@
                             </div>
                         @endif
                         
-                        <!-- Manage Collaborators -->
-                        @if($canManageUsers && $currentList->allow_collaboration)
+                        <!-- Collaboration Settings (Owner Only) -->
+                        @if($isOwner)
                             <div class="bg-[#18181B] border border-[#3F3F46] rounded-xl p-4">
                                 <div class="flex items-center gap-3 mb-3">
                                     <div class="w-10 h-10 bg-[#7C3AED]/20 rounded-lg flex items-center justify-center">
@@ -813,14 +812,33 @@
                                         </svg>
                                     </div>
                                     <div>
-                                        <h4 class="text-white font-semibold font-['Inter']">Collaborators</h4>
-                                        <p class="text-[#A1A1AA] text-xs">{{ $currentList->collaborators->where('accepted_at', '!=', null)->count() }} active</p>
+                                        <h4 class="text-white font-semibold font-['Inter']">Collaboration</h4>
+                                        <p class="text-[#A1A1AA] text-xs">
+                                            @if($currentList->allow_collaboration)
+                                                Enabled • {{ $currentList->collaborators->where('accepted_at', '!=', null)->count() }} active
+                                            @else
+                                                Disabled
+                                            @endif
+                                        </p>
                                     </div>
                                 </div>
-                                <button wire:click="openCollaborationManager({{ $currentList->id }})" 
-                                        class="w-full bg-[#7C3AED] hover:bg-[#6D28D9] text-white py-2 px-3 rounded-lg text-sm font-semibold transition-colors">
-                                    Manage Users
-                                </button>
+                                @if($currentList->allow_collaboration)
+                                    <div class="space-y-2">
+                                        <button wire:click="openCollaborationManager({{ $currentList->id }})" 
+                                                class="w-full bg-[#7C3AED] hover:bg-[#6D28D9] text-white py-2 px-3 rounded-lg text-sm font-semibold transition-colors">
+                                            Manage Users
+                                        </button>
+                                        <button wire:click="toggleCollaboration({{ $currentList->id }})" 
+                                                class="w-full bg-[#71717A] hover:bg-[#52525B] text-white py-1.5 px-3 rounded-lg text-xs font-semibold transition-colors">
+                                            Disable Collaboration
+                                        </button>
+                                    </div>
+                                @else
+                                    <button wire:click="toggleCollaboration({{ $currentList->id }})" 
+                                            class="w-full bg-[#7C3AED] hover:bg-[#6D28D9] text-white py-2 px-3 rounded-lg text-sm font-semibold transition-colors">
+                                        Enable Collaboration
+                                    </button>
+                                @endif
                             </div>
                         @endif
                         
@@ -859,9 +877,9 @@
                                         <p class="text-[#A1A1AA] text-xs">Permanently remove this list</p>
                                     </div>
                                 </div>
-                                <button wire:click="deleteList({{ $currentList->id }})" 
-                                        onclick="return confirm('Are you sure you want to delete this list? This action cannot be undone.')"
-                                        class="w-full bg-[#EF4444] hover:bg-[#DC2626] text-white py-2 px-3 rounded-lg text-sm font-semibold transition-colors">
+                                <button wire:click="setDeleteTarget({{ $currentList->id }})" 
+                                        class="w-full bg-[#EF4444] hover:bg-[#DC2626] text-white py-2 px-3 rounded-lg text-sm font-semibold transition-colors"
+                                        data-list-id="{{ $currentList->id }}">
                                     Delete List
                                 </button>
                             </div>
@@ -949,13 +967,15 @@
                                 </div>
                             </div>
                             
-                            <div class="flex gap-2">
-                                <a href="{{ route('lists.public', $currentList->slug) }}" 
-                                   target="_blank"
-                                   class="flex-1 bg-[#F59E0B] hover:bg-[#D97706] text-white px-3 py-2 rounded-lg text-sm font-semibold transition-colors text-center">
-                                    View Public Page
-                                </a>
-                            </div>
+                            @if($currentList->is_public)
+                                <div class="flex gap-2">
+                                    <a href="{{ route('lists.public', $currentList->slug) }}" 
+                                       target="_blank"
+                                       class="flex-1 bg-[#F59E0B] hover:bg-[#D97706] text-white px-3 py-2 rounded-lg text-sm font-semibold transition-colors text-center">
+                                        View Public Page
+                                    </a>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -1306,6 +1326,45 @@
         </div>
     @endif
     
+    <!-- Delete Confirmation Modal -->
+    @if($showDeleteModal)
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[70] p-4" wire:click="closeDeleteModal">
+            <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl border border-red-500/30 p-6 w-full max-w-md" wire:click.stop>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-white font-['Share_Tech_Mono']">Delete List</h3>
+                    <button wire:click="closeDeleteModal" class="text-[#A1A1AA] hover:text-white transition-colors p-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </div>
+                    
+                    <h4 class="text-lg font-bold text-white mb-2">Are you sure?</h4>
+                    <p class="text-[#A1A1AA] text-sm">
+                        This will permanently delete <strong class="text-white">{{ $deletingListName ?: 'this list' }}</strong>.
+                        All games and data in this list will be lost forever.
+                    </p>
+                </div>
+
+                <div class="flex gap-3">
+                    <button wire:click="deleteList" class="flex-1 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200">
+                        Yes, Delete List
+                    </button>
+                    <button wire:click="closeDeleteModal" class="flex-1 border border-[#3F3F46] hover:border-[#71717A] text-white px-6 py-3 rounded-xl font-semibold transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Description Edit Modal -->
     @if($showDescriptionModal && $editingDescriptionListId)
         @php
