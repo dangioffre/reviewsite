@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Review;
 use App\Models\Product;
 use App\Models\GameUserStatus;
+use App\Models\Genre;
 
 class DashboardController extends Controller
 {
@@ -195,18 +196,110 @@ class DashboardController extends Controller
         return view('dashboard.likes', compact('user', 'likedReviews'));
     }
     
-    public function collection()
+    public function collection(Request $request)
     {
         $user = Auth::user();
         
-        $gameStatuses = GameUserStatus::where('user_id', $user->id)
-            ->with(['product.genre', 'product.platform'])
-            ->orderBy('updated_at', 'desc')
-            ->paginate(20);
-            
-        $gameStats = $this->getGameStats($user);
+        // Base query
+        $query = GameUserStatus::where('user_id', $user->id)
+            ->with(['product.genre', 'product.platform']);
         
-        return view('dashboard.collection', compact('user', 'gameStatuses', 'gameStats'));
+        // Search functionality
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->whereHas('product', function($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%{$searchTerm}%");
+            });
+        }
+        
+        // Status filters
+        if ($request->filled('status')) {
+            switch ($request->status) {
+                case 'have':
+                    $query->where('have', true);
+                    break;
+                case 'want':
+                    $query->where('want', true);
+                    break;
+                case 'played':
+                    $query->where('played', true);
+                    break;
+                case 'favorites':
+                    $query->where('is_favorite', true);
+                    break;
+                case 'dropped':
+                    $query->where('dropped', true);
+                    break;
+            }
+        }
+        
+        // Completion status filter
+        if ($request->filled('completion')) {
+            $query->where('completion_status', $request->completion);
+        }
+        
+        // Genre filter
+        if ($request->filled('genre')) {
+            $query->whereHas('product', function($q) use ($request) {
+                $q->where('genre_id', $request->genre);
+            });
+        }
+        
+        // Sorting
+        $sort = $request->get('sort', 'updated_desc');
+        switch ($sort) {
+            case 'name_asc':
+                $query->join('products', 'game_user_statuses.product_id', '=', 'products.id')
+                      ->orderBy('products.name', 'asc')
+                      ->select('game_user_statuses.*');
+                break;
+            case 'name_desc':
+                $query->join('products', 'game_user_statuses.product_id', '=', 'products.id')
+                      ->orderBy('products.name', 'desc')
+                      ->select('game_user_statuses.*');
+                break;
+            case 'rating_desc':
+                $query->orderByDesc('rating');
+                break;
+            case 'rating_asc':
+                $query->orderBy('rating');
+                break;
+            case 'playtime_desc':
+                $query->orderByDesc('hours_played');
+                break;
+            case 'playtime_asc':
+                $query->orderBy('hours_played');
+                break;
+            case 'completion_desc':
+                $query->orderByDesc('completion_percentage');
+                break;
+            case 'updated_desc':
+            default:
+                $query->latest('updated_at');
+                break;
+        }
+        
+        // Paginate results
+        $gameStatuses = $query->paginate(12)->withQueryString();
+        
+        // Get all genres for filter dropdown
+        $genres = Genre::orderBy('name')->get();
+        
+        // Calculate stats for the entire collection (not filtered)
+        $allStatuses = GameUserStatus::where('user_id', $user->id)->get();
+        $totalGames = $allStatuses->count();
+        $completedGames = $allStatuses->whereIn('completion_status', ['completed', 'fully_completed'])->count();
+        $favoriteGames = $allStatuses->where('is_favorite', true)->count();
+        $totalPlaytime = $allStatuses->sum('hours_played');
+        
+        return view('dashboard.collection', compact(
+            'gameStatuses', 
+            'genres',
+            'totalGames', 
+            'completedGames', 
+            'favoriteGames', 
+            'totalPlaytime'
+        ));
     }
     
     public function reviewsAndLikes(Request $request)

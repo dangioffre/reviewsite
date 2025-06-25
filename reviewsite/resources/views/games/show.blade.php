@@ -97,7 +97,7 @@
                             <!-- Star Rating Component -->
                             <x-star-rating :product="$product" :userRating="$userRating" />
                             
-                            <livewire:game-status-buttons :product="$product" />
+                            <livewire:enhanced-game-status-buttons :product="$product" />
                             
                             <!-- Action Buttons -->
                             <div class="space-y-3 mt-6">
