@@ -48,7 +48,7 @@
         <form action="{{ route('podcasts.store') }}" method="POST" class="space-y-8">
             @csrf
             
-            <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] p-8">
+            <div class="bg-[#27272A] rounded-2xl shadow-2xl border border-[#3F3F46] p-8">
                 <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Podcast Details</h2>
                 
                 <div class="grid md:grid-cols-2 gap-6">
@@ -142,7 +142,7 @@
             </div>
 
             <!-- Information Section -->
-            <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] p-8">
+            <div class="bg-[#27272A] rounded-2xl shadow-2xl border border-[#3F3F46] p-8">
                 <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Next Steps</h2>
                 
                 <div class="space-y-4 text-[#A1A1AA] font-['Inter']">
@@ -183,7 +183,7 @@
             <!-- Submit Button -->
             <div class="text-center">
                 <button type="submit" 
-                        class="bg-gradient-to-r from-[#E53E3E] to-[#B91C1C] text-white font-bold py-4 px-8 rounded-full text-lg font-['Inter'] hover:from-[#DC2626] hover:to-[#991B1B] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+                        class="bg-[#E53E3E] text-white font-bold py-4 px-8 rounded-full text-lg font-['Inter'] hover:bg-red-700 transition-colors shadow-lg">
                     Submit Podcast for Review
                 </button>
                 
