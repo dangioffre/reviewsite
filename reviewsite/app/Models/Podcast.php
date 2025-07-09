@@ -180,7 +180,10 @@ class Podcast extends Model
 
     public function getLogoUrlAttribute($value)
     {
-        return $value ? asset('storage/' . $value) : null;
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            return $value;
+        }
+        return $value ? asset('storage/' . $value) : asset('images/default-podcast.png');
     }
 
     // Static methods
