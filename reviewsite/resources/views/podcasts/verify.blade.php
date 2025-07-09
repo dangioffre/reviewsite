@@ -77,6 +77,11 @@
                                 <span><strong>Latest Episode Description:</strong> Add the token to your most recent episode's description</span>
                             </li>
                         </ul>
+                        <div class="mt-4 p-4 bg-[#1A1A1B] border border-yellow-500/50 rounded-lg">
+                            <p class="text-sm text-yellow-300">
+                                <strong class="font-semibold">Please Note:</strong> It may take some time for your RSS feed to update after you add the token. Depending on your podcast host, this can take anywhere from a few minutes to a few hours.
+                            </p>
+                        </div>
                     </div>
 
                     <div class="border-l-4 border-[#E53E3E] pl-6">

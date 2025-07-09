@@ -100,6 +100,24 @@ class PodcastController extends Controller
     }
 
     /**
+     * Fetch podcast info from RSS feed
+     */
+    public function fetchRssInfo(Request $request)
+    {
+        $request->validate(['rss_url' => 'required|url']);
+
+        $rssUrl = $request->input('rss_url');
+        
+        $podcastInfo = $this->rssService->validateRssFeed($rssUrl);
+
+        if (!$podcastInfo['valid']) {
+            return response()->json(['success' => false, 'error' => $podcastInfo['error'] ?? 'Could not validate RSS feed.']);
+        }
+
+        return response()->json(['success' => true, 'data' => $podcastInfo]);
+    }
+
+    /**
      * Check verification status
      */
     public function checkVerification(Podcast $podcast)

@@ -175,12 +175,18 @@ class RssVerificationService
                     'error' => 'Not a valid RSS feed format',
                 ];
             }
+            
+            $channel = $xml->channel;
+            $itunes = $channel->children('itunes', true);
 
             return [
                 'valid' => true,
-                'title' => (string) $xml->channel->title,
-                'description' => (string) $xml->channel->description,
-                'episode_count' => count($xml->channel->item ?? []),
+                'title' => (string) $channel->title,
+                'description' => (string) $channel->description,
+                'website_url' => (string) $channel->link,
+                'logo_url' => $this->extractLogoUrl($channel),
+                'hosts' => (string) ($itunes->author ?? ''),
+                'episode_count' => count($channel->item ?? []),
             ];
         } catch (\Exception $e) {
             return [
@@ -309,35 +315,24 @@ class RssVerificationService
      */
     private function extractEpisodeNumber($item): ?int
     {
-        $namespaces = $item->getNameSpaces(true);
-        
-        if (isset($namespaces['itunes'])) {
-            $itunes = $item->children($namespaces['itunes']);
-            if (isset($itunes->episode)) {
-                return (int) $itunes->episode;
-            }
+        $itunes = $item->children('itunes', true);
+        if (isset($itunes->episode)) {
+            return (int) $itunes->episode;
         }
 
         return null;
     }
 
-    /**
-     * Extract logo URL from RSS channel
-     */
     private function extractLogoUrl($channel): ?string
     {
-        // Check iTunes image
-        $namespaces = $channel->getNameSpaces(true);
-        
-        if (isset($namespaces['itunes'])) {
-            $itunes = $channel->children($namespaces['itunes']);
-            if (isset($itunes->image)) {
-                return (string) $itunes->image['href'];
-            }
+        // Check for iTunes image first, as it's often higher quality
+        $itunes = $channel->children('itunes', true);
+        if (isset($itunes->image) && isset($itunes->image->attributes()->href)) {
+            return (string) $itunes->image->attributes()->href;
         }
 
-        // Check regular image
-        if (isset($channel->image->url)) {
+        // Fallback to the standard RSS image tag
+        if (isset($channel->image) && isset($channel->image->url)) {
             return (string) $channel->image->url;
         }
 

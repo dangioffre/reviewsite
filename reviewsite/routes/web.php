@@ -68,6 +68,7 @@ Route::get('/podcasts/create', [PodcastController::class, 'create'])->name('podc
 Route::post('/podcasts', [PodcastController::class, 'store'])->name('podcasts.store');
 Route::get('/podcasts/dashboard', [PodcastController::class, 'dashboard'])->name('podcasts.dashboard');
 Route::get('/podcasts/{podcast}/verify', [PodcastController::class, 'verify'])->name('podcasts.verify');
+Route::post('/podcasts/fetch-info', [PodcastController::class, 'fetchRssInfo'])->name('podcasts.fetch-info');
 Route::post('/podcasts/{podcast}/check-verification', [PodcastController::class, 'checkVerification'])->name('podcasts.check-verification');
 Route::post('/podcasts/{podcast}/sync-rss', [PodcastController::class, 'syncRss'])->name('podcasts.sync-rss');
 Route::get('/podcasts/{podcast}', [PodcastController::class, 'show'])->name('podcasts.show');
