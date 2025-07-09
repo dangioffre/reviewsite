@@ -258,16 +258,29 @@ class PodcastResource extends Resource
                     ->modalHeading('Approve Podcast')
                     ->modalDescription('Are you sure you want to approve this podcast? It will be publicly visible.')
                     ->action(function (Podcast $record): void {
+                        $wasPending = in_array($record->status, ['pending', 'verified']);
+
                         $record->update([
                             'status' => 'approved',
                             'approved_at' => now(),
                             'approved_by' => auth()->id(),
                         ]);
 
-                        Notification::make()
-                            ->title('Podcast approved successfully')
-                            ->success()
-                            ->send();
+                        // If it was just approved for the first time, run an initial sync
+                        if ($wasPending) {
+                            $service = app(\App\Services\RssVerificationService::class);
+                            $count = $service->importEpisodes($record);
+                            
+                            Notification::make()
+                                ->title("Initial Sync: Imported {$count} episodes")
+                                ->success()
+                                ->send();
+                        } else {
+                            Notification::make()
+                                ->title('Podcast approved successfully')
+                                ->success()
+                                ->send();
+                        }
                     }),
 
                 Tables\Actions\Action::make('reject')

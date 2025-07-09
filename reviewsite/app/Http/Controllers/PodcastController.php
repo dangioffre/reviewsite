@@ -368,24 +368,19 @@ class PodcastController extends Controller
     public function syncRss(Podcast $podcast)
     {
         if (!Auth::check() || !$podcast->userCanPostAsThisPodcast(Auth::user())) {
-            abort(403);
+            return back()->with('error', 'You are not authorized to sync this podcast.');
         }
 
-        // Check rate limiting (once every 2 hours)
-        if ($podcast->last_rss_check && $podcast->last_rss_check->gt(now()->subHours(2))) {
-            return back()->with('error', 'RSS sync is rate limited. Please wait before trying again.');
+        try {
+            $count = $this->rssService->importEpisodes($podcast);
+
+            if ($count > 0) {
+                return back()->with('success', "Successfully imported {$count} new episodes.");
+            } else {
+                return back()->with('success', 'No new episodes found. Your podcast is up to date.');
+            }
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to sync RSS feed: ' . $e->getMessage());
         }
-
-        $importedCount = $this->rssService->importEpisodes($podcast);
-
-        if ($importedCount > 0) {
-            return back()->with('success', "Successfully imported {$importedCount} new episodes.");
-        }
-
-        if ($podcast->hasRssError()) {
-            return back()->with('error', 'RSS sync failed: ' . $podcast->rss_error);
-        }
-
-        return back()->with('info', 'RSS sync completed. No new episodes found.');
     }
 } 
