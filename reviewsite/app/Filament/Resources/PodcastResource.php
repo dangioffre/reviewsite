@@ -382,14 +382,13 @@ class PodcastResource extends Resource
 
                                 Infolists\Components\TextEntry::make('rss_url')
                                     ->label('RSS URL')
-                                    ->url()
+                                    ->url(fn (Podcast $record): ?string => $record->rss_url)
                                     ->openUrlInNewTab(),
 
                                 Infolists\Components\TextEntry::make('website_url')
-                                    ->label('Website URL')
-                                    ->url()
-                                    ->openUrlInNewTab()
-                                    ->visible(fn ($record) => !empty($record->website_url)),
+                                    ->label('Website')
+                                    ->url(fn (Podcast $record): ?string => $record->website_url)
+                                    ->visible(fn (Podcast $record): bool => !empty($record->website_url)),
 
                                 Infolists\Components\TextEntry::make('hosts')
                                     ->badge()

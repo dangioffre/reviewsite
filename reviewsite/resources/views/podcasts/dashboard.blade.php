@@ -15,7 +15,7 @@
             </div>
             <div class="flex items-center space-x-4">
                 <a href="{{ route('podcasts.invitations') }}" 
-                   class="bg-gradient-to-r from-[#6366F1] to-[#4F46E5] text-white font-bold py-3 px-6 rounded-lg font-['Inter'] hover:from-[#5B21B6] hover:to-[#7C3AED] transition-all duration-200 relative">
+                   class="bg-[#6366F1] text-white font-bold py-3 px-6 rounded-lg font-['Inter'] hover:bg-[#5B21B6] transition-all duration-200 relative">
                     @if($pendingInvitations->count() > 0)
                         <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
                             {{ $pendingInvitations->count() }}
@@ -24,7 +24,7 @@
                     Team Invitations
                 </a>
                 <a href="{{ route('podcasts.create') }}" 
-                   class="bg-gradient-to-r from-[#E53E3E] to-[#B91C1C] text-white font-bold py-3 px-6 rounded-lg font-['Inter'] hover:from-[#DC2626] hover:to-[#991B1B] transition-all duration-200">
+                   class="bg-[#E53E3E] text-white font-bold py-3 px-6 rounded-lg font-['Inter'] hover:bg-[#DC2626] transition-all duration-200">
                     Submit New Podcast
                 </a>
             </div>
