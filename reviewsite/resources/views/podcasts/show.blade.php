@@ -144,11 +144,11 @@
             <!-- Episodes -->
             <div class="lg:w-2/3">
                 <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] p-8">
-                    <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Recent Episodes</h2>
+                    <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">All Episodes</h2>
                     
-                    @if($podcast->episodes->count() > 0)
+                    @if($episodes->count() > 0)
                         <div class="space-y-4">
-                            @foreach($podcast->episodes as $episode)
+                            @foreach($episodes as $episode)
                                 <div class="bg-[#1A1A1B] rounded-lg p-6 border border-[#3F3F46] hover:border-[#E53E3E] transition-all duration-300">
                                     <div class="flex items-start gap-4">
                                         @if($episode->artwork_url)
@@ -190,6 +190,10 @@
                                     </div>
                                 </div>
                             @endforeach
+                        </div>
+
+                        <div class="mt-8">
+                            {{ $episodes->links() }}
                         </div>
                     @else
                         <div class="text-center py-12">

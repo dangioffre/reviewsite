@@ -153,13 +153,13 @@ class PodcastController extends Controller
             abort(404);
         }
 
-        $podcast->load([
-            'owner',
-            'activeTeamMembers.user',
-            'episodes' => function ($query) {
-                $query->published()->recent()->limit(10);
-            }
-        ]);
+        $podcast->load(['owner', 'activeTeamMembers.user']);
+
+        // Paginate all episodes instead of loading recent ones
+        $episodes = $podcast->episodes()
+            ->published()
+            ->recent()
+            ->paginate(10);
 
         // Get recently attached reviews (reviews that have been attached to episodes)
         $recentAttachedReviews = Review::select('reviews.*', 'episodes.title as episode_title', 'episodes.id as episode_id')
@@ -180,7 +180,7 @@ class PodcastController extends Controller
             ->where('reviews.is_published', true)
             ->count();
 
-        return view('podcasts.show', compact('podcast', 'totalEpisodes', 'totalReviews', 'recentAttachedReviews'));
+        return view('podcasts.show', compact('podcast', 'episodes', 'totalEpisodes', 'totalReviews', 'recentAttachedReviews'));
     }
 
     /**
