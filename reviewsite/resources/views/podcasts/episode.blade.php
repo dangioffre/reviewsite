@@ -76,19 +76,19 @@
                 </section>
                 @endif
                 
-                <!-- Episode Reviews -->
+                <!-- Comments -->
                 <section id="episode-reviews">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-bold">Episode Reviews ({{ $episodeReviews->count() }})</h2>
+                        <h2 class="text-xl font-bold">Comments ({{ $episodeReviews->count() }})</h2>
                         <div>
                             @guest
-                                <a href="{{ route('login') }}" class="px-4 py-2 bg-[#E53E3E] text-white font-bold rounded-lg hover:bg-red-700 transition-colors text-sm">Write a Review</a>
+                                <a href="{{ route('login') }}" class="px-4 py-2 bg-[#E53E3E] text-white font-bold rounded-lg hover:bg-red-700 transition-colors text-sm">Write a Comment</a>
                             @endguest
                             @auth
                                 @if ($userReview)
-                                    <a href="{{ route('podcasts.episodes.reviews.edit', [$podcast, $episode, $userReview]) }}" class="px-4 py-2 bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors text-sm">Edit Your Review</a>
+                                    <a href="{{ route('podcasts.episodes.reviews.edit', [$podcast, $episode, $userReview]) }}" class="px-4 py-2 bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors text-sm">Edit Your Comment</a>
                                 @elseif($episode->canBeReviewedBy(auth()->user()))
-                                    <a href="{{ route('podcasts.episodes.reviews.create', [$podcast, $episode]) }}" class="px-4 py-2 bg-[#E53E3E] text-white font-bold rounded-lg hover:bg-red-700 transition-colors text-sm">Write a Review</a>
+                                    <a href="{{ route('podcasts.episodes.reviews.create', [$podcast, $episode]) }}" class="px-4 py-2 bg-[#E53E3E] text-white font-bold rounded-lg hover:bg-red-700 transition-colors text-sm">Write a Comment</a>
                                 @endif
                             @endauth
                         </div>
@@ -144,9 +144,9 @@
                     </div>
                     @else
                     <div class="text-center py-12 bg-[#27272A] rounded-xl border border-[#3F3F46]">
-                        <p class="text-[#A1A1AA] font-medium">No reviews for this episode yet.</p>
+                        <p class="text-[#A1A1AA] font-medium">No comments for this episode yet.</p>
                         @guest
-                            <a href="{{ route('login') }}" class="text-[#E53E3E] hover:underline mt-2 inline-block text-sm">Log in to write a review</a>
+                            <a href="{{ route('login') }}" class="text-[#E53E3E] hover:underline mt-2 inline-block text-sm">Log in to write a comment</a>
                         @endguest
                     </div>
                     @endif
