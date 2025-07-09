@@ -58,21 +58,16 @@
         </div>
 
         <!-- Recent Activity -->
-        <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46]">
-            <div class="p-6 border-b border-[#3F3F46]">
-                <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono']">Recent Activity</h2>
-                <p class="text-[#A1A1AA] mt-1 font-['Inter']">Your latest reviews and interactions</p>
-            </div>
-            <div class="divide-y divide-[#3F3F46]">
+        <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] p-6">
+            <h2 class="text-2xl font-bold text-white mb-4 font-['Share_Tech_Mono']">Recent Activity</h2>
+            <p class="text-[#A1A1AA] mb-6 font-['Inter']">Your latest reviews and interactions</p>
+
+            <div class="space-y-2">
                 @forelse($recentActivity as $activity)
                     <x-dashboard.activity-item :activity="$activity" />
                 @empty
-                    <div class="p-6 text-center text-[#A1A1AA]">
-                        <svg class="w-12 h-12 mx-auto mb-4 text-[#3F3F46]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <p class="font-['Inter']">No recent activity yet.</p>
-                        <p class="text-sm mt-1 font-['Inter']">Start by writing your first review!</p>
+                    <div class="text-center py-8">
+                        <p class="text-[#A1A1AA]">No recent activity to show.</p>
                     </div>
                 @endforelse
             </div>

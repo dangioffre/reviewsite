@@ -122,8 +122,9 @@ class DashboardController extends Controller
     {
         $activities = collect();
         
-        // Add review activities
+        // Add review activities for products
         $recentReviews = $user->reviews()
+            ->whereNotNull('product_id') // Only product reviews
             ->with('product')
             ->orderBy('reviews.created_at', 'desc')
             ->limit(10)
@@ -146,6 +147,32 @@ class DashboardController extends Controller
             
         $activities = $activities->merge($recentReviews);
         
+        // Add comment activities for podcast episodes
+        $recentComments = $user->reviews()
+            ->whereNotNull('episode_id') // Only episode comments
+            ->with('episode.podcast')
+            ->orderBy('reviews.created_at', 'desc')
+            ->limit(10)
+            ->get()
+            ->map(function($comment) {
+                if (!$comment->episode || !$comment->episode->podcast) {
+                    return null; // Skip comments without an episode/podcast
+                }
+                return [
+                    'type' => 'comment',
+                    'action' => 'published',
+                    'title' => $comment->title,
+                    'product' => $comment->episode->podcast->name,
+                    'product_type' => 'Podcast',
+                    'episode_title' => $comment->episode->title,
+                    'rating' => $comment->rating,
+                    'created_at' => $comment->created_at,
+                    'url' => route('podcasts.episodes.show', [$comment->episode->podcast, $comment->episode])
+                ];
+            })->filter();
+            
+        $activities = $activities->merge($recentComments);
+
         // Add like activities (when others liked user's reviews)
         $recentLikes = $user->reviews()
             ->whereHas('likes', function($query) {
@@ -177,6 +204,51 @@ class DashboardController extends Controller
         return $activities->sortByDesc('created_at')->take(15);
     }
     
+    public function reviewsAndLikes(Request $request)
+    {
+        $user = Auth::user();
+        $filter = $request->input('filter', 'all');
+
+        $reviewsQuery = $user->reviews()
+            ->with(['product.genre', 'product.platform', 'episode.podcast'])
+            ->withCount('likes')
+            ->orderBy('created_at', 'desc');
+
+        $likesQuery = $user->likedReviews()
+            ->with(['product.genre', 'product.platform', 'episode.podcast', 'user'])
+            ->withCount('likes')
+            ->orderBy('pivot_created_at', 'desc');
+
+        if ($filter === 'reviews') {
+            $paginator = $reviewsQuery->paginate(10)->through(function ($review) {
+                return ['type' => 'review', 'data' => $review, 'date' => $review->created_at];
+            });
+        } elseif ($filter === 'likes') {
+            $paginator = $likesQuery->paginate(10)->through(function ($like) {
+                return ['type' => 'like', 'data' => $like, 'date' => $like->pivot->created_at];
+            });
+        } else {
+            $allReviews = $reviewsQuery->get()->map(function ($review) {
+                return ['type' => 'review', 'data' => $review, 'date' => $review->created_at];
+            });
+            $allLikes = $likesQuery->get()->map(function ($like) {
+                return ['type' => 'like', 'data' => $like, 'date' => $like->pivot->created_at];
+            });
+
+            $allItems = $allReviews->merge($allLikes)->sortByDesc('date');
+            
+            $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+                $allItems->forPage(\Illuminate\Pagination\Paginator::resolveCurrentPage(), 10),
+                $allItems->count(),
+                10,
+                \Illuminate\Pagination\Paginator::resolveCurrentPage(),
+                ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath()]
+            );
+        }
+
+        return view('dashboard.reviews-and-likes', compact('user', 'paginator', 'filter'));
+    }
+
     public function reviews()
     {
         $user = Auth::user();
@@ -306,68 +378,5 @@ class DashboardController extends Controller
             'favoriteGames', 
             'totalPlaytime'
         ));
-    }
-    
-    public function reviewsAndLikes(Request $request)
-    {
-        $user = Auth::user();
-        $filter = $request->get('filter', 'all'); // all, reviews, likes
-        
-        $reviews = collect();
-        $likedReviews = collect();
-        
-        if ($filter === 'all' || $filter === 'reviews') {
-            $reviews = $user->reviews()
-                ->with(['product.genre', 'product.platform'])
-                ->withCount('likes')
-                ->orderBy('reviews.created_at', 'desc')
-                ->get();
-        }
-        
-        if ($filter === 'all' || $filter === 'likes') {
-            $likedReviews = $user->likedReviews()
-                ->with(['product.genre', 'product.platform'])
-                ->orderBy('pivot_created_at', 'desc')
-                ->get();
-        }
-        
-        // Combine and sort by date
-        $combinedItems = collect();
-        
-        foreach ($reviews as $review) {
-            $combinedItems->push([
-                'type' => 'review',
-                'data' => $review,
-                'date' => $review->created_at,
-                'sort_date' => $review->created_at
-            ]);
-        }
-        
-        foreach ($likedReviews as $review) {
-            $combinedItems->push([
-                'type' => 'like',
-                'data' => $review,
-                'date' => $review->pivot->created_at,
-                'sort_date' => $review->pivot->created_at
-            ]);
-        }
-        
-        // Sort by date and paginate
-        $combinedItems = $combinedItems->sortByDesc('sort_date');
-        $perPage = 12;
-        $currentPage = $request->get('page', 1);
-        $offset = ($currentPage - 1) * $perPage;
-        $paginatedItems = $combinedItems->slice($offset, $perPage);
-        
-        // Create a custom paginator
-        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
-            $paginatedItems,
-            $combinedItems->count(),
-            $perPage,
-            $currentPage,
-            ['path' => $request->url(), 'query' => $request->query()]
-        );
-        
-        return view('dashboard.reviews-and-likes', compact('user', 'paginator', 'filter'));
     }
 } 
