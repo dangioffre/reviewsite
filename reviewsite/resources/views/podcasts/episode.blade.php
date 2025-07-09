@@ -1,6 +1,4 @@
-@extends('layouts.app')
-
-@section('content')
+<x-layouts.app>
 <div class="min-h-screen bg-[#18181B] text-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <!-- Breadcrumbs -->
@@ -253,5 +251,9 @@
     font-size: 12px;
     font-weight: 500;
 }
+.clean-audio-player::-webkit-media-controls-timeline,
+.clean-audio-player::-webkit-media-controls-volume-slider {
+    padding: 0 10px;
+}
 </style>
-@endsection 
+</x-layouts.app> 

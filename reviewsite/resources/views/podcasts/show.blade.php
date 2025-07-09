@@ -1,6 +1,4 @@
-@extends('layouts.app')
-
-@section('content')
+<x-layouts.app>
 <div class="min-h-screen bg-gradient-to-br from-[#1A1A1B] to-[#2D2D30] text-white py-12">
     <div class="max-w-7xl mx-auto px-4">
         <!-- Podcast Header -->
@@ -263,4 +261,4 @@
         </div>
     </div>
 </div>
-@endsection 
+</x-layouts.app> 

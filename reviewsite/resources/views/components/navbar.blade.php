@@ -59,10 +59,13 @@
 
                 <!-- Auth Section -->
                 @auth
-                    <!-- User Menu Dropdown -->
-                    <div class="relative" x-data="{ userMenu: false }">
-                        <button @click="userMenu = !userMenu" 
-                                class="flex items-center space-x-2 text-white hover:text-[#A1A1AA] transition-colors">
+                    <div class="flex items-center space-x-4">
+                        @livewire('notifications-bell')
+                        
+                        <!-- User Menu Dropdown -->
+                        <div class="relative" x-data="{ userMenu: false }">
+                            <button @click="userMenu = !userMenu" 
+                                    class="flex items-center space-x-2 text-white hover:text-[#A1A1AA] transition-colors">
                             <span class="hidden md:block text-sm">{{ auth()->user()->name }}</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -113,6 +116,7 @@
                     </form>
                         </div>
                     </div>
+                </div>
                 @else
                     <div class="flex items-center space-x-3">
                     <a href="{{ route('login') }}" 

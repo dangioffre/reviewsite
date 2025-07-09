@@ -10,6 +10,8 @@ use App\Http\Controllers\PodcastTeamController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use App\Models\User;
+use App\Notifications\NewPodcastComment;
 
 class ReviewController extends Controller
 {
@@ -364,6 +366,20 @@ class ReviewController extends Controller
         $review->is_published = true;
         // product_id is intentionally left null for episode reviews
         $review->save();
+
+        // Notify podcast owner
+        $podcastOwner = $podcast->owner;
+        if ($podcastOwner->id !== Auth::id()) { // Don't notify if commenter is the owner
+            // We pass all the data the notification needs so it doesn't have to touch the DB in the queue
+            $podcastOwner->notify(new NewPodcastComment(
+                $review->id,
+                $episode->title,
+                $episode->slug,
+                $podcast->slug,
+                Auth::user()->name,
+                Auth::id()
+            ));
+        }
 
         return redirect()->route('podcasts.episodes.show', [$podcast, $episode])
             ->with('success', 'Your episode review has been published successfully!');
