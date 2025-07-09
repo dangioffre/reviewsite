@@ -6,20 +6,8 @@
     <div class="w-2 rounded-l-xl {{ $isStaff ? 'bg-gradient-to-b from-[#E53E3E] to-[#DC2626]' : 'bg-gradient-to-b from-[#2563EB] to-[#1e40af]' }} mr-4"></div>
     <div class="bg-[#1A1A1B] rounded-xl p-6 border border-[#3F3F46] flex-1 flex flex-col">
         <div class="flex items-center gap-3 mb-2">
-            <div class="w-10 h-10 {{ $isStaff ? 'bg-gradient-to-r from-[#E53E3E] to-[#DC2626]' : 'bg-gradient-to-r from-[#2563EB] to-[#1e40af]' }} rounded-full flex items-center justify-center">
-                @if($isStaff)
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                    </svg>
-                @else
-                    <span class="text-white font-bold font-['Share_Tech_Mono']">{{ substr($review->user->name, 0, 1) }}</span>
-                @endif
-            </div>
-            <div>
-                <span class="text-white font-semibold font-['Inter']">{{ $review->user->name }}</span>
-                @if($isStaff)
-                    <span class="ml-2 px-2 py-0.5 bg-[#E53E3E] text-white text-xs rounded font-bold align-middle">STAFF</span>
-                @endif
+            <x-review-identity :review="$review" />
+            <div class="ml-auto">
                 <div class="text-[#A1A1AA] text-xs font-['Inter']">{{ $review->created_at->format('M d, Y') }}</div>
             </div>
         </div>

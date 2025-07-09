@@ -52,11 +52,8 @@
                             </h1>
                             
                             <div class="flex flex-wrap items-center gap-6 text-[#A1A1AA] mb-4">
-                                <div class="flex items-center bg-[#27272A]/80 backdrop-blur-sm rounded-full px-4 py-2 border border-[#3F3F46]">
-                                    <img src="{{ $review->user->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($review->user->name) . '&color=E53E3E&background=27272A' }}" 
-                                         alt="{{ $review->user->name }}" 
-                                         class="w-8 h-8 rounded-full mr-3">
-                                    <span class="font-['Inter'] text-white font-semibold">{{ $review->user->name }}</span>
+                                <div class="bg-[#27272A]/80 backdrop-blur-sm rounded-full px-4 py-2 border border-[#3F3F46]">
+                                    <x-review-identity :review="$review" :showEpisode="true" />
                                 </div>
                                 <div class="bg-[#27272A]/80 backdrop-blur-sm rounded-full px-4 py-2 border border-[#3F3F46]">
                                     <span class="font-['Inter'] text-white">{{ $review->created_at->format('M j, Y') }}</span>

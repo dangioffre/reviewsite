@@ -127,6 +127,35 @@
                             @enderror
                         </div>
                     </div>
+
+                    <!-- Podcast Selection -->
+                    @if($availablePodcasts->count() > 0)
+                    <div class="mt-6 p-4 border-t border-[#3F3F46]">
+                        <h3 class="text-lg font-semibold text-white mb-4 font-['Share_Tech_Mono']">Post as Podcast</h3>
+                        <div>
+                            <label for="podcast_id" class="block text-sm font-medium text-white mb-2 font-['Inter']">
+                                Review as Podcast (Optional)
+                            </label>
+                            <select id="podcast_id" 
+                                    name="podcast_id" 
+                                    class="w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-3 text-white focus:border-[#E53E3E] focus:ring-[#E53E3E] transition font-['Inter']">
+                                <option value="">Post as {{ Auth::user()->name }} (Personal Review)</option>
+                                @foreach($availablePodcasts as $podcast)
+                                    <option value="{{ $podcast->id }}" {{ old('podcast_id') == $podcast->id ? 'selected' : '' }}>
+                                        {{ $podcast->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <p class="mt-1 text-xs text-[#A1A1AA] font-['Inter']">
+                                Choose a podcast to post this review as. Your name will still be shown as the author.
+                            </p>
+                            @error('podcast_id')
+                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                    @endif
+                    </div>
                 </div>
 
                 <!-- Review Content -->

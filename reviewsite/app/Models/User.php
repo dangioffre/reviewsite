@@ -68,4 +68,46 @@ class User extends Authenticatable
     {
         return $this->hasMany(ListModel::class);
     }
+
+    public function podcasts()
+    {
+        return $this->hasMany(Podcast::class, 'owner_id');
+    }
+
+    public function podcastTeamMemberships()
+    {
+        return $this->hasMany(PodcastTeamMember::class);
+    }
+
+    public function activePodcastTeamMemberships()
+    {
+        return $this->podcastTeamMemberships()->whereNotNull('accepted_at');
+    }
+
+    public function pendingPodcastInvitations()
+    {
+        return $this->podcastTeamMemberships()->whereNull('accepted_at');
+    }
+
+    public function podcastReviews()
+    {
+        return $this->reviews()->whereNotNull('podcast_id');
+    }
+
+    public function canPostAsPodcast(Podcast $podcast)
+    {
+        return $podcast->userCanPostAsThisPodcast($this);
+    }
+
+    public function getAvailablePodcastsForReviews()
+    {
+        return $this->podcasts()
+            ->approved()
+            ->union(
+                Podcast::whereHas('activeTeamMembers', function ($query) {
+                    $query->where('user_id', $this->id);
+                })->approved()
+            )
+            ->get();
+    }
 }

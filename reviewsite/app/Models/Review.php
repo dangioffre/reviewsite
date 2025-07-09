@@ -13,6 +13,8 @@ class Review extends Model
     protected $fillable = [
         'product_id',
         'user_id',
+        'podcast_id',
+        'episode_id',
         'title',
         'slug',
         'content',
@@ -74,6 +76,23 @@ class Review extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function podcast()
+    {
+        return $this->belongsTo(Podcast::class);
+    }
+
+    public function episode()
+    {
+        return $this->belongsTo(Episode::class);
+    }
+
+    public function attachedToEpisodes()
+    {
+        return $this->belongsToMany(Episode::class, 'episode_review_attachments')
+                    ->withPivot('attached_by')
+                    ->withTimestamps();
+    }
+
     public function reports()
     {
         return $this->hasMany(Report::class);
@@ -92,6 +111,16 @@ class Review extends Model
     public function scopePublished($query)
     {
         return $query->where('is_published', true);
+    }
+
+    public function scopePodcast($query)
+    {
+        return $query->whereNotNull('podcast_id');
+    }
+
+    public function scopeNotPodcast($query)
+    {
+        return $query->whereNull('podcast_id');
     }
 
     public function getRouteKeyName()
@@ -139,5 +168,50 @@ class Review extends Model
     public function isLikedBy(User $user)
     {
         return $this->likes()->where('user_id', $user->id)->exists();
+    }
+
+    public function isPodcastReview()
+    {
+        return !is_null($this->podcast_id);
+    }
+
+    public function getAuthorDisplayNameAttribute()
+    {
+        if ($this->isPodcastReview()) {
+            $name = $this->user->name . ' (' . $this->podcast->name;
+            
+            if ($this->episode) {
+                $name .= ', ' . $this->episode->display_number;
+            }
+            
+            $name .= ')';
+            return $name;
+        }
+
+        return $this->user->name;
+    }
+
+    public function getReviewTypeAttribute()
+    {
+        if ($this->isPodcastReview()) {
+            return 'podcast';
+        }
+
+        return $this->is_staff_review ? 'staff' : 'user';
+    }
+
+    public function getReviewContextAttribute()
+    {
+        if ($this->isPodcastReview()) {
+            return [
+                'type' => 'podcast',
+                'podcast' => $this->podcast,
+                'episode' => $this->episode,
+            ];
+        }
+
+        return [
+            'type' => $this->is_staff_review ? 'staff' : 'user',
+        ];
     }
 }

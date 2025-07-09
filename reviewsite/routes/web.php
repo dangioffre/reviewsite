@@ -9,6 +9,7 @@ use App\Http\Controllers\TechController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PodcastController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -60,6 +61,41 @@ Route::post('/tech/{product}/{review}/like', [ReviewController::class, 'toggleLi
 // Tech Review Reports
 Route::get('/tech/{product}/{review}/report', [ReportController::class, 'show'])->name('tech.reviews.report.show');
 Route::post('/tech/{product}/{review}/report', [ReportController::class, 'store'])->name('tech.reviews.report.store');
+
+// Podcast Routes
+Route::get('/podcasts', [PodcastController::class, 'index'])->name('podcasts.index');
+Route::get('/podcasts/create', [PodcastController::class, 'create'])->name('podcasts.create');
+Route::post('/podcasts', [PodcastController::class, 'store'])->name('podcasts.store');
+Route::get('/podcasts/dashboard', [PodcastController::class, 'dashboard'])->name('podcasts.dashboard');
+Route::get('/podcasts/{podcast}/verify', [PodcastController::class, 'verify'])->name('podcasts.verify');
+Route::post('/podcasts/{podcast}/check-verification', [PodcastController::class, 'checkVerification'])->name('podcasts.check-verification');
+Route::post('/podcasts/{podcast}/sync-rss', [PodcastController::class, 'syncRss'])->name('podcasts.sync-rss');
+Route::get('/podcasts/{podcast}', [PodcastController::class, 'show'])->name('podcasts.show');
+Route::get('/podcasts/{podcast}/episodes/{episode}', [PodcastController::class, 'showEpisode'])->name('podcasts.episodes.show');
+
+// Episode Review Attachment Routes
+Route::post('/podcasts/{podcast}/episodes/{episode}/attach-review', [PodcastController::class, 'attachReview'])->name('podcasts.episodes.attach-review');
+Route::delete('/podcasts/{podcast}/episodes/{episode}/detach-review/{review}', [PodcastController::class, 'detachReview'])->name('podcasts.episodes.detach-review');
+
+// Episode Review Routes
+Route::get('/podcasts/{podcast}/episodes/{episode}/reviews/create', [ReviewController::class, 'createEpisodeReview'])->name('podcasts.episodes.reviews.create');
+Route::post('/podcasts/{podcast}/episodes/{episode}/reviews', [ReviewController::class, 'storeEpisodeReview'])->name('podcasts.episodes.reviews.store');
+Route::get('/podcasts/{podcast}/episodes/{episode}/reviews/{review}', [ReviewController::class, 'showEpisodeReview'])->name('podcasts.episodes.reviews.show');
+Route::get('/podcasts/{podcast}/episodes/{episode}/reviews/{review}/edit', [ReviewController::class, 'editEpisodeReview'])->name('podcasts.episodes.reviews.edit');
+Route::put('/podcasts/{podcast}/episodes/{episode}/reviews/{review}', [ReviewController::class, 'updateEpisodeReview'])->name('podcasts.episodes.reviews.update');
+Route::delete('/podcasts/{podcast}/episodes/{episode}/reviews/{review}', [ReviewController::class, 'destroyEpisodeReview'])->name('podcasts.episodes.reviews.destroy');
+
+// Podcast Team Management Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/podcasts/{podcast}/team/manage', [App\Http\Controllers\PodcastTeamController::class, 'manage'])->name('podcasts.team.manage');
+    Route::post('/podcasts/{podcast}/team/invite', [App\Http\Controllers\PodcastTeamController::class, 'invite'])->name('podcasts.team.invite');
+    Route::post('/podcasts/{podcast}/team/{teamMember}/accept', [App\Http\Controllers\PodcastTeamController::class, 'acceptInvitation'])->name('podcasts.team.accept');
+    Route::post('/podcasts/{podcast}/team/{teamMember}/decline', [App\Http\Controllers\PodcastTeamController::class, 'declineInvitation'])->name('podcasts.team.decline');
+    Route::delete('/podcasts/{podcast}/team/{teamMember}', [App\Http\Controllers\PodcastTeamController::class, 'removeMember'])->name('podcasts.team.remove');
+    Route::put('/podcasts/{podcast}/team/{teamMember}/permissions', [App\Http\Controllers\PodcastTeamController::class, 'updatePermissions'])->name('podcasts.team.permissions');
+    Route::post('/podcasts/{podcast}/team/leave', [App\Http\Controllers\PodcastTeamController::class, 'leaveTeam'])->name('podcasts.team.leave');
+    Route::get('/my-podcast-invitations', [App\Http\Controllers\PodcastTeamController::class, 'myInvitations'])->name('podcasts.invitations');
+});
 
 // Authentication Routes
 use Illuminate\Support\Facades\Auth;
