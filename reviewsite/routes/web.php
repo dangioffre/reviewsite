@@ -84,6 +84,7 @@ Route::get('/podcasts/{podcast}/episodes/{episode}/reviews/{review}', [ReviewCon
 Route::get('/podcasts/{podcast}/episodes/{episode}/reviews/{review}/edit', [ReviewController::class, 'editEpisodeReview'])->name('podcasts.episodes.reviews.edit');
 Route::put('/podcasts/{podcast}/episodes/{episode}/reviews/{review}', [ReviewController::class, 'updateEpisodeReview'])->name('podcasts.episodes.reviews.update');
 Route::delete('/podcasts/{podcast}/episodes/{episode}/reviews/{review}', [ReviewController::class, 'destroyEpisodeReview'])->name('podcasts.episodes.reviews.destroy');
+Route::post('/podcasts/{podcast}/episodes/{episode}/reviews/{review}/report', [ReportController::class, 'storeEpisodeReviewReport'])->name('podcasts.episodes.reviews.report.store');
 
 // Podcast Team Management Routes
 Route::middleware('auth')->group(function () {

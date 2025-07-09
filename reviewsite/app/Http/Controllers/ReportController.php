@@ -7,6 +7,8 @@ use App\Models\Review;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Podcast;
+use App\Models\Episode;
 
 class ReportController extends Controller
 {
@@ -53,6 +55,50 @@ class ReportController extends Controller
 
         $showRoute = $product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show';
         return redirect()->route($showRoute, [$product, $review])
+            ->with('success', 'Report submitted successfully. We will review it shortly.');
+    }
+
+    /**
+     * Store a new report for an episode review.
+     */
+    public function storeEpisodeReviewReport(Request $request, Podcast $podcast, Episode $episode, Review $review)
+    {
+        // Check if user is authenticated
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Please login to report a review.');
+        }
+
+        // Verify the review belongs to the episode
+        if ($review->episode_id !== $episode->id) {
+            abort(404);
+        }
+
+        // Check if user has already reported this review
+        $existingReport = Report::where('review_id', $review->id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if ($existingReport) {
+            return redirect()->route('podcasts.episodes.show', [$podcast, $episode])
+                ->with('error', 'You have already reported this review.');
+        }
+
+        // Validate the request
+        $request->validate([
+            'reason' => 'required|string|in:' . implode(',', array_keys(Report::getReasons())),
+            'additional_info' => 'nullable|string|max:1000',
+        ]);
+
+        // Create the report
+        Report::create([
+            'review_id' => $review->id,
+            'user_id' => Auth::id(),
+            'reason' => $request->reason,
+            'additional_info' => $request->additional_info,
+            'status' => 'pending',
+        ]);
+
+        return redirect()->route('podcasts.episodes.show', [$podcast, $episode])
             ->with('success', 'Report submitted successfully. We will review it shortly.');
     }
 

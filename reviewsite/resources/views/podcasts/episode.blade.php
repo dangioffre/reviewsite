@@ -49,6 +49,16 @@
                     </div>
                 </header>
 
+                <!-- Show Notes -->
+                @if($episode->show_notes)
+                <section class="bg-[#27272A] rounded-xl border border-[#3F3F46] p-8">
+                    <h2 class="text-xl font-bold mb-4">Show Notes</h2>
+                    <div class="prose prose-invert max-w-none prose-p:text-[#D4D4D8] prose-a:text-[#E53E3E] hover:prose-a:text-red-400 prose-strong:text-white">
+                        {!! $episode->show_notes !!}
+                    </div>
+                </section>
+                @endif
+
                 <!-- Audio Player -->
                 @if($episode->audio_url)
                 <section class="bg-[#27272A] rounded-xl border border-[#3F3F46] p-6">
@@ -66,25 +76,22 @@
                 </section>
                 @endif
                 
-                <!-- Show Notes -->
-                @if($episode->show_notes)
-                <section class="bg-[#27272A] rounded-xl border border-[#3F3F46] p-8">
-                    <h2 class="text-xl font-bold mb-4">Show Notes</h2>
-                    <div class="prose prose-invert max-w-none prose-p:text-[#D4D4D8] prose-a:text-[#E53E3E] hover:prose-a:text-red-400 prose-strong:text-white">
-                        {!! $episode->show_notes !!}
-                    </div>
-                </section>
-                @endif
-
                 <!-- Episode Reviews -->
                 <section id="episode-reviews">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-xl font-bold">Episode Reviews ({{ $episodeReviews->count() }})</h2>
-                        @auth
-                            @if($episode->canBeReviewedBy(auth()->user()) && !$episode->hasReviewFrom(auth()->user()))
-                                <a href="{{ route('podcasts.episodes.reviews.create', [$podcast, $episode]) }}" class="px-4 py-2 bg-[#E53E3E] text-white font-bold rounded-lg hover:bg-red-700 transition-colors text-sm">Write a Review</a>
-                            @endif
-                        @endauth
+                        <div>
+                            @guest
+                                <a href="{{ route('login') }}" class="px-4 py-2 bg-[#E53E3E] text-white font-bold rounded-lg hover:bg-red-700 transition-colors text-sm">Write a Review</a>
+                            @endguest
+                            @auth
+                                @if ($userReview)
+                                    <a href="{{ route('podcasts.episodes.reviews.edit', [$podcast, $episode, $userReview]) }}" class="px-4 py-2 bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors text-sm">Edit Your Review</a>
+                                @elseif($episode->canBeReviewedBy(auth()->user()))
+                                    <a href="{{ route('podcasts.episodes.reviews.create', [$podcast, $episode]) }}" class="px-4 py-2 bg-[#E53E3E] text-white font-bold rounded-lg hover:bg-red-700 transition-colors text-sm">Write a Review</a>
+                                @endif
+                            @endauth
+                        </div>
                     </div>
                     
                     @if($episodeReviews->count() > 0)
@@ -93,10 +100,15 @@
                         <article class="bg-[#27272A] rounded-xl border border-[#3F3F46] p-6 flex gap-4">
                             <img src="https://ui-avatars.com/api/?name={{ urlencode($review->user->name) }}&background=E53E3E&color=fff&bold=true" alt="{{ $review->user->name }}" class="w-10 h-10 rounded-full">
                             <div class="flex-1">
-                                <div class="flex justify-between items-center">
+                                <div class="flex justify-between items-start">
                                     <div>
                                         <span class="font-bold">{{ $review->user->name }}</span>
-                                        <p class="text-sm text-[#A1A1AA]">{{ $review->created_at->diffForHumans() }}</p>
+                                        <p class="text-sm text-[#A1A1AA]">
+                                            {{ $review->created_at->diffForHumans() }}
+                                            @if($review->created_at->ne($review->updated_at))
+                                                <span class="text-xs text-gray-500">(edited {{ $review->updated_at->diffForHumans() }})</span>
+                                            @endif
+                                        </p>
                                     </div>
                                     <div class="flex items-center gap-1 text-yellow-400 font-bold text-sm bg-yellow-400/10 border border-yellow-400/20 px-3 py-1 rounded-full">
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
@@ -104,6 +116,28 @@
                                     </div>
                                 </div>
                                 <p class="mt-4 text-[#D4D4D8]">{{ $review->content }}</p>
+
+                                <!-- Actions: Edit/Delete for owner, Report for others -->
+                                <div class="mt-4 flex items-center justify-end gap-4">
+                                    @if(Auth::id() == $review->user_id)
+                                        <a href="{{ route('podcasts.episodes.reviews.edit', [$podcast, $episode, $review]) }}" class="text-xs text-[#A1A1AA] hover:text-white transition-colors">Edit</a>
+                                        <form action="{{ route('podcasts.episodes.reviews.destroy', [$podcast, $episode, $review]) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this review?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-xs text-red-500 hover:text-red-400 transition-colors">Delete</button>
+                                        </form>
+                                    @else
+                                        @auth
+                                            <button class="text-xs text-gray-400 hover:text-white report-button" 
+                                                    data-report-url="{{ route('podcasts.episodes.reviews.report.store', [$podcast, $episode, $review]) }}">
+                                                Report
+                                            </button>
+                                        @endauth
+                                        @guest
+                                            <a href="{{ route('login') }}" class="text-xs text-gray-400 hover:text-white">Report</a>
+                                        @endguest
+                                    @endif
+                                </div>
                             </div>
                         </article>
                         @endforeach
@@ -134,10 +168,34 @@
                     </div>
                 </section>
                 
+                <!-- Attach Review (for Team) -->
+                @auth
+                    @if($podcast->userCanPostAsThisPodcast(Auth::user()) && $availableReviews->isNotEmpty())
+                    <section class="bg-[#27272A] rounded-xl border border-[#3F3F46] p-6">
+                        <h3 class="text-lg font-bold mb-4">Attach a Team Review</h3>
+                        <form action="{{ route('podcasts.episodes.attach-review', [$podcast, $episode]) }}" method="POST">
+                            @csrf
+                            <div class="space-y-4">
+                                <select name="review_id" class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-[#E53E3E] focus:border-[#E53E3E]">
+                                    <option value="">Select a review to attach...</option>
+                                    @foreach($availableReviews as $review)
+                                        <option value="{{ $review->id }}">{{ $review->product->name }} - "{{ $review->title }}" by {{ $review->user->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('review_id')
+                                    <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                                <button type="submit" class="w-full px-4 py-2 bg-[#E53E3E] text-white font-bold rounded-lg hover:bg-red-700 transition-colors">Attach Review</button>
+                            </div>
+                        </form>
+                    </section>
+                    @endif
+                @endauth
+
                 <!-- Attached Reviews -->
                 @if($attachedReviews->count() > 0)
                 <section>
-                    <h3 class="text-lg font-bold mb-4">Related Product Reviews</h3>
+                    <h3 class="text-lg font-bold mb-4">Reviews by {{ $podcast->name }}</h3>
                     <div class="space-y-4">
                         @foreach($attachedReviews as $review)
                         <a href="{{ route('games.reviews.show', ['product' => $review->product, 'review' => $review]) }}" class="block bg-[#27272A] rounded-xl border border-[#3F3F46] p-4 hover:border-[#E53E3E] transition-colors">
@@ -146,6 +204,7 @@
                                 <div class="flex-1">
                                     <p class="font-bold text-white leading-tight">{{ $review->product->name }}</p>
                                     <p class="text-sm text-[#A1A1AA]">{{ $review->title }}</p>
+                                    <p class="text-xs text-[#A1A1AA] mt-1">By {{ $review->user->name }}</p>
                                 </div>
                             </div>
                         </a>
@@ -157,7 +216,7 @@
                 <!-- More Episodes -->
                 @if($recentEpisodes->count() > 0)
                 <section>
-                    <h3 class="text-lg font-bold mb-4">More Episodes</h3>
+                    <h3 class="text-lg font-bold mb-4">More Episodes by {{ $podcast->name }}</h3>
                     <div class="space-y-3">
                         @foreach($recentEpisodes as $recentEpisode)
                             <a href="{{ route('podcasts.episodes.show', [$podcast, $recentEpisode]) }}" class="block bg-[#27272A] rounded-xl border border-[#3F3F46] p-4 hover:border-[#E53E3E] transition-colors">

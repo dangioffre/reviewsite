@@ -349,18 +349,20 @@ class RssVerificationService
      */
     private function parseDuration(string $duration): int
     {
+        // Check if duration is already in seconds (numeric)
+        if (is_numeric($duration)) {
+            return (int) $duration;
+        }
+
+        // Handle HH:MM:SS, MM:SS, or even SS format
         $parts = explode(':', $duration);
         $seconds = 0;
-        
-        if (count($parts) === 3) {
-            // HH:MM:SS
-            $seconds = ($parts[0] * 3600) + ($parts[1] * 60) + $parts[2];
-        } elseif (count($parts) === 2) {
-            // MM:SS
-            $seconds = ($parts[0] * 60) + $parts[1];
-        } else {
-            // Just seconds
-            $seconds = (int) $duration;
+        $multiplier = 1;
+
+        // Iterate backwards (from seconds to hours)
+        for ($i = count($parts) - 1; $i >= 0; $i--) {
+            $seconds += (int) $parts[$i] * $multiplier;
+            $multiplier *= 60;
         }
 
         return $seconds;

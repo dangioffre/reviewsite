@@ -439,18 +439,15 @@ class ReviewController extends Controller
         }
 
         $request->validate([
-            'title' => 'required|string|max:255',
             'content' => 'required|string',
             'rating' => 'required|integer|min:1|max:10',
         ]);
 
-        $review->title = $request->title;
         $review->content = $request->content;
         $review->rating = $request->rating;
         $review->save();
 
-        return redirect()->route('podcasts.episodes.show', [$podcast, $episode])
-            ->with('success', 'Your episode review has been updated successfully!');
+        return redirect()->route('podcasts.episodes.show', [$podcast, $episode])->with('success', 'Review updated successfully!');
     }
 
     /**

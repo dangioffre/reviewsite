@@ -193,6 +193,15 @@ class PodcastController extends Controller
         // Fetch product reviews that are attached to this episode
         $attachedReviews = $episode->attachedReviews()->with(['product', 'user'])->get();
 
+        // Get the current user's review for this episode, if it exists
+        $userReview = null;
+        if (Auth::check()) {
+            $userReview = Review::where('episode_id', $episode->id)
+                ->where('user_id', Auth::id())
+                ->whereNull('product_id')
+                ->first();
+        }
+
         // Get available reviews for attachment if user is team member
         $availableReviews = collect();
         if (Auth::check() && $podcast->userCanPostAsThisPodcast(Auth::user())) {
@@ -207,7 +216,7 @@ class PodcastController extends Controller
             ->limit(5)
             ->get();
 
-        return view('podcasts.episode', compact('podcast', 'episode', 'episodeReviews', 'attachedReviews', 'availableReviews', 'recentEpisodes'));
+        return view('podcasts.episode', compact('podcast', 'episode', 'episodeReviews', 'attachedReviews', 'availableReviews', 'recentEpisodes', 'userReview'));
     }
 
     /**
