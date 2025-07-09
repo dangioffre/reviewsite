@@ -114,7 +114,7 @@ class PodcastController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Verification successful! Your podcast has been verified and is now pending admin approval.',
-                'redirect' => route('podcasts.show', $podcast)
+                'redirect' => route('podcasts.dashboard')
             ]);
         }
 

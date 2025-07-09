@@ -140,7 +140,7 @@ class RssVerificationService
     public function validateRssFeed(string $rssUrl): array
     {
         try {
-            $response = Http::timeout(30)->get($rssUrl);
+            $response = Http::withoutVerifying()->timeout(30)->get($rssUrl);
             
             if (!$response->successful()) {
                 return [
@@ -195,7 +195,7 @@ class RssVerificationService
      */
     private function fetchRssContent(string $url): ?string
     {
-        $response = Http::timeout(30)->get($url);
+        $response = Http::withoutVerifying()->timeout(30)->get($url);
         
         return $response->successful() ? $response->body() : null;
     }
