@@ -15,7 +15,7 @@
             </div>
             <div>
                 <a href="{{ route('podcasts.create') }}" 
-                   class="bg-white text-[#E53E3E] font-bold py-4 px-8 rounded-lg font-['Inter'] hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-110 inline-block">
+                   class="bg-[#E53E3E] text-white font-bold py-4 px-8 rounded-lg font-['Inter'] hover:bg-[#DC2626] transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-110 inline-block">
                     Submit Your Podcast
                 </a>
             </div>
@@ -116,7 +116,7 @@
                     Be the first to submit a gaming podcast to our community!
                 </p>
                 <a href="{{ route('podcasts.create') }}" 
-                   class="bg-white text-[#E53E3E] font-bold py-3 px-8 rounded-lg font-['Inter'] hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-110 inline-block">
+                   class="bg-[#E53E3E] text-white font-bold py-3 px-8 rounded-lg font-['Inter'] hover:bg-[#DC2626] transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-110 inline-block">
                     Submit Your Podcast
                 </a>
             </div>

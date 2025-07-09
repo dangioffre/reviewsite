@@ -1,36 +1,37 @@
-@extends('layouts.app')
-
-@section('content')
-<div class="min-h-screen bg-gradient-to-br from-[#1A1A1B] to-[#2D2D30] text-white py-12">
-    <div class="max-w-7xl mx-auto px-4">
+<x-layouts.app>
+<div class="min-h-screen bg-[#151515]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Header -->
-        <div class="flex items-center justify-between mb-8">
-            <div>
-                <h1 class="text-4xl font-bold text-white font-['Share_Tech_Mono'] mb-2">
-                    Podcast Dashboard
-                </h1>
-                <p class="text-[#A1A1AA] font-['Inter']">
-                    Manage your podcasts and track their status
-                </p>
-            </div>
-            <div class="flex items-center space-x-4">
-                <a href="{{ route('podcasts.invitations') }}" 
-                   class="bg-[#6366F1] text-white font-bold py-3 px-6 rounded-lg font-['Inter'] hover:bg-[#5B21B6] transition-all duration-200 relative">
-                    @if($pendingInvitations->count() > 0)
-                        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
-                            {{ $pendingInvitations->count() }}
-                        </span>
-                    @endif
-                    Team Invitations
-                </a>
-                <a href="{{ route('podcasts.create') }}" 
-                   class="bg-[#E53E3E] text-white font-bold py-3 px-6 rounded-lg font-['Inter'] hover:bg-[#DC2626] transition-all duration-200">
-                    Submit New Podcast
-                </a>
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-4xl lg:text-6xl font-bold text-white mb-4 font-['Share_Tech_Mono'] leading-tight">Podcast Management</h1>
+                    <p class="text-[#A1A1AA] text-lg font-['Inter']">Manage your podcasts and track their status</p>
+                </div>
+                 <div class="flex items-center space-x-4">
+                    <a href="{{ route('podcasts.invitations') }}" 
+                       class="bg-[#6366F1] text-white font-bold py-3 px-6 rounded-lg font-['Inter'] hover:bg-[#5B21B6] transition-all duration-200 relative">
+                        @if($pendingInvitations->count() > 0)
+                            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
+                                {{ $pendingInvitations->count() }}
+                            </span>
+                        @endif
+                        Team Invitations
+                    </a>
+                    <a href="{{ route('podcasts.create') }}" 
+                       class="bg-[#E53E3E] text-white font-bold py-3 px-6 rounded-lg font-['Inter'] hover:bg-[#DC2626] transition-all duration-200">
+                        Submit New Podcast
+                    </a>
+                </div>
             </div>
         </div>
 
-        <!-- Owned Podcasts -->
+        <!-- Top Navigation -->
+        <div class="mb-8">
+            <x-dashboard.navigation />
+        </div>
+
+         <!-- Owned Podcasts -->
         <div class="mb-12">
             <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Your Podcasts</h2>
             
@@ -238,40 +239,6 @@
                 </div>
             </div>
         @endif
-
-        <!-- Quick Actions -->
-        <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] p-8">
-            <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Quick Actions</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <a href="{{ route('podcasts.create') }}" 
-                   class="bg-[#E53E3E] text-white p-6 rounded-lg hover:bg-[#DC2626] transition-colors text-center">
-                    <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    <h3 class="font-bold font-['Share_Tech_Mono']">Submit New Podcast</h3>
-                    <p class="text-sm opacity-90 font-['Inter']">Add another podcast to your collection</p>
-                </a>
-
-                <a href="{{ route('podcasts.index') }}" 
-                   class="bg-[#3F3F46] text-white p-6 rounded-lg hover:bg-[#374151] transition-colors text-center">
-                    <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
-                    </svg>
-                    <h3 class="font-bold font-['Share_Tech_Mono']">Browse Podcasts</h3>
-                    <p class="text-sm opacity-90 font-['Inter']">Discover other gaming podcasts</p>
-                </a>
-
-                <a href="{{ route('dashboard') }}" 
-                   class="bg-[#3F3F46] text-white p-6 rounded-lg hover:bg-[#374151] transition-colors text-center">
-                    <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
-                    <h3 class="font-bold font-['Share_Tech_Mono']">Main Dashboard</h3>
-                    <p class="text-sm opacity-90 font-['Inter']">View your reviews and activity</p>
-                </a>
-            </div>
-        </div>
     </div>
 </div>
-@endsection 
+</x-layouts.app> 

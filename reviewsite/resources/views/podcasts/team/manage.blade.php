@@ -13,9 +13,15 @@
                     Manage team members for {{ $podcast->name }}
                 </p>
             </div>
-            <div>
-                <a href="{{ route('podcasts.show', $podcast) }}" class="text-[#A1A1AA] hover:text-white transition-colors mr-6 font-['Inter']">View Podcast</a>
-                <a href="{{ route('podcasts.dashboard') }}" class="text-[#A1A1AA] hover:text-white transition-colors font-['Inter']">Back to Dashboard</a>
+            <div class="flex items-center space-x-4">
+                <a href="{{ route('podcasts.show', $podcast) }}" 
+                   class="bg-[#E53E3E] text-white font-bold py-3 px-6 rounded-lg font-['Inter'] hover:bg-[#DC2626] transition-all duration-200">
+                    View Podcast
+                </a>
+                <a href="{{ route('podcasts.dashboard') }}" 
+                   class="bg-[#6366F1] text-white font-bold py-3 px-6 rounded-lg font-['Inter'] hover:bg-[#5B21B6] transition-all duration-200">
+                    Back to Dashboard
+                </a>
             </div>
         </div>
 

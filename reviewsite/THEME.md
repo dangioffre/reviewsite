@@ -1,0 +1,73 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# ReviewSite: UI/Theme Guidelines (90s-Inspired)
+
+## Color Palette
+This palette is based on the "90s-inspired" concept, featuring a high-contrast dark theme with a bold red primary accent.
+
+### Base Colors
+- **Primary Background**: `#151515` (Near-black)
+- **Secondary Background**: `#141516` (Dark gray for cards/modals)
+- **Primary Text**: `#FFFFFF` (Pure white)
+- **Secondary Text**: `#A1A1AA` (Muted gray)
+
+### Accent Colors
+- **Primary Accent**: `#E53E3E` (Bold Red)
+- **Secondary Accent (Highlight)**: `#2563EB` (Vibrant Blue for focus/active states)
+- **Success**: `#4CAF50` (Green)
+- **Warning**: `#FFC107` (Yellow)
+- **Error**: `#E53E3E` (Uses the Primary Accent Red for consistency)
+
+### Borders
+- **Standard**: `#3F3F46` (A slightly lighter gray than the secondary background)
+- **Highlight**: `#2563EB` (Matches the secondary accent color)
+
+## Typography
+To capture the "modern layout, retro colors" feel, we'll pair a clean, modern font for body text with a mono-spaced, tech-inspired font for headings. Both are available from Google Fonts.
+
+### Fonts
+- **Primary (Headings)**: Share Tech Mono
+  - Regular (400)
+- **Secondary (Body Text)**: Inter
+  - Regular (400)
+  - Semi-bold (600)
+  - Bold (700)
+
+Body size font in all areas should be a minimum of 16px.
+
+## Components
+Here are the base Tailwind CSS classes for key components, using our new color palette.
+
+### Button Colors
+
+#### Primary Button
+- **Purpose**: Used for the main call-to-action on a page, such as "Submit," "View," or "Create."
+- **Color**: Red
+- **Class**: `bg-[#E53E3E] text-white font-bold py-3 px-6 rounded-lg font-['Inter'] hover:bg-[#DC2626] transition-all duration-200`
+
+#### Secondary Button
+- **Purpose**: Used for secondary actions, such as management tasks or navigating to related pages.
+- **Color**: Purple
+- **Class**: `bg-[#6366F1] text-white font-bold py-3 px-6 rounded-lg font-['Inter'] hover:bg-[#5B21B6] transition-all duration-200`
+
+#### Tertiary Button
+- **Purpose**: Used for less prominent actions, like "Sync RSS" or other utility functions.
+- **Color**: Gray
+- **Class**: `bg-[#27272A] text-white px-4 py-2 rounded-lg border border-[#3F3F46] hover:bg-[#374151] transition-colors font-['Inter'] text-sm`
+
+### Other Components
+- **Card**: `bg-[#27272A] rounded-lg shadow-md p-4`
+- **Form Input**: `w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-2.5 text-white placeholder-[#A1A1AA] focus:border-[#2563EB] focus:ring-[#2563EB]`
+
+... (We can continue defining other form elements as needed).
+
+## Action Bar
+Your `x-action-bar` component is an excellent idea and we will implement it. We'll adapt the hover colors to fit the new theme:
+
+- **edit**: Pencil icon, blue hover (`hover:bg-blue-500/30`).
+- **view**: Book icon, gray hover (`hover:bg-gray-500/30`).
+- **remove / delete**: Trash icon, red hover (`hover:bg-red-500/30`).
+- **add**: Plus icon, green hover (`hover:bg-green-500/30`). 

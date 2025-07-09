@@ -377,7 +377,7 @@ class PodcastController extends Controller
             ->with('podcast')
             ->get();
 
-        return view('podcasts.dashboard', compact('ownedPodcasts', 'teamMemberships', 'pendingInvitations'));
+        return view('dashboard.podcasts', compact('ownedPodcasts', 'teamMemberships', 'pendingInvitations'));
     }
 
     /**
