@@ -73,6 +73,9 @@ Route::post('/podcasts/{podcast}/sync-rss', [PodcastController::class, 'syncRss'
 Route::get('/podcasts/{podcast}', [PodcastController::class, 'show'])->name('podcasts.show');
 Route::get('/podcasts/{podcast}/episodes/{episode}', [PodcastController::class, 'showEpisode'])->name('podcasts.episodes.show');
 
+// Podcast Management
+Route::post('/podcasts/{podcast}/update-links', [PodcastController::class, 'updateLinks'])->name('podcasts.update-links');
+
 // Episode Review Attachment Routes
 Route::post('/podcasts/{podcast}/episodes/{episode}/attach-review', [PodcastController::class, 'attachReview'])->name('podcasts.episodes.attach-review');
 Route::delete('/podcasts/{podcast}/episodes/{episode}/detach-review/{review}', [PodcastController::class, 'detachReview'])->name('podcasts.episodes.detach-review');

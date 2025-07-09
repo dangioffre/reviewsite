@@ -220,6 +220,26 @@ class PodcastController extends Controller
     }
 
     /**
+     * Update podcast links
+     */
+    public function updateLinks(Request $request, Podcast $podcast)
+    {
+        if (!Auth::check() || Auth::id() !== $podcast->owner_id) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'links' => 'array',
+            'links.*.platform' => 'required|string|max:100',
+            'links.*.url' => 'required|url|max:500',
+        ]);
+
+        $podcast->update(['links' => $validated['links']]);
+
+        return back()->with('success', 'Podcast links updated successfully!');
+    }
+
+    /**
      * Attach a review to an episode
      */
     public function attachReview(Podcast $podcast, Episode $episode, Request $request)

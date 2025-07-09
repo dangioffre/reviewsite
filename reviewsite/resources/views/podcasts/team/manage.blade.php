@@ -137,6 +137,31 @@
                     </form>
                 </div>
 
+                <!-- Manage Podcast Links -->
+                <div class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg p-6">
+                    <h2 class="text-xl font-semibold mb-4 text-white">Manage Platform Links</h2>
+                    <form method="POST" action="{{ route('podcasts.update-links', $podcast) }}" id="links-form">
+                        @csrf
+                        <div id="links-container" class="space-y-4">
+                            @if(is_array($podcast->links))
+                                @foreach($podcast->links as $index => $link)
+                                <div class="flex items-center space-x-2 link-group">
+                                    <input type="text" name="links[{{ $index }}][platform]" value="{{ $link['platform'] ?? '' }}" placeholder="Platform (e.g., Spotify)" class="w-1/3 px-3 py-2 bg-[#27272A] border border-[#3F3F46] rounded-lg text-white placeholder-[#A1A1AA] focus:border-[#E53E3E] focus:ring-1 focus:ring-[#E53E3E] focus:outline-none">
+                                    <input type="url" name="links[{{ $index }}][url]" value="{{ $link['url'] ?? '' }}" placeholder="URL" class="flex-1 px-3 py-2 bg-[#27272A] border border-[#3F3F46] rounded-lg text-white placeholder-[#A1A1AA] focus:border-[#E53E3E] focus:ring-1 focus:ring-[#E53E3E] focus:outline-none">
+                                    <button type="button" class="text-red-500 hover:text-red-400 remove-link-btn">&times;</button>
+                                </div>
+                                @endforeach
+                            @endif
+                        </div>
+                        <button type="button" id="add-link-btn" class="mt-4 text-sm text-[#E53E3E] hover:underline">+ Add Link</button>
+                        <div class="pt-6">
+                            <button type="submit" class="w-full bg-[#E53E3E] text-white py-2 px-4 rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-[#E53E3E] focus:ring-offset-2 focus:ring-offset-[#1A1A1B] transition-colors">
+                                Save Links
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
                 <!-- Team Overview -->
                 <div class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg p-6">
                     <h2 class="text-xl font-semibold mb-4 text-white">Team Overview</h2>
@@ -332,6 +357,30 @@
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const linksContainer = document.getElementById('links-container');
+    const addLinkBtn = document.getElementById('add-link-btn');
+    let linkIndex = {{ is_array($podcast->links) ? count($podcast->links) : 0 }};
+
+    addLinkBtn.addEventListener('click', function () {
+        const newLinkGroup = document.createElement('div');
+        newLinkGroup.classList.add('flex', 'items-center', 'space-x-2', 'link-group');
+        newLinkGroup.innerHTML = `
+            <input type="text" name="links[${linkIndex}][platform]" placeholder="Platform (e.g., Spotify)" class="w-1/3 px-3 py-2 bg-[#27272A] border border-[#3F3F46] rounded-lg text-white placeholder-[#A1A1AA] focus:border-[#E53E3E] focus:ring-1 focus:ring-[#E53E3E] focus:outline-none">
+            <input type="url" name="links[${linkIndex}][url]" placeholder="URL" class="flex-1 px-3 py-2 bg-[#27272A] border border-[#3F3F46] rounded-lg text-white placeholder-[#A1A1AA] focus:border-[#E53E3E] focus:ring-1 focus:ring-[#E53E3E] focus:outline-none">
+            <button type="button" class="text-red-500 hover:text-red-400 remove-link-btn">&times;</button>
+        `;
+        linksContainer.appendChild(newLinkGroup);
+        linkIndex++;
+    });
+
+    linksContainer.addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove-link-btn')) {
+            e.target.closest('.link-group').remove();
+        }
+    });
+});
+
 function showPermissionsModal(memberId, userName, role, canAddGames, canDeleteGames, canPostReviews, canManageEpisodes) {
     document.getElementById('permissionsForm').action = `/podcasts/{{ $podcast->slug }}/team/${memberId}/permissions`;
     document.getElementById('modalRole').value = role;

@@ -112,7 +112,7 @@
                                         </a>
                                         <a href="{{ route('podcasts.team.manage', $podcast) }}" 
                                            class="bg-[#6366F1] text-white px-4 py-2 rounded-lg hover:bg-[#5B21B6] transition-colors font-['Inter'] text-sm">
-                                            Manage Team
+                                            Manage Podcast
                                         </a>
                                         <form action="{{ route('podcasts.sync-rss', $podcast) }}" method="POST" class="inline">
                                             @csrf

@@ -129,6 +129,9 @@ class DashboardController extends Controller
             ->limit(10)
             ->get()
             ->map(function($review) {
+                if (!$review->product) {
+                    return null; // Skip reviews without a product
+                }
                 return [
                     'type' => 'review',
                     'action' => $review->is_published ? 'published' : 'created',
@@ -139,7 +142,7 @@ class DashboardController extends Controller
                     'created_at' => $review->created_at,
                     'url' => route($review->product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show', [$review->product, $review])
                 ];
-            });
+            })->filter(); // Remove nulls from the collection;
             
         $activities = $activities->merge($recentReviews);
         
@@ -151,6 +154,9 @@ class DashboardController extends Controller
             ->with(['product', 'likes'])
             ->get()
             ->flatMap(function($review) {
+                if (!$review->product) {
+                    return []; // Skip reviews without a product
+                }
                 return $review->likes->map(function($like) use ($review) {
                     return [
                         'type' => 'like',

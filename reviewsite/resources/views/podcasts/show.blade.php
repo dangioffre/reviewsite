@@ -100,14 +100,16 @@
                     </div>
 
                     <!-- Social Links -->
-                    @if($podcast->links && count($podcast->links) > 0)
+                    @if(is_array($podcast->links) && count($podcast->links) > 0)
                         <div class="flex flex-wrap gap-3">
-                            @foreach($podcast->links as $platform => $url)
-                                <a href="{{ $url }}" 
-                                   target="_blank" 
-                                   class="bg-[#3F3F46] text-white px-4 py-2 rounded-lg hover:bg-[#E53E3E] transition-colors font-['Inter'] text-sm">
-                                    {{ ucfirst($platform) }}
-                                </a>
+                            @foreach($podcast->links as $link)
+                                @if(is_array($link) && isset($link['url']) && isset($link['platform']))
+                                    <a href="{{ $link['url'] }}" 
+                                       target="_blank" 
+                                       class="bg-[#3F3F46] text-white px-4 py-2 rounded-lg hover:bg-[#E53E3E] transition-colors font-['Inter'] text-sm">
+                                        {{ $link['platform'] }}
+                                    </a>
+                                @endif
                             @endforeach
                         </div>
                     @endif
