@@ -75,6 +75,7 @@ Route::get('/podcasts/{podcast}/episodes/{episode}', [PodcastController::class, 
 
 // Podcast Management
 Route::post('/podcasts/{podcast}/update-links', [PodcastController::class, 'updateLinks'])->name('podcasts.update-links');
+Route::delete('/podcasts/{podcast}', [PodcastController::class, 'destroy'])->name('podcasts.destroy');
 
 // Episode Review Attachment Routes
 Route::post('/podcasts/{podcast}/episodes/{episode}/attach-review', [PodcastController::class, 'attachReview'])->name('podcasts.episodes.attach-review');

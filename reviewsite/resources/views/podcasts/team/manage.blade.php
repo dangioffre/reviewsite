@@ -1,42 +1,28 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen bg-[#0A0A0A] text-white">
-    <div class="container mx-auto px-4 py-8">
-        <div class="max-w-6xl mx-auto">
-            <!-- Header -->
-            <div class="mb-8">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h1 class="text-3xl font-bold text-white">Team Management</h1>
-                        <p class="mt-2 text-[#A1A1AA]">Manage team members for {{ $podcast->name }}</p>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <a href="{{ route('podcasts.show', $podcast) }}" class="text-[#E53E3E] hover:text-red-400 transition-colors">
-                            View Podcast
-                        </a>
-                        <a href="{{ route('podcasts.dashboard') }}" class="text-[#A1A1AA] hover:text-white transition-colors">
-                            Back to Dashboard
-                        </a>
-                    </div>
-                </div>
+<div class="min-h-screen bg-gradient-to-br from-[#1A1A1B] to-[#2D2D30] text-white py-12">
+    <div class="max-w-7xl mx-auto px-4">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-4xl font-bold text-white font-['Share_Tech_Mono']">
+                    Podcast Management
+                </h1>
+                <p class="text-[#A1A1AA] font-['Inter']">
+                    Manage team members for {{ $podcast->name }}
+                </p>
             </div>
+            <div>
+                <a href="{{ route('podcasts.show', $podcast) }}" class="text-[#A1A1AA] hover:text-white transition-colors mr-6 font-['Inter']">View Podcast</a>
+                <a href="{{ route('podcasts.dashboard') }}" class="text-[#A1A1AA] hover:text-white transition-colors font-['Inter']">Back to Dashboard</a>
+            </div>
+        </div>
 
-            <!-- Flash Messages -->
-            @if (session('success'))
-                <div class="mb-6 bg-green-900 bg-opacity-20 border border-green-500 text-green-400 px-4 py-3 rounded-lg">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            @if (session('error'))
-                <div class="mb-6 bg-red-900 bg-opacity-20 border border-red-500 text-red-400 px-4 py-3 rounded-lg">
-                    {{ session('error') }}
-                </div>
-            @endif
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Invite New Member -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column: Team Management -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Invite New Team Member -->
                 <div class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg p-6">
                     <h2 class="text-xl font-semibold mb-4 text-white">Invite New Team Member</h2>
                     
@@ -153,17 +139,34 @@
                                 @endforeach
                             @endif
                         </div>
-                        <button type="button" id="add-link-btn" class="mt-4 text-sm text-[#E53E3E] hover:underline">+ Add Link</button>
+                        <button type="button" id="add-link-btn" class="text-sm text-[#6366F1] hover:text-[#4F46E5] font-semibold">+ Add Link</button>
                         <div class="pt-6">
-                            <button type="submit" class="w-full bg-[#E53E3E] text-white py-2 px-4 rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-[#E53E3E] focus:ring-offset-2 focus:ring-offset-[#1A1A1B] transition-colors">
-                                Save Links
-                            </button>
+                            <button type="submit" class="w-full bg-[#E53E3E] text-white font-bold py-3 rounded-lg hover:bg-[#DC2626] transition-colors">Save Links</button>
                         </div>
                     </form>
                 </div>
 
-                <!-- Team Overview -->
-                <div class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg p-6">
+                <!-- Danger Zone -->
+                <div class="bg-red-900/20 border border-red-700 rounded-lg p-6">
+                    <h2 class="text-xl font-semibold mb-4 text-red-400">Danger Zone</h2>
+                    <p class="text-red-300 mb-4">
+                        Deleting your podcast is a permanent action. All episodes, episode reviews, and team members will be removed. This cannot be undone.
+                    </p>
+                    <form method="POST" action="{{ route('podcasts.destroy', $podcast) }}">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" 
+                                class="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition-colors"
+                                onclick="return confirm('Are you absolutely sure you want to delete this podcast? This action is irreversible.')">
+                            Delete This Podcast
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Column: Team Overview -->
+            <div class="lg:col-span-1">
+                <div class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg p-6 sticky top-12">
                     <h2 class="text-xl font-semibold mb-4 text-white">Team Overview</h2>
                     
                     <div class="grid grid-cols-2 gap-4 mb-6">

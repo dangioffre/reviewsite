@@ -240,6 +240,39 @@ class PodcastController extends Controller
     }
 
     /**
+     * Delete a podcast and its related data.
+     */
+    public function destroy(Podcast $podcast)
+    {
+        // Ensure only the owner can delete the podcast
+        if (!Auth::check() || Auth::id() !== $podcast->owner_id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Get all episode IDs for the podcast
+        $episodeIds = $podcast->episodes()->pluck('id');
+
+        // Delete episode-specific reviews (reviews not tied to a product)
+        Review::whereIn('episode_id', $episodeIds)->whereNull('product_id')->delete();
+        
+        // Detach product reviews from episodes
+        $podcast->episodes()->with('attachedReviews')->get()->each(function ($episode) {
+            $episode->attachedReviews()->detach();
+        });
+
+        // Delete episodes
+        $podcast->episodes()->delete();
+
+        // Delete team members and invitations
+        $podcast->teamMembers()->delete();
+
+        // Finally, delete the podcast itself
+        $podcast->delete();
+
+        return redirect()->route('podcasts.dashboard')->with('success', 'Podcast has been successfully deleted.');
+    }
+
+    /**
      * Attach a review to an episode
      */
     public function attachReview(Podcast $podcast, Episode $episode, Request $request)
