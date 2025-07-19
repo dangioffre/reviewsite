@@ -3,7 +3,7 @@
 @section('title', 'Discover Streamers')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900">
+<div class="min-h-screen bg-[#151515]">
     <!-- Hero Section -->
     <div class="relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-red-600/20"></div>
