@@ -103,6 +103,14 @@ class StreamerProfile extends Model
     }
 
     /**
+     * Get the showcased games for this streamer profile.
+     */
+    public function showcasedGames(): HasMany
+    {
+        return $this->hasMany(StreamerShowcasedGame::class)->ordered();
+    }
+
+    /**
      * Get the user who verified this profile.
      */
     public function verifier(): BelongsTo

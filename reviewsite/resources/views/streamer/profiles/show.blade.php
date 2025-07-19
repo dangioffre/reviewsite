@@ -115,6 +115,9 @@
             <!-- Streaming Schedule -->
             <x-streamer.streaming-schedule :streamer-profile="$streamerProfile" />
 
+            <!-- Showcased Games -->
+            <x-streamer.showcased-games :streamer-profile="$streamerProfile" />
+
             <!-- Recent Reviews -->
             <x-streamer.recent-reviews :streamer-profile="$streamerProfile" />
             

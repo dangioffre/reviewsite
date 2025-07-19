@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -587,5 +588,18 @@ class StreamerProfileController extends Controller
         }
 
         return redirect()->back()->with('success', 'Manual live status override cleared. Using automatic detection.');
+    }
+
+    /**
+     * Show the game showcase management page for the streamer.
+     */
+    public function manageShowcase(StreamerProfile $streamerProfile): View
+    {
+        // Ensure the authenticated user owns this streamer profile
+        if (Auth::id() !== $streamerProfile->user_id) {
+            abort(403, 'Unauthorized access to streamer profile.');
+        }
+
+        return view('streamer.profiles.manage-showcase', compact('streamerProfile'));
     }
 }
