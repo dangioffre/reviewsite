@@ -49,6 +49,108 @@
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
         background: #52525B;
     }
+    
+    /* Modal Styling for Twitch Embed */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1050;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        outline: 0;
+    }
+    
+    .modal.show {
+        display: block !important;
+    }
+    
+    .modal-dialog {
+        position: relative;
+        width: auto;
+        margin: 1.75rem;
+        pointer-events: none;
+    }
+    
+    .modal-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        pointer-events: auto;
+        background: linear-gradient(135deg, #27272A 0%, #1A1A1B 100%);
+        border: 1px solid #3F3F46;
+        border-radius: 0.5rem;
+        outline: 0;
+    }
+    
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.5rem 1.5rem;
+        border-bottom: none;
+        border-top-left-radius: calc(0.5rem - 1px);
+        border-top-right-radius: calc(0.5rem - 1px);
+    }
+    
+    .modal-body {
+        position: relative;
+        flex: 1 1 auto;
+        padding: 0;
+    }
+    
+    .modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #3F3F46;
+        border-bottom-right-radius: calc(0.5rem - 1px);
+        border-bottom-left-radius: calc(0.5rem - 1px);
+    }
+    
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1040;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+    
+    .modal-backdrop.fade {
+        opacity: 0;
+    }
+    
+    .modal-backdrop.show {
+        opacity: 1;
+    }
+    
+    body.modal-open {
+        overflow: hidden;
+    }
+    
+    @media (min-width: 576px) {
+        .modal-dialog {
+            max-width: 500px;
+            margin: 1.75rem auto;
+        }
+    }
+    
+    @media (min-width: 992px) {
+        .modal-xl {
+            max-width: 1200px;
+        }
+    }
+    
+    /* Aspect ratio for video container */
+    .aspect-video {
+        aspect-ratio: 16 / 9;
+    }
 </style>
 @endpush
 
@@ -402,40 +504,93 @@
                         </h3>
                         
                         <div class="space-y-4">
-                            @foreach($streamerProfile->vods as $vod)
+                            @foreach($streamerProfile->vods->take(5) as $vod)
+                                @php
+                                    // Extract Twitch video ID or clip ID from URL for embed
+                                    $twitchVideoId = null;
+                                    $twitchClipId = null;
+                                    $twitchChannel = null;
+                                    $embedType = null;
+                                    $url = $vod->vod_url;
+                                    
+                                    // Handle different Twitch VOD URL formats
+                                    if (preg_match('/(?:www\.|m\.|go\.)?twitch\.tv\/videos\/(\d+)/', $url, $matches)) {
+                                        $twitchVideoId = $matches[1];
+                                        $embedType = 'video';
+                                    }
+                                    // Handle Twitch clip URLs
+                                    elseif (preg_match('/(?:www\.|m\.|go\.)?twitch\.tv\/([^\/]+)\/clip\/([^\/\?]+)/', $url, $matches)) {
+                                        $twitchChannel = $matches[1];
+                                        $twitchClipId = $matches[2];
+                                        $embedType = 'clip';
+                                    }
+                                    // Alternative clip URL format
+                                    elseif (preg_match('/clips\.twitch\.tv\/([^\/\?]+)/', $url, $matches)) {
+                                        $twitchClipId = $matches[1];
+                                        $embedType = 'clip';
+                                    }
+                                @endphp
+                                
                                 <div class="bg-[#1A1A1B] rounded-lg border border-[#3F3F46] overflow-hidden hover:border-[#52525B] transition-colors">
                                     @if($vod->thumbnail_url)
-                                        <div class="aspect-video">
+                                        <div class="aspect-video relative">
                                             <img src="{{ $vod->thumbnail_url }}" 
                                                  class="w-full h-full object-cover" 
                                                  alt="{{ $vod->title }}">
+                                            @if($vod->formatted_duration)
+                                                <div class="absolute bottom-2 right-2 bg-black/80 text-white px-2 py-1 rounded text-xs font-['Inter']">
+                                                    {{ $vod->formatted_duration }}
+                                                </div>
+                                            @endif
                                         </div>
                                     @endif
                                     <div class="p-4">
-                                        <h4 class="text-white font-bold mb-2 font-['Inter']">{{ Str::limit($vod->title, 60) }}</h4>
+                                        <h4 class="text-white font-bold mb-2 font-['Inter']">{{ Str::limit($vod->title, 50) }}</h4>
                                         @if($vod->description)
-                                            <p class="text-[#A1A1AA] text-sm mb-3 font-['Inter']">{{ Str::limit($vod->description, 80) }}</p>
+                                            <p class="text-[#A1A1AA] text-sm mb-3 font-['Inter']">{{ Str::limit($vod->description, 60) }}</p>
                                         @endif
-                                        <div class="flex justify-between items-center">
-                                            <div class="text-[#A1A1AA] text-sm font-['Inter']">
-                                                @if($vod->duration_seconds)
-                                                    <div class="flex items-center mb-1">
-                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                        </svg>
-                                                        {{ gmdate('H:i:s', $vod->duration_seconds) }}
-                                                    </div>
-                                                @endif
+                                        
+                                        <div class="flex items-center justify-between mb-3">
+                                            <div class="text-[#A1A1AA] text-xs font-['Inter']">
                                                 @if($vod->published_at)
-                                                    <div>{{ $vod->published_at->diffForHumans() }}</div>
+                                                    {{ $vod->published_at->diffForHumans() }}
                                                 @endif
                                             </div>
+                                            @if($vod->is_manual)
+                                                <span class="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs font-['Inter']">
+                                                    Manual
+                                                </span>
+                                            @else
+                                                <span class="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs font-['Inter']">
+                                                    Imported
+                                                </span>
+                                            @endif
+                                        </div>
+                                        
+                                        <div class="flex gap-2">
+                                            @if($embedType)
+                                                <button type="button" 
+                                                        class="flex-1 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-center text-xs font-['Inter'] watch-embed-btn"
+                                                        data-embed-type="{{ $embedType }}"
+                                                        data-vod-id="{{ $twitchVideoId }}" 
+                                                        data-clip-id="{{ $twitchClipId }}"
+                                                        data-channel="{{ $twitchChannel }}"
+                                                        data-vod-title="{{ $vod->title }}"
+                                                        data-original-url="{{ $vod->vod_url }}"
+                                                        title="Watch embedded Twitch {{ $embedType === 'clip' ? 'Clip' : 'VOD' }}">
+                                                    <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                                        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+                                                    </svg>
+                                                    Watch
+                                                </button>
+                                            @endif
+                                            
                                             <a href="{{ $vod->vod_url }}" target="_blank" 
-                                               class="px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors font-['Inter']">
-                                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                               class="flex-1 px-3 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors text-center text-xs font-['Inter']">
+                                                <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                                                 </svg>
-                                                Watch
+                                                External
                                             </a>
                                         </div>
                                     </div>
@@ -681,7 +836,167 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 300);
         }, 5000);
     }
+    
+    // Twitch Embed Modal functionality (same as in manage-vods page)
+    const twitchModal = document.getElementById('twitchEmbedModal');
+    if (twitchModal) {
+        const twitchEmbed = document.getElementById('twitchEmbed');
+        const vodTitleDisplay = document.getElementById('vodTitleDisplay');
+        const openTwitchLink = document.getElementById('openTwitchLink');
+        const watchEmbedButtons = document.querySelectorAll('.watch-embed-btn');
+        
+        // Open Twitch embed modal
+        watchEmbedButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const embedType = this.dataset.embedType;
+                const vodId = this.dataset.vodId;
+                const clipId = this.dataset.clipId;
+                const channel = this.dataset.channel;
+                const vodTitle = this.dataset.vodTitle;
+                const originalUrl = this.dataset.originalUrl;
+                
+                let embedUrl = '';
+                let twitchUrl = originalUrl;
+                
+                // Set up the embed URL based on type
+                if (embedType === 'video' && vodId) {
+                    embedUrl = `https://player.twitch.tv/?video=${vodId}&parent=${window.location.hostname}&autoplay=false`;
+                    twitchUrl = `https://www.twitch.tv/videos/${vodId}`;
+                } else if (embedType === 'clip' && clipId) {
+                    embedUrl = `https://clips.twitch.tv/embed?clip=${clipId}&parent=${window.location.hostname}&autoplay=false`;
+                    twitchUrl = originalUrl;
+                }
+                
+                // Set up the embed
+                twitchEmbed.src = embedUrl;
+                
+                // Update modal content
+                vodTitleDisplay.textContent = vodTitle;
+                openTwitchLink.href = twitchUrl;
+                
+                // Update modal title based on type
+                const modalTitle = document.querySelector('#twitchEmbedModalLabel');
+                modalTitle.textContent = embedType === 'clip' ? 'Watch Clip' : 'Watch VOD';
+                
+                // Show modal
+                twitchModal.style.display = 'block';
+                twitchModal.classList.add('show');
+                document.body.classList.add('modal-open');
+                
+                // Add backdrop
+                const backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade show';
+                backdrop.id = 'twitch-modal-backdrop';
+                document.body.appendChild(backdrop);
+                
+                // Close on backdrop click
+                backdrop.addEventListener('click', closeTwitchModal);
+            });
+        });
+        
+        // Close Twitch modal
+        function closeTwitchModal() {
+            twitchModal.style.display = 'none';
+            twitchModal.classList.remove('show');
+            document.body.classList.remove('modal-open');
+            
+            // Clear the iframe to stop playback
+            twitchEmbed.src = '';
+            
+            const backdrop = document.getElementById('twitch-modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+        }
+        
+        // Close buttons for Twitch modal
+        const twitchCloseButtons = twitchModal.querySelectorAll('[data-dismiss="modal"]');
+        twitchCloseButtons.forEach(button => {
+            button.addEventListener('click', closeTwitchModal);
+        });
+        
+        // Close Twitch modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && twitchModal.classList.contains('show')) {
+                closeTwitchModal();
+            }
+        });
+    }
 });
 </script>
 @endpush
+
+<!-- Twitch Embed Modal -->
+<div class="modal fade" id="twitchEmbedModal" tabindex="-1" role="dialog" aria-labelledby="twitchEmbedModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content border-0 shadow-2xl">
+            <!-- Modal Header -->
+            <div class="modal-header bg-gradient-to-r from-purple-600 to-purple-700 text-white">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mr-3">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h5 class="text-lg font-bold font-['Share_Tech_Mono'] mb-0" id="twitchEmbedModalLabel">
+                            Watch VOD
+                        </h5>
+                        <p class="text-purple-100 text-sm font-['Inter'] mb-0" id="vodTitleDisplay">
+                            Loading...
+                        </p>
+                    </div>
+                </div>
+                <button type="button" class="text-white hover:text-purple-200 transition-colors p-2 hover:bg-white/10 rounded-lg" data-dismiss="modal" aria-label="Close">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="modal-body p-0">
+                <div class="aspect-video bg-black">
+                    <iframe id="twitchEmbed" 
+                            src="" 
+                            height="100%" 
+                            width="100%" 
+                            allowfullscreen="true" 
+                            scrolling="no" 
+                            frameborder="0">
+                    </iframe>
+                </div>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="modal-footer bg-[#1A1A1B] border-t border-[#3F3F46] px-6 py-4">
+                <div class="flex items-center justify-between w-full">
+                    <div class="text-[#A1A1AA] text-sm font-['Inter']">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Embedded Twitch player - Full screen available
+                    </div>
+                    <div class="flex gap-3">
+                        <button type="button" 
+                                class="px-4 py-2 bg-[#3F3F46] text-white rounded-lg hover:bg-[#52525B] transition-colors font-['Inter']" 
+                                data-dismiss="modal">
+                            Close
+                        </button>
+                        <a id="openTwitchLink" 
+                           href="#" 
+                           target="_blank" 
+                           class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-['Inter']">
+                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                            Open on Twitch
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection

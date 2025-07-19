@@ -6,6 +6,7 @@
     .vod-card {
         transition: all 0.3s ease;
         background: linear-gradient(135deg, #27272A 0%, #1A1A1B 100%);
+        min-height: 400px;
     }
     
     .vod-card:hover {
@@ -127,6 +128,15 @@
         .modal-lg {
             max-width: 800px;
         }
+        
+        .modal-xl {
+            max-width: 1200px;
+        }
+    }
+    
+    /* Aspect ratio for video container */
+    .aspect-video {
+        aspect-ratio: 16 / 9;
     }
     
     /* Custom Form Styling */
@@ -210,15 +220,7 @@
                             Import from {{ ucfirst($streamerProfile->platform) }}
                         </button>
                     </form>
-                    <form method="POST" action="{{ route('streamer.profile.check-vod-health', $streamerProfile) }}" class="inline">
-                        @csrf
-                        <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-['Inter'] action-btn">
-                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                            </svg>
-                            Check Health
-                        </button>
-                    </form>
+
                 </div>
             </div>
         </div>
@@ -283,9 +285,9 @@
             @if($streamerProfile->vods->count() > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     @foreach($streamerProfile->vods as $vod)
-                        <div class="vod-card rounded-xl border border-[#3F3F46] overflow-hidden">
+                        <div class="vod-card rounded-xl border border-[#3F3F46] flex flex-col h-full">
                             <!-- Thumbnail -->
-                            <div class="vod-thumbnail aspect-video relative">
+                            <div class="vod-thumbnail aspect-video relative overflow-hidden rounded-t-xl">
                                 @if($vod->thumbnail_url)
                                     <img src="{{ $vod->thumbnail_url }}" 
                                          class="w-full h-full object-cover transition-transform duration-300" 
@@ -307,7 +309,7 @@
                             </div>
                             
                             <!-- Content -->
-                            <div class="p-4 flex flex-col h-full">
+                            <div class="p-4 flex flex-col flex-1">
                                 <h3 class="text-white font-bold text-sm mb-2 font-['Inter'] line-clamp-2">
                                     {{ $vod->title }}
                                 </h3>
@@ -322,36 +324,21 @@
                                 <div class="flex flex-wrap gap-2 mb-3">
                                     @if($vod->is_manual)
                                         <span class="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs font-['Inter']">
+                                            <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                            </svg>
                                             Manual
                                         </span>
                                     @else
                                         <span class="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs font-['Inter']">
+                                            <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                                            </svg>
                                             Imported
                                         </span>
                                     @endif
                                     
-                                    @if($vod->health_status === 'healthy')
-                                        <span class="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs font-['Inter']" title="VOD link is working">
-                                            <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                            </svg>
-                                            Healthy
-                                        </span>
-                                    @elseif($vod->health_status === 'unhealthy')
-                                        <span class="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs font-['Inter']" title="{{ $vod->health_check_error }}">
-                                            <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                            Broken
-                                        </span>
-                                    @else
-                                        <span class="px-2 py-1 bg-gray-500/20 text-gray-400 rounded text-xs font-['Inter']" title="Health status not checked yet">
-                                            <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                            Unchecked
-                                        </span>
-                                    @endif
+
                                 </div>
                                 
                                 @if($vod->published_at)
@@ -361,26 +348,84 @@
                                 @endif
                                 
                                 <!-- Actions -->
-                                <div class="mt-auto flex gap-2">
-                                    <a href="{{ $vod->vod_url }}" target="_blank" 
-                                       class="flex-1 px-3 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors text-center text-xs font-['Inter']">
-                                        <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                                        </svg>
-                                        View
-                                    </a>
-                                    <form method="POST" action="{{ route('streamer.profile.delete-vod', [$streamerProfile, $vod]) }}" 
-                                          class="flex-1" onsubmit="return confirm('Are you sure you want to delete this VOD?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" 
-                                                class="w-full px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-xs font-['Inter']">
+                                <div class="mt-auto space-y-2">
+                                    <div class="flex gap-2">
+                                        @php
+                                            // Extract Twitch video ID or clip ID from URL for embed
+                                            $twitchVideoId = null;
+                                            $twitchClipId = null;
+                                            $twitchChannel = null;
+                                            $embedType = null;
+                                            $url = $vod->vod_url;
+                                            
+                                            // Handle different Twitch VOD URL formats:
+                                            // https://www.twitch.tv/videos/1234567890
+                                            // https://twitch.tv/videos/1234567890
+                                            // https://m.twitch.tv/videos/1234567890
+                                            // https://go.twitch.tv/videos/1234567890
+                                            if (preg_match('/(?:www\.|m\.|go\.)?twitch\.tv\/videos\/(\d+)/', $url, $matches)) {
+                                                $twitchVideoId = $matches[1];
+                                                $embedType = 'video';
+                                            }
+                                            // Handle Twitch clip URLs:
+                                            // https://www.twitch.tv/username/clip/ClipSlug-RandomString
+                                            // https://clips.twitch.tv/ClipSlug-RandomString
+                                            elseif (preg_match('/(?:www\.|m\.|go\.)?twitch\.tv\/([^\/]+)\/clip\/([^\/\?]+)/', $url, $matches)) {
+                                                $twitchChannel = $matches[1];
+                                                $twitchClipId = $matches[2];
+                                                $embedType = 'clip';
+                                            }
+                                            // Alternative clip URL format
+                                            elseif (preg_match('/clips\.twitch\.tv\/([^\/\?]+)/', $url, $matches)) {
+                                                $twitchClipId = $matches[1];
+                                                $embedType = 'clip';
+                                            }
+                                        @endphp
+                                        
+                                        @if($embedType)
+                                            <button type="button" 
+                                                    class="flex-1 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-center text-xs font-['Inter'] watch-embed-btn"
+                                                    data-embed-type="{{ $embedType }}"
+                                                    data-vod-id="{{ $twitchVideoId }}" 
+                                                    data-clip-id="{{ $twitchClipId }}"
+                                                    data-channel="{{ $twitchChannel }}"
+                                                    data-vod-title="{{ $vod->title }}"
+                                                    data-original-url="{{ $vod->vod_url }}"
+                                                    title="Watch embedded Twitch {{ $embedType === 'clip' ? 'Clip' : 'VOD' }}">
+                                                <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+                                                </svg>
+                                                {{ $embedType === 'clip' ? 'Play Clip' : 'Watch' }}
+                                            </button>
+                                        @else
+                                            <!-- Debug: Show why embed isn't available -->
+                                            <div class="flex-1 px-3 py-2 bg-gray-600 text-gray-300 rounded-lg text-center text-xs font-['Inter'] opacity-50" 
+                                                 title="Embed not available - URL: {{ $vod->vod_url }}">
+                                                <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18 21l-2.636-2.636M6 6l2.636 2.636"></path>
+                                                </svg>
+                                                No Embed
+                                            </div>
+                                        @endif
+                                        
+                                        <a href="{{ $vod->vod_url }}" target="_blank" 
+                                           class="flex-1 px-3 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors text-center text-xs font-['Inter']">
                                             <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                                             </svg>
-                                            Delete
-                                        </button>
-                                    </form>
+                                            External
+                                        </a>
+                                    </div>
+                                    
+                                    <button type="button" 
+                                            class="w-full px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-xs font-['Inter'] delete-vod-btn"
+                                            data-vod-title="{{ $vod->title }}"
+                                            data-delete-url="{{ route('streamer.profile.delete-vod', [$streamerProfile, $vod]) }}">
+                                        <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                        Delete
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -492,6 +537,20 @@
                                     </svg>
                                 </div>
                             </div>
+                            <div class="mt-2 p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
+                                <div class="flex items-start">
+                                    <svg class="w-4 h-4 text-purple-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+                                    </svg>
+                                    <div class="text-purple-300 text-xs font-['Inter']">
+                                        <div class="font-semibold mb-1">Twitch VODs & Clips support embedded viewing!</div>
+                                        <div class="space-y-1">
+                                            <div>VODs: <code class="bg-purple-900/30 px-1 rounded">https://www.twitch.tv/videos/1234567890</code></div>
+                                            <div>Clips: <code class="bg-purple-900/30 px-1 rounded">https://www.twitch.tv/username/clip/ClipName-abc123</code></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             @error('vod_url')
                                 <div class="flex items-center mt-2 text-red-400 text-sm font-['Inter']">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -593,6 +652,163 @@
         </div>
     </div>
 </div>
+
+<!-- Twitch Embed Modal -->
+<div class="modal fade" id="twitchEmbedModal" tabindex="-1" role="dialog" aria-labelledby="twitchEmbedModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content border-0 shadow-2xl">
+            <!-- Modal Header -->
+            <div class="modal-header bg-gradient-to-r from-purple-600 to-purple-700 text-white">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mr-3">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h5 class="text-lg font-bold font-['Share_Tech_Mono'] mb-0" id="twitchEmbedModalLabel">
+                            Watch VOD
+                        </h5>
+                        <p class="text-purple-100 text-sm font-['Inter'] mb-0" id="vodTitleDisplay">
+                            Loading...
+                        </p>
+                    </div>
+                </div>
+                <button type="button" class="text-white hover:text-purple-200 transition-colors p-2 hover:bg-white/10 rounded-lg" data-dismiss="modal" aria-label="Close">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="modal-body p-0">
+                <div class="aspect-video bg-black">
+                    <iframe id="twitchEmbed" 
+                            src="" 
+                            height="100%" 
+                            width="100%" 
+                            allowfullscreen="true" 
+                            scrolling="no" 
+                            frameborder="0">
+                    </iframe>
+                </div>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="modal-footer bg-[#1A1A1B] border-t border-[#3F3F46] px-6 py-4">
+                <div class="flex items-center justify-between w-full">
+                    <div class="text-[#A1A1AA] text-sm font-['Inter']">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Embedded Twitch player - Full screen available
+                    </div>
+                    <div class="flex gap-3">
+                        <button type="button" 
+                                class="px-4 py-2 bg-[#3F3F46] text-white rounded-lg hover:bg-[#52525B] transition-colors font-['Inter']" 
+                                data-dismiss="modal">
+                            Close
+                        </button>
+                        <a id="openTwitchLink" 
+                           href="#" 
+                           target="_blank" 
+                           class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-['Inter']">
+                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                            Open on Twitch
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteVodModal" tabindex="-1" role="dialog" aria-labelledby="deleteVodModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content border-0 shadow-2xl">
+            <!-- Modal Header -->
+            <div class="modal-header bg-gradient-to-r from-red-600 to-red-700 text-white">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mr-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h5 class="text-lg font-bold font-['Share_Tech_Mono'] mb-0" id="deleteVodModalLabel">
+                            Delete VOD
+                        </h5>
+                        <p class="text-red-100 text-sm font-['Inter'] mb-0">
+                            This action cannot be undone
+                        </p>
+                    </div>
+                </div>
+                <button type="button" class="text-white hover:text-red-200 transition-colors p-2 hover:bg-white/10 rounded-lg" data-dismiss="modal" aria-label="Close">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="modal-body p-6">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-white mb-2 font-['Inter']">
+                            Are you sure you want to delete this VOD?
+                        </h3>
+                        <p class="text-[#A1A1AA] font-['Inter'] mb-4" id="deleteVodTitle">
+                            This VOD will be permanently removed from your collection.
+                        </p>
+                        <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-red-300 text-sm font-['Inter']">
+                                    This action cannot be undone. The VOD will be permanently deleted.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="modal-footer bg-[#1A1A1B] border-t border-[#3F3F46] px-6 py-4">
+                <div class="flex justify-end gap-3 w-full">
+                    <button type="button" 
+                            class="px-4 py-2 bg-[#3F3F46] text-white rounded-lg hover:bg-[#52525B] transition-colors font-['Inter']" 
+                            data-dismiss="modal">
+                        Cancel
+                    </button>
+                    <form id="deleteVodForm" method="POST" action="" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" 
+                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-['Inter']">
+                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Delete VOD
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -648,6 +864,143 @@ document.addEventListener('DOMContentLoaded', function() {
     @if($errors->any())
         modalButtons[0].click();
     @endif
+    
+    // Twitch Embed Modal functionality
+    const twitchModal = document.getElementById('twitchEmbedModal');
+    const twitchEmbed = document.getElementById('twitchEmbed');
+    const vodTitleDisplay = document.getElementById('vodTitleDisplay');
+    const openTwitchLink = document.getElementById('openTwitchLink');
+    const watchEmbedButtons = document.querySelectorAll('.watch-embed-btn');
+    
+    // Open Twitch embed modal
+    watchEmbedButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const embedType = this.dataset.embedType;
+            const vodId = this.dataset.vodId;
+            const clipId = this.dataset.clipId;
+            const channel = this.dataset.channel;
+            const vodTitle = this.dataset.vodTitle;
+            const originalUrl = this.dataset.originalUrl;
+            
+            let embedUrl = '';
+            let twitchUrl = originalUrl;
+            
+            // Set up the embed URL based on type
+            if (embedType === 'video' && vodId) {
+                embedUrl = `https://player.twitch.tv/?video=${vodId}&parent=${window.location.hostname}&autoplay=false`;
+                twitchUrl = `https://www.twitch.tv/videos/${vodId}`;
+            } else if (embedType === 'clip' && clipId) {
+                embedUrl = `https://clips.twitch.tv/embed?clip=${clipId}&parent=${window.location.hostname}&autoplay=false`;
+                twitchUrl = originalUrl;
+            }
+            
+            // Set up the embed
+            twitchEmbed.src = embedUrl;
+            
+            // Update modal content
+            vodTitleDisplay.textContent = vodTitle;
+            openTwitchLink.href = twitchUrl;
+            
+            // Update modal title based on type
+            const modalTitle = document.querySelector('#twitchEmbedModalLabel');
+            modalTitle.textContent = embedType === 'clip' ? 'Watch Clip' : 'Watch VOD';
+            
+            // Show modal
+            twitchModal.style.display = 'block';
+            twitchModal.classList.add('show');
+            document.body.classList.add('modal-open');
+            
+            // Add backdrop
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'twitch-modal-backdrop';
+            document.body.appendChild(backdrop);
+            
+            // Close on backdrop click
+            backdrop.addEventListener('click', closeTwitchModal);
+        });
+    });
+    
+    // Close Twitch modal
+    function closeTwitchModal() {
+        twitchModal.style.display = 'none';
+        twitchModal.classList.remove('show');
+        document.body.classList.remove('modal-open');
+        
+        // Clear the iframe to stop playback
+        twitchEmbed.src = '';
+        
+        const backdrop = document.getElementById('twitch-modal-backdrop');
+        if (backdrop) {
+            backdrop.remove();
+        }
+    }
+    
+    // Close buttons for Twitch modal
+    const twitchCloseButtons = twitchModal.querySelectorAll('[data-dismiss="modal"]');
+    twitchCloseButtons.forEach(button => {
+        button.addEventListener('click', closeTwitchModal);
+    });
+    
+    // Close Twitch modal on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && twitchModal.classList.contains('show')) {
+            closeTwitchModal();
+        }
+        if (e.key === 'Escape' && deleteModal.classList.contains('show')) {
+            closeDeleteModal();
+        }
+    });
+    
+    // Delete VOD Modal functionality
+    const deleteModal = document.getElementById('deleteVodModal');
+    const deleteVodForm = document.getElementById('deleteVodForm');
+    const deleteVodTitle = document.getElementById('deleteVodTitle');
+    const deleteVodButtons = document.querySelectorAll('.delete-vod-btn');
+    
+    // Open delete modal
+    deleteVodButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const vodTitle = this.dataset.vodTitle;
+            const deleteUrl = this.dataset.deleteUrl;
+            
+            // Update modal content
+            deleteVodTitle.textContent = `"${vodTitle}" will be permanently removed from your collection.`;
+            deleteVodForm.action = deleteUrl;
+            
+            // Show modal
+            deleteModal.style.display = 'block';
+            deleteModal.classList.add('show');
+            document.body.classList.add('modal-open');
+            
+            // Add backdrop
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'delete-modal-backdrop';
+            document.body.appendChild(backdrop);
+            
+            // Close on backdrop click
+            backdrop.addEventListener('click', closeDeleteModal);
+        });
+    });
+    
+    // Close delete modal
+    function closeDeleteModal() {
+        deleteModal.style.display = 'none';
+        deleteModal.classList.remove('show');
+        document.body.classList.remove('modal-open');
+        
+        const backdrop = document.getElementById('delete-modal-backdrop');
+        if (backdrop) {
+            backdrop.remove();
+        }
+    }
+    
+    // Close buttons for delete modal
+    const deleteCloseButtons = deleteModal.querySelectorAll('[data-dismiss="modal"]');
+    deleteCloseButtons.forEach(button => {
+        button.addEventListener('click', closeDeleteModal);
+    });
 });
 </script>
 @endpush
