@@ -159,6 +159,9 @@ Route::post('/streamers', [App\Http\Controllers\StreamerProfileController::class
 Route::get('/streamers/{streamerProfile}', [App\Http\Controllers\StreamerProfileController::class, 'show'])
     ->name('streamer.profile.show');
 
+Route::get('/streamers/{streamerProfile}/vods', [App\Http\Controllers\StreamerProfileController::class, 'showVods'])
+    ->name('streamer.profile.vods');
+
 Route::middleware('auth')->group(function () {
     Route::get('/streamers/{streamerProfile}/edit', [App\Http\Controllers\StreamerProfileController::class, 'edit'])
         ->name('streamer.profile.edit');

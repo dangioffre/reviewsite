@@ -289,6 +289,21 @@ class StreamerProfileController extends Controller
     }
 
     /**
+     * Display all VODs for the specified streamer profile.
+     */
+    public function showVods(StreamerProfile $streamerProfile): View
+    {
+        $streamerProfile->load([
+            'user',
+            'vods' => function($query) {
+                $query->orderBy('published_at', 'desc');
+            }
+        ]);
+
+        return view('streamer.profiles.vods', compact('streamerProfile'));
+    }
+
+    /**
      * Show the form for editing the specified streamer profile.
      */
     public function edit(StreamerProfile $streamerProfile): View

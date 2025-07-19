@@ -118,10 +118,8 @@
             <!-- Recent Reviews -->
             <x-streamer.recent-reviews :streamer-profile="$streamerProfile" />
             
-            <!-- Sidebar with Recent VODs -->
-            <div class="max-w-md mx-auto">
-                <x-streamer.recent-vods :streamer-profile="$streamerProfile" />
-            </div>
+            <!-- Recent VODs -->
+            <x-streamer.recent-vods :streamer-profile="$streamerProfile" />
         </div>
     </div>
 </div>
