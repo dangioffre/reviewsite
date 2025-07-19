@@ -34,6 +34,10 @@ class ReviewResource extends Resource
                     ->relationship('user', 'name')
                     ->searchable()
                     ->required(),
+                Forms\Components\Select::make('streamer_profile_id')
+                    ->relationship('streamerProfile', 'channel_name')
+                    ->searchable()
+                    ->helperText('Select if this review is posted by a streamer'),
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->maxLength(255),
@@ -81,6 +85,14 @@ class ReviewResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('streamerProfile.channel_name')
+                    ->label('Streamer Channel')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color('primary')
+                    ->icon('heroicon-o-video-camera')
+                    ->placeholder('Not a streamer review'),
                 Tables\Columns\TextColumn::make('rating')
                     ->sortable()
                     ->badge()
@@ -103,6 +115,19 @@ class ReviewResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('product')
                     ->relationship('product', 'name'),
+                Tables\Filters\SelectFilter::make('streamerProfile')
+                    ->relationship('streamerProfile', 'channel_name')
+                    ->label('Streamer Channel')
+                    ->searchable(),
+                Tables\Filters\TernaryFilter::make('is_streamer_review')
+                    ->label('Streamer Reviews')
+                    ->placeholder('All reviews')
+                    ->trueLabel('Streamer reviews only')
+                    ->falseLabel('Non-streamer reviews only')
+                    ->queries(
+                        true: fn (Builder $query) => $query->whereNotNull('streamer_profile_id'),
+                        false: fn (Builder $query) => $query->whereNull('streamer_profile_id'),
+                    ),
                 Tables\Filters\TernaryFilter::make('is_staff_review')
                     ->label('Staff Review'),
                 Tables\Filters\TernaryFilter::make('is_published')

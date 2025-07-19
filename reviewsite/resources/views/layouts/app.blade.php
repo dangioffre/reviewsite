@@ -115,6 +115,37 @@
         
         @stack('scripts')
         <script>
+            // Search Bar Component
+            function searchBar() {
+                return {
+                    query: '',
+                    suggestions: [],
+                    showSuggestions: false,
+                    
+                    async search() {
+                        if (this.query.length < 2) {
+                            this.suggestions = [];
+                            return;
+                        }
+                        
+                        try {
+                            const response = await fetch(`/api/search/suggestions?q=${encodeURIComponent(this.query)}`);
+                            this.suggestions = await response.json();
+                        } catch (error) {
+                            console.error('Search error:', error);
+                            this.suggestions = [];
+                        }
+                    },
+                    
+                    goToSearch() {
+                        if (this.query.trim()) {
+                            window.location.href = `/search?q=${encodeURIComponent(this.query.trim())}`;
+                        }
+                    }
+                }
+            }
+        </script>
+        <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const reportModal = document.getElementById('report-modal');
                 const reportForm = document.getElementById('report-form');

@@ -110,4 +110,26 @@ class User extends Authenticatable
             )
             ->get();
     }
+
+    public function streamerProfile()
+    {
+        return $this->hasOne(StreamerProfile::class);
+    }
+
+    public function followedStreamers()
+    {
+        return $this->belongsToMany(StreamerProfile::class, 'streamer_followers')
+                    ->withPivot('notification_preferences')
+                    ->withTimestamps();
+    }
+
+    public function isStreamer(): bool
+    {
+        return $this->streamerProfile !== null;
+    }
+
+    public function canCreateStreamerProfile(): bool
+    {
+        return $this->streamerProfile === null;
+    }
 }

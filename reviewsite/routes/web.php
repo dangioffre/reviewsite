@@ -103,6 +103,113 @@ Route::middleware('auth')->group(function () {
     Route::get('/my-podcast-invitations', [App\Http\Controllers\PodcastTeamController::class, 'myInvitations'])->name('podcasts.invitations');
 });
 
+// Streamer OAuth Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/auth/{platform}/redirect', [App\Http\Controllers\StreamerOAuthController::class, 'redirect'])
+        ->name('streamer.oauth.redirect')
+        ->where('platform', 'twitch|youtube|kick');
+    
+    Route::get('/auth/{platform}/callback', [App\Http\Controllers\StreamerOAuthController::class, 'callback'])
+        ->name('streamer.oauth.callback')
+        ->where('platform', 'twitch|youtube|kick');
+    
+    Route::delete('/auth/{platform}/disconnect', [App\Http\Controllers\StreamerOAuthController::class, 'disconnect'])
+        ->name('streamer.oauth.disconnect')
+        ->where('platform', 'twitch|youtube|kick');
+});
+
+// Test route for OAuth configuration (remove in production)
+Route::get('/test/streamer-oauth', [App\Http\Controllers\TestStreamerController::class, 'testOAuth'])
+    ->name('test.streamer.oauth');
+
+// Debug route for streamer profile ownership (remove in production)
+Route::get('/debug/streamer-profile/{streamerProfile}', function(\App\Models\StreamerProfile $streamerProfile) {
+    $currentUser = auth()->user();
+    
+    return response()->json([
+        'current_user_id' => $currentUser ? $currentUser->id : null,
+        'current_user_name' => $currentUser ? $currentUser->name : null,
+        'profile_user_id' => $streamerProfile->user_id,
+        'profile_owner_name' => $streamerProfile->user ? $streamerProfile->user->name : null,
+        'profile_channel_name' => $streamerProfile->channel_name,
+        'profile_platform' => $streamerProfile->platform,
+        'ownership_match' => $currentUser && $currentUser->id === $streamerProfile->user_id,
+        'is_approved' => $streamerProfile->is_approved,
+        'verification_status' => $streamerProfile->verification_status,
+        'can_request_verification' => $streamerProfile->canRequestVerification(),
+    ], 200, [], JSON_PRETTY_PRINT);
+})->middleware('auth')->name('debug.streamer.profile');
+
+// Streamer Profile Routes
+Route::get('/streamers', [App\Http\Controllers\StreamerProfileController::class, 'index'])
+    ->name('streamer.profiles.index');
+
+Route::get('/api/streamers/recommendations', [App\Http\Controllers\StreamerProfileController::class, 'recommendations'])
+    ->name('streamer.profiles.recommendations')
+    ->middleware('auth');
+
+Route::get('/streamers/create', [App\Http\Controllers\StreamerProfileController::class, 'create'])
+    ->name('streamer.profiles.create')
+    ->middleware('auth');
+
+Route::post('/streamers', [App\Http\Controllers\StreamerProfileController::class, 'store'])
+    ->name('streamer.profiles.store')
+    ->middleware('auth');
+
+Route::get('/streamers/{streamerProfile}', [App\Http\Controllers\StreamerProfileController::class, 'show'])
+    ->name('streamer.profile.show');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/streamers/{streamerProfile}/edit', [App\Http\Controllers\StreamerProfileController::class, 'edit'])
+        ->name('streamer.profile.edit');
+    
+    Route::put('/streamers/{streamerProfile}', [App\Http\Controllers\StreamerProfileController::class, 'update'])
+        ->name('streamer.profile.update');
+    
+    // Live Status Management Routes
+    Route::post('/streamers/{streamerProfile}/live-status', [App\Http\Controllers\StreamerProfileController::class, 'setLiveStatus'])
+        ->name('streamer.profile.set-live-status');
+    
+    Route::delete('/streamers/{streamerProfile}/live-status', [App\Http\Controllers\StreamerProfileController::class, 'clearLiveStatusOverride'])
+        ->name('streamer.profile.clear-live-status');
+    
+    // VOD Management Routes
+    Route::get('/streamers/{streamerProfile}/vods', [App\Http\Controllers\StreamerProfileController::class, 'manageVods'])
+        ->name('streamer.profile.manage-vods');
+    
+    Route::post('/streamers/{streamerProfile}/vods', [App\Http\Controllers\StreamerProfileController::class, 'addVod'])
+        ->name('streamer.profile.add-vod');
+    
+    Route::post('/streamers/{streamerProfile}/import-vods', [App\Http\Controllers\StreamerProfileController::class, 'importVods'])
+        ->name('streamer.profile.import-vods');
+    
+    Route::delete('/streamers/{streamerProfile}/vods/{vod}', [App\Http\Controllers\StreamerProfileController::class, 'deleteVod'])
+        ->name('streamer.profile.delete-vod');
+    
+    Route::post('/streamers/{streamerProfile}/check-vod-health', [App\Http\Controllers\StreamerProfileController::class, 'checkVodHealth'])
+        ->name('streamer.profile.check-vod-health');
+    
+    // Verification system removed - all OAuth-connected streamers are automatically verified
+});
+
+// Streamer Follow Routes
+Route::middleware('auth')->group(function () {
+    Route::post('/streamer/follow/{streamerProfile}', [App\Http\Controllers\StreamerFollowController::class, 'follow'])
+        ->name('streamer.follow');
+    
+    Route::delete('/streamer/follow/{streamerProfile}', [App\Http\Controllers\StreamerFollowController::class, 'unfollow'])
+        ->name('streamer.unfollow');
+    
+    Route::get('/streamer/follow/{streamerProfile}/status', [App\Http\Controllers\StreamerFollowController::class, 'status'])
+        ->name('streamer.follow.status');
+    
+    Route::patch('/streamer/follow/{streamerProfile}/preferences', [App\Http\Controllers\StreamerFollowController::class, 'updateNotificationPreferences'])
+        ->name('streamer.notification-preferences');
+    
+    Route::get('/following', [App\Http\Controllers\StreamerFollowController::class, 'followers'])
+        ->name('streamer.followers.index');
+});
+
 // Authentication Routes
 use Illuminate\Support\Facades\Auth;
 
@@ -355,6 +462,75 @@ Route::get('/api/search/users', function(Illuminate\Http\Request $request) {
     
     return response()->json($users);
 })->name('api.search.users');
+
+Route::get('/api/search/streamers', function(Illuminate\Http\Request $request) {
+    if (!$request->filled('q') || strlen($request->q) < 2) {
+        return response()->json([]);
+    }
+    
+    $streamers = \App\Models\StreamerProfile::approved()
+        ->whereRaw('LOWER(channel_name) LIKE ?', ['%' . strtolower($request->q) . '%'])
+        ->orWhereRaw('LOWER(bio) LIKE ?', ['%' . strtolower($request->q) . '%'])
+        ->with('user')
+        ->limit(10)
+        ->get()
+        ->map(function($streamer) {
+            return [
+                'id' => $streamer->id,
+                'channel_name' => $streamer->channel_name,
+                'platform' => $streamer->platform,
+                'bio' => $streamer->bio ? Str::limit($streamer->bio, 100) : null,
+                'profile_photo_url' => $streamer->profile_photo_url,
+                'is_live' => $streamer->isLive(),
+                'is_verified' => $streamer->is_verified,
+                'url' => route('streamer.profile.show', $streamer)
+            ];
+        });
+    
+    return response()->json($streamers);
+})->name('api.search.streamers');
+
+// Main Search Routes
+Route::get('/search', [App\Http\Controllers\SearchController::class, 'index'])->name('search.index');
+Route::get('/api/search/suggestions', [App\Http\Controllers\SearchController::class, 'suggestions'])->name('api.search.suggestions');
+
+Route::get('/api/search/streamer-reviews', function(Illuminate\Http\Request $request) {
+    if (!$request->filled('q') || strlen($request->q) < 2) {
+        return response()->json([]);
+    }
+    
+    $reviews = \App\Models\Review::whereNotNull('streamer_profile_id')
+        ->where('is_published', true)
+        ->where(function($query) use ($request) {
+            $query->whereRaw('LOWER(title) LIKE ?', ['%' . strtolower($request->q) . '%'])
+                  ->orWhereRaw('LOWER(content) LIKE ?', ['%' . strtolower($request->q) . '%']);
+        })
+        ->with(['streamerProfile', 'product', 'user'])
+        ->orderBy('created_at', 'desc')
+        ->limit(10)
+        ->get()
+        ->map(function($review) {
+            return [
+                'id' => $review->id,
+                'title' => $review->title,
+                'content' => Str::limit($review->content, 150),
+                'rating' => $review->rating,
+                'streamer_name' => $review->streamerProfile->channel_name,
+                'streamer_platform' => $review->streamerProfile->platform,
+                'product_name' => $review->product->name,
+                'product_type' => $review->product->type,
+                'author_display' => $review->user->name . ' (' . $review->streamerProfile->channel_name . ')',
+                'created_at' => $review->created_at->format('M j, Y'),
+                'url' => $review->product->type === 'game' 
+                    ? route('games.reviews.show', [$review->product, $review])
+                    : route('tech.reviews.show', [$review->product, $review]),
+                'streamer_url' => route('streamer.profile.show', $review->streamerProfile),
+                'category' => 'streamer_review'
+            ];
+        });
+    
+    return response()->json($reviews);
+})->name('api.search.streamer-reviews');
 
 Route::get('/lists/{slug}', function($slug, Illuminate\Http\Request $request) {
     $list = \App\Models\ListModel::where('slug', $slug)

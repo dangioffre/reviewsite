@@ -15,6 +15,7 @@ class Review extends Model
         'user_id',
         'podcast_id',
         'episode_id',
+        'streamer_profile_id',
         'title',
         'slug',
         'content',
@@ -86,6 +87,11 @@ class Review extends Model
         return $this->belongsTo(Episode::class);
     }
 
+    public function streamerProfile()
+    {
+        return $this->belongsTo(StreamerProfile::class);
+    }
+
     public function attachedToEpisodes()
     {
         return $this->belongsToMany(Episode::class, 'episode_review_attachments')
@@ -121,6 +127,16 @@ class Review extends Model
     public function scopeNotPodcast($query)
     {
         return $query->whereNull('podcast_id');
+    }
+
+    public function scopeStreamer($query)
+    {
+        return $query->whereNotNull('streamer_profile_id');
+    }
+
+    public function scopeNotStreamer($query)
+    {
+        return $query->whereNull('streamer_profile_id');
     }
 
     public function getRouteKeyName()
@@ -175,8 +191,17 @@ class Review extends Model
         return !is_null($this->podcast_id);
     }
 
+    public function isStreamerReview()
+    {
+        return !is_null($this->streamer_profile_id);
+    }
+
     public function getAuthorDisplayNameAttribute()
     {
+        if ($this->isStreamerReview()) {
+            return $this->user->name . ' (' . $this->streamerProfile->channel_name . ')';
+        }
+
         if ($this->isPodcastReview()) {
             $name = $this->user->name . ' (' . $this->podcast->name;
             
@@ -193,6 +218,10 @@ class Review extends Model
 
     public function getReviewTypeAttribute()
     {
+        if ($this->isStreamerReview()) {
+            return 'streamer';
+        }
+
         if ($this->isPodcastReview()) {
             return 'podcast';
         }
@@ -202,6 +231,13 @@ class Review extends Model
 
     public function getReviewContextAttribute()
     {
+        if ($this->isStreamerReview()) {
+            return [
+                'type' => 'streamer',
+                'streamer_profile' => $this->streamerProfile,
+            ];
+        }
+
         if ($this->isPodcastReview()) {
             return [
                 'type' => 'podcast',

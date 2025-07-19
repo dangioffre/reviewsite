@@ -68,8 +68,9 @@ class ReviewController extends Controller
         
         $hardware = Product::whereIn('type', ['hardware', 'accessory'])->get();
         $availablePodcasts = $this->getAvailablePodcasts();
+        $availableStreamerProfiles = $this->getAvailableStreamerProfiles();
         
-        return view('reviews.create', compact('product', 'hardware', 'availablePodcasts'));
+        return view('reviews.create', compact('product', 'hardware', 'availablePodcasts', 'availableStreamerProfiles'));
     }
 
     /**
@@ -94,6 +95,7 @@ class ReviewController extends Controller
             'negative_points' => 'nullable|string',
             'platform_played_on' => 'nullable|string',
             'podcast_id' => 'nullable|exists:podcasts,id',
+            'streamer_profile_id' => 'nullable|exists:streamer_profiles,id',
         ]);
 
         // Validate podcast permission if podcast_id is provided
@@ -102,6 +104,21 @@ class ReviewController extends Controller
             if (!$podcast || !$podcast->userCanPostAsThisPodcast(Auth::user())) {
                 return back()->withErrors([
                     'podcast_id' => 'You do not have permission to post reviews as this podcast.'
+                ])->withInput();
+            }
+        }
+
+        // Validate streamer profile permission if streamer_profile_id is provided
+        if ($request->streamer_profile_id) {
+            $streamerProfile = Auth::user()->streamerProfile()
+                ->where('id', $request->streamer_profile_id)
+                ->where('is_approved', true)
+                ->where('is_verified', true)
+                ->first();
+            
+            if (!$streamerProfile) {
+                return back()->withErrors([
+                    'streamer_profile_id' => 'You do not have permission to post reviews as this streamer profile.'
                 ])->withInput();
             }
         }
@@ -115,6 +132,7 @@ class ReviewController extends Controller
             $existingReview->negative_points = $request->negative_points ? array_filter(explode("\n", $request->negative_points)) : [];
             $existingReview->platform_played_on = $request->platform_played_on;
             $existingReview->podcast_id = $request->podcast_id;
+            $existingReview->streamer_profile_id = $request->streamer_profile_id;
             $existingReview->is_staff_review = Auth::user()->is_admin;
             $existingReview->is_published = true;
             $existingReview->save();
@@ -141,6 +159,7 @@ class ReviewController extends Controller
         $review->negative_points = $request->negative_points ? array_filter(explode("\n", $request->negative_points)) : [];
         $review->platform_played_on = $request->platform_played_on;
         $review->podcast_id = $request->podcast_id;
+        $review->streamer_profile_id = $request->streamer_profile_id;
         $review->is_staff_review = Auth::user()->is_admin;
         $review->is_published = true;
         $review->save();
@@ -168,8 +187,9 @@ class ReviewController extends Controller
         
         $hardware = Product::whereIn('type', ['hardware', 'accessory'])->get();
         $availablePodcasts = $this->getAvailablePodcasts();
+        $availableStreamerProfiles = $this->getAvailableStreamerProfiles();
         
-        return view('reviews.edit', compact('review', 'product', 'hardware', 'availablePodcasts'));
+        return view('reviews.edit', compact('review', 'product', 'hardware', 'availablePodcasts', 'availableStreamerProfiles'));
     }
 
     /**
@@ -195,6 +215,7 @@ class ReviewController extends Controller
             'negative_points' => 'nullable|string',
             'platform_played_on' => 'nullable|string',
             'podcast_id' => 'nullable|exists:podcasts,id',
+            'streamer_profile_id' => 'nullable|exists:streamer_profiles,id',
         ]);
 
         // Validate podcast permission if podcast_id is provided
@@ -207,6 +228,21 @@ class ReviewController extends Controller
             }
         }
 
+        // Validate streamer profile permission if streamer_profile_id is provided
+        if ($request->streamer_profile_id) {
+            $streamerProfile = Auth::user()->streamerProfile()
+                ->where('id', $request->streamer_profile_id)
+                ->where('is_approved', true)
+                ->where('is_verified', true)
+                ->first();
+            
+            if (!$streamerProfile) {
+                return back()->withErrors([
+                    'streamer_profile_id' => 'You do not have permission to post reviews as this streamer profile.'
+                ])->withInput();
+            }
+        }
+
         $review->title = $request->title;
         $review->content = $request->content;
         $review->rating = $request->rating;
@@ -214,6 +250,7 @@ class ReviewController extends Controller
         $review->negative_points = $request->negative_points ? array_filter(explode("\n", $request->negative_points)) : [];
         $review->platform_played_on = $request->platform_played_on;
         $review->podcast_id = $request->podcast_id;
+        $review->streamer_profile_id = $request->streamer_profile_id;
         $review->save();
 
         $showRoute = $product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show';
@@ -293,6 +330,23 @@ class ReviewController extends Controller
             ->get();
         
         return $availablePodcasts;
+    }
+
+    /**
+     * Get available streamer profiles for the current user to post reviews as
+     */
+    private function getAvailableStreamerProfiles()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return collect();
+        }
+
+        // Get approved and verified streamer profiles for the current user
+        return $user->streamerProfile()
+            ->where('is_approved', true)
+            ->where('is_verified', true)
+            ->get();
     }
 
     // Episode Review Methods

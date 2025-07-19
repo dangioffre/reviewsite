@@ -69,6 +69,9 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 \App\Filament\Widgets\StatsOverview::class,
+                \App\Filament\Widgets\StreamerStatsOverview::class,
+                \App\Filament\Widgets\StreamerRegistrationChart::class,
+                \App\Filament\Widgets\RecentStreamerActivity::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -89,6 +92,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make('Products'),
                 NavigationGroup::make('Content'),
                 NavigationGroup::make('Community'),
+                NavigationGroup::make('Streamers'),
                 NavigationGroup::make('Categories'),
                 NavigationGroup::make('Companies'),
             ]);

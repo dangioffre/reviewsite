@@ -41,12 +41,17 @@
                           {{ request()->routeIs('podcasts.*') ? 'text-white bg-[#E53E3E] bg-opacity-20' : '' }}">
                     Podcasts
                 </a>
+                <a href="{{ route('streamer.profiles.index') }}" 
+                   class="text-[#A1A1AA] hover:text-white transition-colors font-['Inter'] font-medium px-3 py-2 rounded-md text-sm
+                          {{ request()->routeIs('streamer.*') ? 'text-white bg-[#E53E3E] bg-opacity-20' : '' }}">
+                    Streamers
+                </a>
             </div>
 
             <!-- Right section: Search + Auth -->
             <div class="flex items-center space-x-4">
                 <!-- Search Bar -->
-                <div class="hidden lg:flex items-center bg-[#1A1A1B] border border-[#3F3F46] rounded-lg px-3 py-2 w-80 focus-within:border-[#2563EB] focus-within:ring-1 focus-within:ring-[#2563EB]">
+                <div class="hidden lg:flex items-center bg-[#1A1A1B] border border-[#3F3F46] rounded-lg px-3 py-2 w-80 focus-within:border-[#2563EB] focus-within:ring-1 focus-within:ring-[#2563EB] relative" x-data="searchBar()">
                     <svg class="w-4 h-4 text-[#A1A1AA] mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
@@ -54,7 +59,48 @@
                         type="text" 
                         placeholder="Search..." 
                         class="bg-transparent text-white placeholder-[#A1A1AA] focus:outline-none flex-1 text-sm"
+                        x-model="query"
+                        @input.debounce.300ms="search()"
+                        @keydown.enter="goToSearch()"
+                        @focus="showSuggestions = true"
+                        @click.away="showSuggestions = false"
                     >
+                    
+                    <!-- Search Suggestions Dropdown -->
+                    <div x-show="showSuggestions && suggestions.length > 0" 
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute top-full left-0 right-0 mt-1 bg-[#27272A] border border-[#3F3F46] rounded-lg shadow-lg py-2 z-50 max-h-80 overflow-y-auto">
+                        <template x-for="suggestion in suggestions" :key="suggestion.url">
+                            <a :href="suggestion.url" 
+                               class="block px-4 py-2 text-sm text-white hover:bg-[#3F3F46] transition-colors">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="font-medium" x-text="suggestion.title"></div>
+                                        <div class="text-xs text-[#A1A1AA]" x-text="suggestion.category"></div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <template x-if="suggestion.platform">
+                                            <span class="text-xs bg-[#3F3F46] px-2 py-1 rounded" x-text="suggestion.platform"></span>
+                                        </template>
+                                        <template x-if="suggestion.is_live">
+                                            <span class="text-xs bg-red-600 px-2 py-1 rounded">LIVE</span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </a>
+                        </template>
+                        <div class="border-t border-[#3F3F46] mt-2 pt-2">
+                            <button @click="goToSearch()" 
+                                    class="block w-full px-4 py-2 text-sm text-[#A1A1AA] hover:text-white hover:bg-[#3F3F46] transition-colors text-left">
+                                <span>See all results for "</span><span x-text="query"></span><span>"</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Auth Section -->
@@ -150,7 +196,7 @@
              class="lg:hidden border-t border-[#3F3F46]">
             <div class="px-4 pt-4 pb-6 space-y-2 bg-[#151515]">
                 <!-- Search Bar Mobile -->
-                <div class="mb-4">
+                <div class="mb-4" x-data="searchBar()">
                     <div class="flex items-center bg-[#1A1A1B] border border-[#3F3F46] rounded-lg px-3 py-2 focus-within:border-[#2563EB] focus-within:ring-1 focus-within:ring-[#2563EB]">
                         <svg class="w-4 h-4 text-[#A1A1AA] mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -159,6 +205,8 @@
                             type="text" 
                             placeholder="Search..." 
                             class="bg-transparent text-white placeholder-[#A1A1AA] focus:outline-none flex-1 text-sm"
+                            x-model="query"
+                            @keydown.enter="goToSearch()"
                         >
                     </div>
                 </div>
@@ -193,6 +241,11 @@
                    class="block px-3 py-2 text-[#A1A1AA] hover:text-white transition-colors font-['Inter'] font-medium rounded-md
                           {{ request()->routeIs('podcasts.*') ? 'text-white bg-[#E53E3E] bg-opacity-20' : '' }}">
                     🎧 Podcasts
+                </a>
+                <a href="{{ route('streamer.profiles.index') }}" 
+                   class="block px-3 py-2 text-[#A1A1AA] hover:text-white transition-colors font-['Inter'] font-medium rounded-md
+                          {{ request()->routeIs('streamer.*') ? 'text-white bg-[#E53E3E] bg-opacity-20' : '' }}">
+                    📺 Streamers
                 </a>
 
                 <!-- Mobile Auth Section -->

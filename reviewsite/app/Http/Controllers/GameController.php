@@ -80,16 +80,25 @@ class GameController extends Controller
     {
         $product->load(['genre', 'platform']);
         
-        // Separate staff and user reviews using Eloquent queries for better performance
+        // Separate staff, streamer, and user reviews using Eloquent queries for better performance
         $staffReviews = $product->reviews()
             ->where('is_staff_review', true)
             ->where('is_published', true)
             ->with('user')
             ->get();
             
+        $streamerReviews = $product->reviews()
+            ->where('is_staff_review', false)
+            ->where('is_published', true)
+            ->whereNotNull('streamer_profile_id')
+            ->with(['user', 'streamerProfile'])
+            ->orderByDesc('created_at')
+            ->get();
+            
         $userReviews = $product->reviews()
             ->where('is_staff_review', false)
             ->where('is_published', true)
+            ->whereNull('streamer_profile_id')
             ->with('user')
             ->orderByDesc('created_at')
             ->get();
@@ -108,7 +117,7 @@ class GameController extends Controller
             \Log::info('User rating for product ' . $product->id . ': ' . $userRating);
         }
         
-        return view('games.show', compact('product', 'staffReviews', 'userReviews', 'averageUserRating', 'userRating'));
+        return view('games.show', compact('product', 'staffReviews', 'streamerReviews', 'userReviews', 'averageUserRating', 'userRating'));
     }
 
     public function rate(Request $request, Product $product)

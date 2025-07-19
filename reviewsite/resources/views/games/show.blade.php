@@ -142,7 +142,7 @@
                                     :class="{ 'border-red-500 text-red-400': activeTab === 'reviews', 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500': activeTab !== 'reviews' }"
                                     class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none">
                                 Reviews
-                                @if(($reviewCount = $staffReviews->count() + $userReviews->count()) > 0)
+                                @if(($reviewCount = $staffReviews->count() + $streamerReviews->count() + $userReviews->count()) > 0)
                                     <span class="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">{{ $reviewCount }}</span>
                                 @endif
                             </button>
@@ -269,6 +269,45 @@
                                         <button @click="if(page > 1) page--" :disabled="page === 1" class="px-3 py-1 rounded bg-[#232326] text-[#A1A1AA] font-bold text-xs disabled:opacity-50">Prev</button>
                                         <span class="text-[#A1A1AA] font-bold text-xs">Page <span x-text="page"></span></span>
                                         <button @click="if(page < Math.ceil({{ $staffReviews->count() }} / perPage)) page++" :disabled="page === Math.ceil({{ $staffReviews->count() }} / perPage)" class="px-3 py-1 rounded bg-[#232326] text-[#A1A1AA] font-bold text-xs disabled:opacity-50">Next</button>
+                                    </div>
+                                </section>
+                                @endif
+                                @if($streamerReviews->count() > 0)
+                                <section x-data="{ view: 'grid', page: 1, perPage: 8 }" class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                                    <div class="flex items-center gap-4 mb-6">
+                                        <div class="w-12 h-12 bg-purple-600 bg-opacity-20 rounded-lg flex items-center justify-center">
+                                            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                            </svg>
+                                        </div>
+                                        <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono']">Reviews by Streamers</h2>
+                                        <div class="ml-auto flex gap-2">
+                                            <button @click="view = 'grid'" :class="view === 'grid' ? 'bg-purple-600 text-white' : 'bg-[#232326] text-[#A1A1AA]'" class="px-3 py-1 rounded font-bold text-xs transition">Grid</button>
+                                            <button @click="view = 'list'" :class="view === 'list' ? 'bg-purple-600 text-white' : 'bg-[#232326] text-[#A1A1AA]'" class="px-3 py-1 rounded font-bold text-xs transition">List</button>
+                                        </div>
+                                    </div>
+                                    <template x-if="view === 'grid'">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                                            @foreach($streamerReviews as $i => $review)
+                                                <template x-if="(page - 1) * perPage <= {{ $i }} && {{ $i }} < page * perPage">
+                                                    @include('partials.review_card', ['review' => $review, 'type' => 'streamer'])
+                                                </template>
+                                            @endforeach
+                                        </div>
+                                    </template>
+                                    <template x-if="view === 'list'">
+                                        <div class="space-y-6">
+                                            @foreach($streamerReviews as $i => $review)
+                                                <template x-if="(page - 1) * perPage <= {{ $i }} && {{ $i }} < page * perPage">
+                                                    @include('partials.review_card', ['review' => $review, 'type' => 'streamer'])
+                                                </template>
+                                            @endforeach
+                                        </div>
+                                    </template>
+                                    <div class="flex justify-center mt-6 gap-2">
+                                        <button @click="if(page > 1) page--" :disabled="page === 1" class="px-3 py-1 rounded bg-[#232326] text-[#A1A1AA] font-bold text-xs disabled:opacity-50">Prev</button>
+                                        <span class="text-[#A1A1AA] font-bold text-xs">Page <span x-text="page"></span></span>
+                                        <button @click="if(page < Math.ceil({{ $streamerReviews->count() }} / perPage)) page++" :disabled="page === Math.ceil({{ $streamerReviews->count() }} / perPage)" class="px-3 py-1 rounded bg-[#232326] text-[#A1A1AA] font-bold text-xs disabled:opacity-50">Next</button>
                                     </div>
                                 </section>
                                 @endif

@@ -35,4 +35,23 @@ return [
         ],
     ],
 
+    // Streaming Platform OAuth Configurations
+    'twitch' => [
+        'client_id' => env('TWITCH_CLIENT_ID'),
+        'client_secret' => env('TWITCH_CLIENT_SECRET'),
+        'redirect' => env('TWITCH_REDIRECT_URI', env('APP_URL').'/auth/twitch/callback'),
+    ],
+
+    'youtube' => [
+        'client_id' => env('YOUTUBE_CLIENT_ID'),
+        'client_secret' => env('YOUTUBE_CLIENT_SECRET'),
+        'redirect' => env('YOUTUBE_REDIRECT_URI', env('APP_URL').'/auth/youtube/callback'),
+    ],
+
+    'kick' => [
+        'client_id' => env('KICK_CLIENT_ID'),
+        'client_secret' => env('KICK_CLIENT_SECRET'),
+        'redirect' => env('KICK_REDIRECT_URI', env('APP_URL').'/auth/kick/callback'),
+    ],
+
 ];

@@ -55,5 +55,27 @@
                 <div class="ml-2 w-2 h-2 bg-[#2563EB] rounded-full"></div>
             @endif
         </a>
+
+        @if(auth()->user()->streamerProfile)
+            <a href="{{ route('streamer.profile.show', auth()->user()->streamerProfile) }}"
+               class="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors font-['Inter'] {{ request()->routeIs('streamer.profile.*') ? 'bg-[#2563EB]/20 text-[#2563EB] border border-[#2563EB]/30' : 'text-[#A1A1AA] hover:bg-[#3F3F46] hover:text-white' }}">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                <span class="font-medium">Streamer Profile</span>
+                @if(request()->routeIs('streamer.profile.*'))
+                    <div class="ml-2 w-2 h-2 bg-[#2563EB] rounded-full"></div>
+                @endif
+            </a>
+        @else
+            <a href="{{ route('streamer.profiles.create') }}"
+               class="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors font-['Inter'] bg-gradient-to-r from-[#7C3AED] to-[#A855F7] text-white hover:from-[#8B5CF6] hover:to-[#C084FC] border border-[#7C3AED]/30">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                <span class="font-medium">Create Streamer Profile</span>
+                <div class="ml-2 w-2 h-2 bg-white rounded-full animate-pulse"></div>
+            </a>
+        @endif
     </div>
 </nav> 
