@@ -1,5 +1,57 @@
 @extends('layouts.app')
 
+@push('styles')
+<style>
+    /* Enhanced hover effects for schedule cards */
+    .schedule-card {
+        transition: all 0.3s ease;
+    }
+    
+    .schedule-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.15);
+    }
+    
+    /* Review card hover effects */
+    .review-card {
+        transition: all 0.3s ease;
+    }
+    
+    .review-card:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Smooth animations for timezone converter */
+    .timezone-converter {
+        transition: all 0.2s ease;
+    }
+    
+    .timezone-converter:hover {
+        background-color: rgba(26, 26, 27, 0.8);
+    }
+    
+    /* Custom scrollbar for better aesthetics */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #27272A;
+        border-radius: 3px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #3F3F46;
+        border-radius: 3px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #52525B;
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="min-h-screen bg-[#151515] py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -139,49 +191,54 @@
                             Streaming Schedule
                         </h2>
                         
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            <div>
-                                <h3 class="text-lg font-bold text-white mb-4 font-['Inter']">Schedule</h3>
-                                <div class="space-y-4">
-                                    @foreach($streamerProfile->schedules->where('is_active', true) as $schedule)
-                                        <div class="bg-[#1A1A1B] rounded-lg border border-[#3F3F46] p-4">
-                                            <div class="flex justify-between items-center mb-2">
-                                                <span class="text-[#2563EB] font-bold font-['Inter']">
-                                                    {{ \Carbon\Carbon::create()->dayOfWeek($schedule->day_of_week)->format('l') }}
-                                                </span>
-                                                <span class="px-2 py-1 bg-[#3F3F46] text-[#A1A1AA] rounded text-xs font-['Inter']">
-                                                    {{ $schedule->timezone }}
-                                                </span>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            @foreach($streamerProfile->schedules->where('is_active', true) as $schedule)
+                                <div class="bg-[#1A1A1B] rounded-lg border border-[#3F3F46] p-4 hover:border-[#2563EB] schedule-card">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <span class="text-[#2563EB] font-bold text-lg font-['Inter']">
+                                            {{ \Carbon\Carbon::create()->dayOfWeek($schedule->day_of_week)->format('D') }}
+                                        </span>
+                                        <div class="text-right">
+                                            <div class="text-white font-bold font-['Inter'] text-sm">
+                                                {{ \Carbon\Carbon::parse($schedule->start_time)->format('g:i A') }}
                                             </div>
-                                            <div class="flex items-center text-white font-['Inter']">
-                                                <svg class="w-4 h-4 mr-2 text-[#A1A1AA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                </svg>
-                                                <span class="schedule-time" 
-                                                      data-start="{{ $schedule->start_time }}" 
-                                                      data-end="{{ $schedule->end_time }}" 
-                                                      data-timezone="{{ $schedule->timezone }}">
-                                                    {{ \Carbon\Carbon::parse($schedule->start_time)->format('g:i A') }} - 
-                                                    {{ \Carbon\Carbon::parse($schedule->end_time)->format('g:i A') }}
-                                                </span>
+                                            <div class="text-[#A1A1AA] text-xs font-['Inter']">
+                                                {{ $schedule->timezone }}
                                             </div>
-                                            @if($schedule->notes)
-                                                <div class="mt-2 text-[#A1A1AA] text-sm font-['Inter']">
-                                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                    </svg>
-                                                    {{ $schedule->notes }}
-                                                </div>
-                                            @endif
                                         </div>
-                                    @endforeach
+                                    </div>
+                                    
+                                    <div class="flex items-center text-[#A1A1AA] text-sm mb-2">
+                                        <svg class="w-3 h-3 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <span class="schedule-time" 
+                                              data-start="{{ $schedule->start_time }}" 
+                                              data-end="{{ $schedule->end_time }}" 
+                                              data-timezone="{{ $schedule->timezone }}">
+                                            {{ \Carbon\Carbon::parse($schedule->end_time)->format('g:i A') }} end
+                                        </span>
+                                    </div>
+                                    
+                                    @if($schedule->notes)
+                                        <div class="text-[#A1A1AA] text-xs font-['Inter'] mt-2 p-2 bg-[#27272A] rounded">
+                                            {{ Str::limit($schedule->notes, 50) }}
+                                        </div>
+                                    @endif
                                 </div>
-                            </div>
-                            <div>
-                                <h3 class="text-lg font-bold text-white mb-4 font-['Inter']">Your Timezone</h3>
-                                <div id="timezone-display" class="space-y-3">
-                                    <!-- Timezone conversions will be populated by JavaScript -->
-                                </div>
+                            @endforeach
+                        </div>
+                        
+                        <!-- Timezone Converter -->
+                        <div class="mt-6 p-4 bg-[#1A1A1B] rounded-lg border border-[#3F3F46] timezone-converter">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[#A1A1AA] text-sm font-['Inter']">
+                                    Times shown in streamer's timezone. 
+                                    <span class="text-[#2563EB] cursor-pointer hover:underline" onclick="convertToLocalTime()">
+                                        Convert to your timezone
+                                    </span>
+                                </span>
+                                <div id="user-timezone" class="text-xs text-[#A1A1AA] font-['Inter']"></div>
                             </div>
                         </div>
                     </div>
@@ -190,58 +247,75 @@
                 <!-- Recent Reviews -->
                 @if($streamerProfile->reviews->count() > 0)
                     <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] p-8">
-                        <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono'] flex items-center">
-                            <svg class="w-6 h-6 mr-3 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-                            </svg>
-                            Recent Reviews
-                        </h2>
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono'] flex items-center">
+                                <svg class="w-6 h-6 mr-3 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                                </svg>
+                                Recent Reviews
+                            </h2>
+                            @if($streamerProfile->reviews->count() >= 6)
+                                <a href="#" class="text-[#2563EB] hover:text-blue-400 text-sm font-['Inter'] transition-colors">
+                                    View All ({{ $streamerProfile->reviews->count() }})
+                                </a>
+                            @endif
+                        </div>
                         
-                        <div class="space-y-6">
-                            @foreach($streamerProfile->reviews as $review)
-                                <div class="bg-[#1A1A1B] rounded-xl border border-[#3F3F46] p-6 hover:border-[#52525B] transition-colors">
-                                    <div class="flex flex-col space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            @foreach($streamerProfile->reviews->take(6) as $review)
+                                <div class="bg-[#1A1A1B] rounded-lg border border-[#3F3F46] p-4 hover:border-[#52525B] review-card group">
+                                    <div class="space-y-3">
+                                        <!-- Product & Rating -->
                                         <div>
-                                            <h3 class="text-lg font-bold text-white mb-2 font-['Inter']">
-                                                <a href="{{ route($review->product->type === 'game' ? 'games.show' : 'tech.show', $review->product) }}" 
-                                                   class="hover:text-[#2563EB] transition-colors">
-                                                    {{ $review->product->name }}
+                                            <h3 class="text-white font-bold text-sm mb-1 font-['Inter'] group-hover:text-[#2563EB] transition-colors">
+                                                <a href="{{ route($review->product->type === 'game' ? 'games.show' : 'tech.show', $review->product) }}">
+                                                    {{ Str::limit($review->product->name, 25) }}
                                                 </a>
                                             </h3>
-                                            <h4 class="text-[#2563EB] font-bold font-['Inter']">{{ $review->title }}</h4>
-                                        </div>
-                                        
-                                        <div class="flex items-center space-x-4">
-                                            <div class="flex items-center">
-                                                @for($i = 1; $i <= 10; $i++)
-                                                    <svg class="w-4 h-4 {{ $i <= $review->rating ? 'text-yellow-400' : 'text-[#3F3F46]' }}" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                                                    </svg>
-                                                @endfor
-                                                <span class="ml-2 text-white font-bold font-['Inter']">{{ $review->rating }}/10</span>
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center">
+                                                    @for($i = 1; $i <= 5; $i++)
+                                                        <svg class="w-3 h-3 {{ $i <= ($review->rating / 2) ? 'text-yellow-400' : 'text-[#3F3F46]' }}" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                                        </svg>
+                                                    @endfor
+                                                </div>
+                                                <span class="text-yellow-400 font-bold text-sm font-['Inter']">{{ $review->rating }}/10</span>
                                             </div>
                                         </div>
                                         
-                                        <p class="text-[#A1A1AA] font-['Inter']">{{ Str::limit($review->content, 200) }}</p>
+                                        <!-- Review Title -->
+                                        <h4 class="text-[#2563EB] font-bold text-sm font-['Inter'] leading-tight">
+                                            {{ Str::limit($review->title, 40) }}
+                                        </h4>
                                         
-                                        <div class="flex items-center justify-between text-sm text-[#A1A1AA] font-['Inter']">
-                                            <span>
-                                                By {{ $review->user->name }} ({{ $streamerProfile->channel_name }})
-                                            </span>
+                                        <!-- Review Content -->
+                                        <p class="text-[#A1A1AA] text-xs font-['Inter'] leading-relaxed">
+                                            {{ Str::limit($review->content, 80) }}
+                                        </p>
+                                        
+                                        <!-- Meta Info -->
+                                        <div class="flex items-center justify-between text-xs text-[#A1A1AA] font-['Inter'] pt-2 border-t border-[#3F3F46]">
                                             <span>{{ $review->created_at->diffForHumans() }}</span>
+                                            <div class="flex items-center">
+                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                                </svg>
+                                                Review
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             @endforeach
-                            
-                            @if($streamerProfile->reviews->count() >= 5)
-                                <div class="text-center">
-                                    <button class="px-6 py-3 bg-[#3F3F46] text-white rounded-lg hover:bg-[#52525B] transition-colors font-['Inter']">
-                                        View All Reviews
-                                    </button>
-                                </div>
-                            @endif
                         </div>
+                        
+                        @if($streamerProfile->reviews->count() > 6)
+                            <div class="text-center mt-6">
+                                <button class="px-6 py-3 bg-[#3F3F46] text-white rounded-lg hover:bg-[#52525B] transition-colors font-['Inter'] text-sm">
+                                    Load More Reviews
+                                </button>
+                            </div>
+                        @endif
                     </div>
                 @endif
             </div>
@@ -386,37 +460,70 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Multi-timezone schedule display
-    const scheduleElements = document.querySelectorAll('.schedule-time');
-    const timezoneDisplay = document.getElementById('timezone-display');
+    // Initialize timezone display
+    initializeTimezoneDisplay();
     
-    if (scheduleElements.length > 0 && timezoneDisplay) {
-        const commonTimezones = [
-            { name: 'Eastern Time', tz: 'America/New_York' },
-            { name: 'Central Time', tz: 'America/Chicago' },
-            { name: 'Mountain Time', tz: 'America/Denver' },
-            { name: 'Pacific Time', tz: 'America/Los_Angeles' },
-            { name: 'UTC', tz: 'UTC' }
-        ];
-        
-        // Display timezone conversions
-        commonTimezones.forEach(tz => {
-            const tzDiv = document.createElement('div');
-            tzDiv.className = 'bg-[#1A1A1B] rounded-lg border border-[#3F3F46] p-3';
-            tzDiv.innerHTML = `<div class="text-white font-bold font-['Inter'] mb-2">${tz.name}</div>`;
-            
-            scheduleElements.forEach(element => {
-                const dayName = element.closest('.bg-\\[\\#1A1A1B\\]').querySelector('.text-\\[\\#2563EB\\]').textContent;
-                const startTime = element.dataset.start;
-                const endTime = element.dataset.end;
-                
-                // Simple time display (in a real app, use proper timezone conversion)
-                tzDiv.innerHTML += `<div class="text-[#A1A1AA] text-sm font-['Inter']">${dayName}: ${startTime} - ${endTime}</div>`;
-            });
-            
-            timezoneDisplay.appendChild(tzDiv);
-        });
+    function initializeTimezoneDisplay() {
+        const userTimezoneEl = document.getElementById('user-timezone');
+        if (userTimezoneEl) {
+            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            userTimezoneEl.textContent = `Your timezone: ${userTimezone}`;
+        }
     }
+    
+    // Global function for timezone conversion
+    window.convertToLocalTime = function() {
+        const scheduleElements = document.querySelectorAll('.schedule-time');
+        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        
+        scheduleElements.forEach(element => {
+            const startTime = element.dataset.start;
+            const endTime = element.dataset.end;
+            const streamerTimezone = element.dataset.timezone;
+            
+            try {
+                // Create date objects for today with the schedule times
+                const today = new Date();
+                const startDateTime = new Date(`${today.toDateString()} ${startTime}`);
+                const endDateTime = new Date(`${today.toDateString()} ${endTime}`);
+                
+                // Format times in user's timezone
+                const startLocal = startDateTime.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                    timeZone: userTimezone
+                });
+                
+                const endLocal = endDateTime.toLocaleTimeString('en-US', {
+                    hour: 'numeric', 
+                    minute: '2-digit',
+                    hour12: true,
+                    timeZone: userTimezone
+                });
+                
+                // Update the display
+                const parentCard = element.closest('.bg-\\[\\#1A1A1B\\]');
+                const startTimeEl = parentCard.querySelector('.text-white.font-bold');
+                const timezoneEl = parentCard.querySelector('.text-\\[\\#A1A1AA\\].text-xs');
+                
+                if (startTimeEl && timezoneEl) {
+                    startTimeEl.textContent = startLocal;
+                    timezoneEl.textContent = userTimezone;
+                    element.textContent = `${endLocal} end`;
+                }
+            } catch (error) {
+                console.error('Error converting timezone:', error);
+            }
+        });
+        
+        // Update the converter text
+        const converterText = document.querySelector('.text-\\[\\#2563EB\\].cursor-pointer');
+        if (converterText) {
+            converterText.textContent = 'Show original times';
+            converterText.onclick = function() { location.reload(); };
+        }
+    };
     
     // Follow button functionality
     const followBtn = document.getElementById('followBtn');
