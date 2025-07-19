@@ -217,8 +217,8 @@
                             <!-- Card Content -->
                             <div class="p-6">
                                 <!-- Streamer Name -->
-                                <h3 class="font-bold text-xl text-white mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-red-400 group-hover:bg-clip-text transition-all duration-300">
-                                    <a href="{{ route('streamer.profile.show', $profile) }}" class="hover:text-purple-400 transition-colors">
+                                <h3 class="font-bold text-xl text-white mb-3 group-hover:text-purple-400 transition-all duration-300">
+                                    <a href="{{ route('streamer.profile.show', $profile) }}" class="hover:text-purple-300 transition-colors">
                                         {{ $profile->channel_name }}
                                     </a>
                                 </h3>
