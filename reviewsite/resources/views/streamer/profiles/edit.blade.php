@@ -409,88 +409,143 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add/Remove Schedule functionality
     let scheduleIndex = {{ count($streamerProfile->schedules) }};
     
-    document.getElementById('add-schedule')?.addEventListener('click', function() {
-        const container = document.getElementById('schedules-container');
-        const newSchedule = document.createElement('div');
-        newSchedule.className = 'schedule-entry bg-[#1A1A1B] rounded-xl border border-[#3F3F46] p-6';
-        newSchedule.innerHTML = `
-            <div class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
-                <div>
-                    <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Day</label>
-                    <select name="schedules[${scheduleIndex}][day_of_week]" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 font-['Inter']">
-                        <option value="">Select Day</option>
-                        <option value="0">Sunday</option>
-                        <option value="1">Monday</option>
-                        <option value="2">Tuesday</option>
-                        <option value="3">Wednesday</option>
-                        <option value="4">Thursday</option>
-                        <option value="5">Friday</option>
-                        <option value="6">Saturday</option>
-                    </select>
+    document.getElementById('add-schedule')?.addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent any form submission
+        e.stopPropagation(); // Stop event bubbling
+        
+        try {
+            const container = document.getElementById('schedules-container');
+            if (!container) {
+                console.error('Schedules container not found');
+                return;
+            }
+            
+            const newSchedule = document.createElement('div');
+            newSchedule.className = 'schedule-entry bg-[#1A1A1B] rounded-xl border border-[#3F3F46] p-6';
+            newSchedule.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Day</label>
+                        <select name="schedules[${scheduleIndex}][day_of_week]" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 font-['Inter']">
+                            <option value="">Select Day</option>
+                            <option value="0">Sunday</option>
+                            <option value="1">Monday</option>
+                            <option value="2">Tuesday</option>
+                            <option value="3">Wednesday</option>
+                            <option value="4">Thursday</option>
+                            <option value="5">Friday</option>
+                            <option value="6">Saturday</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Start</label>
+                        <input type="time" name="schedules[${scheduleIndex}][start_time]" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 font-['Inter']">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2 font-['Inter']">End</label>
+                        <input type="time" name="schedules[${scheduleIndex}][end_time]" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 font-['Inter']">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Timezone</label>
+                        <select name="schedules[${scheduleIndex}][timezone]" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 font-['Inter']">
+                            <option value="America/New_York">Eastern</option>
+                            <option value="America/Chicago">Central</option>
+                            <option value="America/Denver">Mountain</option>
+                            <option value="America/Los_Angeles">Pacific</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Notes</label>
+                        <input type="text" name="schedules[${scheduleIndex}][notes]" maxlength="255" placeholder="Optional" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 placeholder-[#A1A1AA] font-['Inter']">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="button" class="remove-schedule w-full px-3 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors font-['Inter']">Remove</button>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Start</label>
-                    <input type="time" name="schedules[${scheduleIndex}][start_time]" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 font-['Inter']">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-white mb-2 font-['Inter']">End</label>
-                    <input type="time" name="schedules[${scheduleIndex}][end_time]" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 font-['Inter']">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Timezone</label>
-                    <select name="schedules[${scheduleIndex}][timezone]" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 font-['Inter']">
-                        <option value="America/New_York">Eastern</option>
-                        <option value="America/Chicago">Central</option>
-                        <option value="America/Denver">Mountain</option>
-                        <option value="America/Los_Angeles">Pacific</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Notes</label>
-                    <input type="text" name="schedules[${scheduleIndex}][notes]" maxlength="255" placeholder="Optional" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 placeholder-[#A1A1AA] font-['Inter']">
-                </div>
-                <div class="flex items-end">
-                    <button type="button" class="remove-schedule w-full px-3 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors font-['Inter']">Remove</button>
-                </div>
-            </div>
-        `;
-        container.appendChild(newSchedule);
-        scheduleIndex++;
+            `;
+            container.appendChild(newSchedule);
+            scheduleIndex++;
+            
+            console.log('Schedule added successfully, new index:', scheduleIndex);
+        } catch (error) {
+            console.error('Error adding schedule:', error);
+            showNotification('Failed to add schedule. Please try again.', 'error');
+        }
     });
 
     // Add/Remove Social Link functionality
     let socialLinkIndex = {{ count($streamerProfile->socialLinks) }};
     
-    document.getElementById('add-social-link')?.addEventListener('click', function() {
-        const container = document.getElementById('social-links-container');
-        const newLink = document.createElement('div');
-        newLink.className = 'social-link-entry bg-[#1A1A1B] rounded-xl border border-[#3F3F46] p-6';
-        newLink.innerHTML = `
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Platform</label>
-                    <input type="text" name="social_links[${socialLinkIndex}][platform]" maxlength="50" placeholder="twitter" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 placeholder-[#A1A1AA] font-['Inter']">
+    document.getElementById('add-social-link')?.addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent any form submission
+        e.stopPropagation(); // Stop event bubbling
+        
+        try {
+            const container = document.getElementById('social-links-container');
+            if (!container) {
+                console.error('Social links container not found');
+                return;
+            }
+            
+            const newLink = document.createElement('div');
+            newLink.className = 'social-link-entry bg-[#1A1A1B] rounded-xl border border-[#3F3F46] p-6';
+            newLink.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Platform</label>
+                        <input type="text" name="social_links[${socialLinkIndex}][platform]" maxlength="50" placeholder="twitter" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 placeholder-[#A1A1AA] font-['Inter']">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-white mb-2 font-['Inter']">URL</label>
+                        <input type="url" name="social_links[${socialLinkIndex}][url]" maxlength="500" placeholder="https://..." class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 placeholder-[#A1A1AA] font-['Inter']">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="button" class="remove-social-link w-full px-3 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors font-['Inter']">Remove</button>
+                    </div>
                 </div>
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-white mb-2 font-['Inter']">URL</label>
-                    <input type="url" name="social_links[${socialLinkIndex}][url]" maxlength="500" placeholder="https://..." class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 placeholder-[#A1A1AA] font-['Inter']">
-                </div>
-                <div class="flex items-end">
-                    <button type="button" class="remove-social-link w-full px-3 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors font-['Inter']">Remove</button>
-                </div>
-            </div>
-        `;
-        container.appendChild(newLink);
-        socialLinkIndex++;
+            `;
+            container.appendChild(newLink);
+            socialLinkIndex++;
+            
+            console.log('Social link added successfully, new index:', socialLinkIndex);
+        } catch (error) {
+            console.error('Error adding social link:', error);
+            showNotification('Failed to add social link. Please try again.', 'error');
+        }
     });
 
     // Remove functionality
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('remove-schedule')) {
-            e.target.closest('.schedule-entry').remove();
+            e.preventDefault();
+            e.stopPropagation();
+            
+            try {
+                const scheduleEntry = e.target.closest('.schedule-entry');
+                if (scheduleEntry) {
+                    scheduleEntry.remove();
+                    console.log('Schedule removed successfully');
+                }
+            } catch (error) {
+                console.error('Error removing schedule:', error);
+                showNotification('Failed to remove schedule. Please try again.', 'error');
+            }
         }
+        
         if (e.target.classList.contains('remove-social-link')) {
-            e.target.closest('.social-link-entry').remove();
+            e.preventDefault();
+            e.stopPropagation();
+            
+            try {
+                const socialLinkEntry = e.target.closest('.social-link-entry');
+                if (socialLinkEntry) {
+                    socialLinkEntry.remove();
+                    console.log('Social link removed successfully');
+                }
+            } catch (error) {
+                console.error('Error removing social link:', error);
+                showNotification('Failed to remove social link. Please try again.', 'error');
+            }
         }
     });
 });

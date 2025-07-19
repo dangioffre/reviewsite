@@ -105,9 +105,7 @@
                                 </div>
                                 <span class="ml-2 text-red-400 font-semibold">LIVE NOW</span>
                             </div>
-                            @if($streamerProfile->manual_live_override !== null)
-                                <span class="text-red-300/70 text-sm">(Manual Override)</span>
-                            @endif
+
                         </div>
                     @else
                         <div class="inline-flex items-center gap-3 px-4 py-2 bg-zinc-700/30 border border-zinc-600 rounded-lg">
