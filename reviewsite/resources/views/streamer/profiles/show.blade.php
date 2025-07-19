@@ -156,119 +156,174 @@
 
 @section('content')
 <div class="min-h-screen bg-[#151515] py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Main Content -->
-            <div class="lg:col-span-2 space-y-8">
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="space-y-8">
                 <!-- Profile Header -->
-                <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] overflow-hidden">
+                <div class="relative bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-3xl shadow-2xl border border-[#3F3F46] overflow-hidden">
+                    <!-- Background Pattern -->
+                    <div class="absolute inset-0 opacity-5">
+                        <div class="absolute inset-0" style="background-image: radial-gradient(circle at 25% 25%, #2563EB 0%, transparent 50%), radial-gradient(circle at 75% 75%, #9146FF 0%, transparent 50%);"></div>
+                    </div>
+                    
                     <!-- Header Actions -->
                     @if(auth()->check() && auth()->user()->id === $streamerProfile->user_id)
-                        <div class="bg-[#1A1A1B] px-6 py-4 border-b border-[#3F3F46]">
-                            <div class="flex gap-3">
+                        <div class="relative bg-black/20 backdrop-blur-sm px-6 py-3 border-b border-[#3F3F46]/50">
+                            <div class="flex justify-end">
                                 <a href="{{ route('streamer.profile.edit', $streamerProfile) }}" 
-                                   class="px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors font-['Inter']">
+                                   class="px-4 py-2 bg-[#2563EB]/90 backdrop-blur-sm text-white rounded-xl hover:bg-[#2563EB] transition-all font-['Inter'] text-sm font-medium">
                                     <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                     </svg>
                                     Edit Profile
                                 </a>
-
                             </div>
                         </div>
                     @endif
 
-                    <div class="p-8">
-                        <div class="flex flex-col md:flex-row gap-6">
+                    <div class="relative p-8">
+                        <div class="flex flex-col xl:flex-row gap-8 items-start">
                             <!-- Profile Image -->
-                            <div class="flex-shrink-0">
+                            <div class="flex-shrink-0 relative">
                                 @if($streamerProfile->profile_photo_url)
-                                    <img src="{{ $streamerProfile->profile_photo_url }}" 
-                                         class="w-32 h-32 rounded-full border-4 border-[#3F3F46]" 
-                                         alt="{{ $streamerProfile->channel_name }}">
+                                    <div class="relative">
+                                        <img src="{{ $streamerProfile->profile_photo_url }}" 
+                                             class="w-40 h-40 rounded-3xl border-4 border-[#3F3F46] shadow-xl" 
+                                             alt="{{ $streamerProfile->channel_name }}">
+                                        <div class="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] rounded-full flex items-center justify-center border-2 border-[#1A1A1B]">
+                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
                                 @else
-                                    <div class="w-32 h-32 bg-[#3F3F46] rounded-full flex items-center justify-center border-4 border-[#52525B]">
-                                        <svg class="w-16 h-16 text-[#A1A1AA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div class="w-40 h-40 bg-gradient-to-br from-[#3F3F46] to-[#52525B] rounded-3xl flex items-center justify-center border-4 border-[#52525B] shadow-xl relative">
+                                        <svg class="w-24 h-24 text-[#A1A1AA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                         </svg>
+                                        <div class="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] rounded-full flex items-center justify-center border-2 border-[#1A1A1B]">
+                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                        </div>
                                     </div>
                                 @endif
                             </div>
 
                             <!-- Profile Info -->
-                            <div class="flex-1">
-                                <div class="flex flex-wrap items-center gap-3 mb-4">
-                                    <h1 class="text-3xl font-bold text-white font-['Share_Tech_Mono']">
+                            <div class="flex-1 min-w-0">
+                                <!-- Name and Badges -->
+                                <div class="mb-6">
+                                    <h1 class="text-5xl font-bold text-white font-['Share_Tech_Mono'] mb-4 leading-tight">
                                         {{ $streamerProfile->channel_name }}
                                     </h1>
                                     
-                                    <!-- Platform Badge -->
-                                    <span class="px-3 py-1 rounded-full text-sm font-bold font-['Inter'] 
-                                        {{ $streamerProfile->platform === 'twitch' ? 'bg-[#9146FF] text-white' : 
-                                           ($streamerProfile->platform === 'youtube' ? 'bg-[#FF0000] text-white' : 'bg-[#53FC18] text-black') }}">
-                                        {{ ucfirst($streamerProfile->platform) }}
-                                    </span>
+                                    <div class="flex flex-wrap items-center gap-3 mb-4">
+                                        <!-- Platform Badge -->
+                                        <div class="flex items-center px-4 py-2 rounded-xl text-sm font-bold font-['Inter'] 
+                                            {{ $streamerProfile->platform === 'twitch' ? 'bg-[#9146FF] text-white' : 
+                                               ($streamerProfile->platform === 'youtube' ? 'bg-[#FF0000] text-white' : 'bg-[#53FC18] text-black') }}">
+                                            @if($streamerProfile->platform === 'twitch')
+                                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+                                                </svg>
+                                            @elseif($streamerProfile->platform === 'youtube')
+                                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                                                </svg>
+                                            @endif
+                                            {{ ucfirst($streamerProfile->platform) }}
+                                        </div>
+                                        
+                                        <!-- Verified Badge -->
+                                        <div class="flex items-center px-4 py-2 bg-blue-500/20 text-blue-400 rounded-xl text-sm font-bold font-['Inter'] border border-blue-500/30">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            Verified
+                                        </div>
+                                        
+                                        <!-- Member Since -->
+                                        <div class="flex items-center px-4 py-2 bg-[#3F3F46]/30 text-[#A1A1AA] rounded-xl text-sm font-['Inter']">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                            Member since {{ $streamerProfile->created_at->format('M Y') }}
+                                        </div>
+                                    </div>
                                     
-                                    <!-- All OAuth-connected streamers are verified -->
-                                    <span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm font-bold font-['Inter']">
-                                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                        Verified
-                                    </span>
+                                    <!-- Stats Row -->
+                                    <div class="flex flex-wrap items-center gap-6">
+                                        <div class="flex items-center">
+                                            <div class="text-3xl font-bold text-white font-['Share_Tech_Mono'] mr-2">{{ $streamerProfile->reviews->count() }}</div>
+                                            <div class="text-[#A1A1AA] font-['Inter']">Reviews</div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="text-3xl font-bold text-white font-['Share_Tech_Mono'] mr-2">{{ $streamerProfile->followers->count() }}</div>
+                                            <div class="text-[#A1A1AA] font-['Inter']">Followers</div>
+                                        </div>
+                                    </div>
                                 </div>
 
+                                <!-- Bio -->
                                 @if($streamerProfile->bio)
-                                    <p class="text-[#A1A1AA] text-lg mb-6 font-['Inter']">{{ $streamerProfile->bio }}</p>
+                                    <div class="mb-6">
+                                        <p class="text-[#E5E7EB] text-lg leading-relaxed font-['Inter']">{{ $streamerProfile->bio }}</p>
+                                    </div>
                                 @endif
                                 
-                                <!-- Live Status & Actions -->
-                                <div class="space-y-4">
+                                <!-- Live Status -->
+                                <div class="mb-6">
                                     @if($streamerProfile->isLive())
-                                        <div class="flex items-center gap-3">
-                                            <span class="px-4 py-2 bg-red-500 text-white rounded-lg font-bold font-['Inter'] animate-pulse">
-                                                <div class="w-2 h-2 bg-white rounded-full inline-block mr-2 animate-ping"></div>
-                                                LIVE NOW
-                                            </span>
+                                        <div class="flex items-center gap-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl">
+                                            <div class="flex items-center">
+                                                <div class="relative">
+                                                    <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                                                    <div class="absolute inset-0 w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
+                                                </div>
+                                                <span class="ml-3 text-red-400 font-bold font-['Inter'] text-lg">LIVE NOW</span>
+                                            </div>
                                             @if($streamerProfile->manual_live_override !== null)
-                                                <span class="text-[#A1A1AA] text-sm font-['Inter']">(Manual Override)</span>
+                                                <span class="text-red-300/70 text-sm font-['Inter']">(Manual Override)</span>
                                             @endif
                                         </div>
-                                        <div class="flex flex-wrap gap-3">
-                                            <a href="{{ $streamerProfile->channel_url }}" target="_blank" 
-                                               class="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-bold font-['Inter']">
-                                                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                </svg>
-                                                Watch Live
-                                            </a>
-                                        </div>
                                     @else
-                                        <div class="flex items-center gap-3">
-                                            <span class="px-4 py-2 bg-[#3F3F46] text-[#A1A1AA] rounded-lg font-bold font-['Inter']">
-                                                <div class="w-2 h-2 bg-[#A1A1AA] rounded-full inline-block mr-2"></div>
-                                                OFFLINE
-                                            </span>
+                                        <div class="flex items-center gap-4 p-4 bg-[#3F3F46]/30 border border-[#3F3F46] rounded-xl">
+                                            <div class="flex items-center">
+                                                <div class="w-3 h-3 bg-[#6B7280] rounded-full"></div>
+                                                <span class="ml-3 text-[#9CA3AF] font-bold font-['Inter']">OFFLINE</span>
+                                            </div>
                                             @if($streamerProfile->live_status_checked_at)
-                                                <span class="text-[#A1A1AA] text-sm font-['Inter']">
+                                                <span class="text-[#6B7280] text-sm font-['Inter']">
                                                     Last checked {{ $streamerProfile->live_status_checked_at->diffForHumans() }}
                                                 </span>
                                             @endif
                                         </div>
-                                        <div class="flex flex-wrap gap-3">
-                                            <a href="{{ $streamerProfile->channel_url }}" target="_blank" 
-                                               class="px-6 py-3 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors font-bold font-['Inter']">
-                                                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                                                </svg>
-                                                Visit Channel
-                                            </a>
-                                        </div>
+                                    @endif
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="flex flex-wrap gap-3">
+                                    @if($streamerProfile->isLive())
+                                        <a href="{{ $streamerProfile->channel_url }}" target="_blank" 
+                                           class="px-8 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition-all font-bold font-['Inter'] shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                                            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            Watch Live
+                                        </a>
+                                    @else
+                                        <a href="{{ $streamerProfile->channel_url }}" target="_blank" 
+                                           class="px-8 py-3 bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] text-white rounded-xl hover:from-[#1D4ED8] hover:to-[#1E40AF] transition-all font-bold font-['Inter'] shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                                            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                            </svg>
+                                            Visit Channel
+                                        </a>
                                     @endif
                                     
                                     @auth
                                         @if(auth()->id() !== $streamerProfile->user_id)
-                                            <button class="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all font-bold font-['Inter']" 
+                                            <button class="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all font-bold font-['Inter'] shadow-lg hover:shadow-xl transform hover:-translate-y-0.5" 
                                                     id="followBtn" data-profile-id="{{ $streamerProfile->id }}">
                                                 <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
@@ -422,34 +477,10 @@
                 @endif
             </div>
             
-            <!-- Sidebar -->
-            <div class="space-y-8">
-                <!-- Profile Stats -->
-                <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] p-6">
-                    <h3 class="text-xl font-bold text-white mb-4 font-['Share_Tech_Mono'] flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                        </svg>
-                        Profile Stats
-                    </h3>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="text-center p-4 bg-[#1A1A1B] rounded-lg border border-[#3F3F46]">
-                            <div class="text-2xl font-bold text-white font-['Share_Tech_Mono']">{{ $streamerProfile->reviews->count() }}</div>
-                            <div class="text-[#A1A1AA] text-sm font-['Inter']">Reviews</div>
-                        </div>
-                        <div class="text-center p-4 bg-[#1A1A1B] rounded-lg border border-[#3F3F46]">
-                            <div class="text-2xl font-bold text-white font-['Share_Tech_Mono']">{{ $streamerProfile->followers->count() }}</div>
-                            <div class="text-[#A1A1AA] text-sm font-['Inter']">Followers</div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4 text-center">
-                        <div class="text-[#A1A1AA] text-sm font-['Inter']">
-                            Member since {{ $streamerProfile->created_at->format('M Y') }}
-                        </div>
-                    </div>
-                </div>
+            <!-- Content Grid -->
+            <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
+                <!-- Main Content -->
+                <div class="xl:col-span-3 space-y-8">
 
                 <!-- Social Links -->
                 @if($streamerProfile->socialLinks->count() > 0)
