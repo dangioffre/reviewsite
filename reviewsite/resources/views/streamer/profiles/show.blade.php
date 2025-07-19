@@ -532,18 +532,53 @@
                                 @endphp
                                 
                                 <div class="bg-[#1A1A1B] rounded-lg border border-[#3F3F46] overflow-hidden hover:border-[#52525B] transition-colors">
-                                    @if($vod->thumbnail_url)
-                                        <div class="aspect-video relative">
+                                    <div class="aspect-video relative">
+                                        @if($vod->thumbnail_url)
                                             <img src="{{ $vod->thumbnail_url }}" 
                                                  class="w-full h-full object-cover" 
-                                                 alt="{{ $vod->title }}">
-                                            @if($vod->formatted_duration)
-                                                <div class="absolute bottom-2 right-2 bg-black/80 text-white px-2 py-1 rounded text-xs font-['Inter']">
-                                                    {{ $vod->formatted_duration }}
+                                                 alt="{{ $vod->title }}"
+                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        @endif
+                                        
+                                        <!-- Default thumbnail for Recent VODs -->
+                                        <div class="w-full h-full bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] flex flex-col items-center justify-center text-white {{ $vod->thumbnail_url ? 'hidden' : 'flex' }}" 
+                                             style="{{ $vod->thumbnail_url ? 'display: none;' : '' }}">
+                                            <div class="text-center">
+                                                @if($embedType === 'clip')
+                                                    <!-- Clip icon -->
+                                                    <svg class="w-12 h-12 mb-2 mx-auto opacity-90" fill="currentColor" viewBox="0 0 24 24">
+                                                        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+                                                    </svg>
+                                                    <div class="text-xs font-bold font-['Share_Tech_Mono'] mb-1">CLIP</div>
+                                                @elseif($embedType === 'video')
+                                                    <!-- VOD icon -->
+                                                    <svg class="w-12 h-12 mb-2 mx-auto opacity-90" fill="currentColor" viewBox="0 0 24 24">
+                                                        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+                                                    </svg>
+                                                    <div class="text-xs font-bold font-['Share_Tech_Mono'] mb-1">VOD</div>
+                                                @else
+                                                    <!-- Generic video icon -->
+                                                    <svg class="w-12 h-12 mb-2 mx-auto opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                                    </svg>
+                                                    <div class="text-xs font-bold font-['Share_Tech_Mono'] mb-1">VIDEO</div>
+                                                @endif
+                                                <div class="text-xs opacity-75 font-['Inter'] px-1 text-center">
+                                                    {{ Str::limit($vod->title, 20) }}
                                                 </div>
-                                            @endif
+                                            </div>
+                                            
+                                            <!-- Decorative elements (smaller for sidebar) -->
+                                            <div class="absolute top-1 left-1 w-4 h-4 border border-white/20 rounded-full"></div>
+                                            <div class="absolute bottom-1 right-1 w-3 h-3 border border-white/20 rounded-full"></div>
                                         </div>
-                                    @endif
+                                        
+                                        @if($vod->formatted_duration)
+                                            <div class="absolute bottom-2 right-2 bg-black/80 text-white px-2 py-1 rounded text-xs font-['Inter']">
+                                                {{ $vod->formatted_duration }}
+                                            </div>
+                                        @endif
+                                    </div>
                                     <div class="p-4">
                                         <h4 class="text-white font-bold mb-2 font-['Inter']">{{ Str::limit($vod->title, 50) }}</h4>
                                         @if($vod->description)
