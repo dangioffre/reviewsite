@@ -585,49 +585,38 @@
                                             <p class="text-[#A1A1AA] text-sm mb-3 font-['Inter']">{{ Str::limit($vod->description, 60) }}</p>
                                         @endif
                                         
-                                        <div class="flex items-center justify-between mb-3">
+                                        <div class="mb-3">
                                             <div class="text-[#A1A1AA] text-xs font-['Inter']">
                                                 @if($vod->published_at)
                                                     {{ $vod->published_at->diffForHumans() }}
                                                 @endif
                                             </div>
-                                            @if($vod->is_manual)
-                                                <span class="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs font-['Inter']">
-                                                    Manual
-                                                </span>
-                                            @else
-                                                <span class="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs font-['Inter']">
-                                                    Imported
-                                                </span>
-                                            @endif
                                         </div>
                                         
-                                        <div class="flex gap-2">
-                                            @if($embedType)
-                                                <button type="button" 
-                                                        class="flex-1 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-center text-xs font-['Inter'] watch-embed-btn"
-                                                        data-embed-type="{{ $embedType }}"
-                                                        data-vod-id="{{ $twitchVideoId }}" 
-                                                        data-clip-id="{{ $twitchClipId }}"
-                                                        data-channel="{{ $twitchChannel }}"
-                                                        data-vod-title="{{ $vod->title }}"
-                                                        data-original-url="{{ $vod->vod_url }}"
-                                                        title="Watch embedded Twitch {{ $embedType === 'clip' ? 'Clip' : 'VOD' }}">
-                                                    <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                                        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
-                                                    </svg>
-                                                    Watch
-                                                </button>
-                                            @endif
-                                            
-                                            <a href="{{ $vod->vod_url }}" target="_blank" 
-                                               class="flex-1 px-3 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors text-center text-xs font-['Inter']">
-                                                <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                        @if($embedType)
+                                            <button type="button" 
+                                                    class="w-full px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-center text-xs font-['Inter'] watch-embed-btn"
+                                                    data-embed-type="{{ $embedType }}"
+                                                    data-vod-id="{{ $twitchVideoId }}" 
+                                                    data-clip-id="{{ $twitchClipId }}"
+                                                    data-channel="{{ $twitchChannel }}"
+                                                    data-vod-title="{{ $vod->title }}"
+                                                    data-original-url="{{ $vod->vod_url }}"
+                                                    title="Watch embedded Twitch {{ $embedType === 'clip' ? 'Clip' : 'VOD' }}">
+                                                <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
                                                 </svg>
-                                                External
-                                            </a>
-                                        </div>
+                                                Watch
+                                            </button>
+                                        @else
+                                            <!-- For non-Twitch content, show a simple message or hide -->
+                                            <div class="w-full px-3 py-2 bg-[#3F3F46] text-[#A1A1AA] rounded-lg text-center text-xs font-['Inter']">
+                                                <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                                </svg>
+                                                Video Content
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             @endforeach
