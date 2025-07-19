@@ -33,12 +33,7 @@
                         </div>
                     @endif
                     
-                    <!-- Verified Badge -->
-                    <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center border-2 border-zinc-900">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
+
                 </div>
             </div>
 
@@ -68,13 +63,7 @@
                             {{ ucfirst($streamerProfile->platform) }}
                         </span>
                         
-                        <!-- Verified Badge -->
-                        <span class="inline-flex items-center px-3 py-1 bg-blue-600/20 text-blue-400 rounded-lg text-sm font-medium border border-blue-600/30">
-                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            Verified
-                        </span>
+
                         
                         <!-- Member Since -->
                         <span class="inline-flex items-center px-3 py-1 bg-zinc-700/50 text-zinc-400 rounded-lg text-sm">
