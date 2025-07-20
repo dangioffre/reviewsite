@@ -277,6 +277,55 @@
     </section>
     @endif
 
+    <!-- Recent Lists -->
+    @if($recentLists->count() > 0)
+    <section class="bg-[#151515] py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between mb-12">
+                <div>
+                    <h2 class="text-4xl font-bold text-white mb-2 font-['Share_Tech_Mono']">Community Lists</h2>
+                    <p class="text-zinc-400 font-['Inter']">Discover curated collections created by our community</p>
+                </div>
+                <a href="{{ route('lists.index') }}" class="text-yellow-400 hover:text-yellow-300 font-semibold transition-colors font-['Inter'] flex items-center gap-2">
+                    Browse All Lists
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @foreach($recentLists as $list)
+                <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-2xl shadow-xl border border-zinc-700 p-6 group hover:border-yellow-500 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-white font-semibold text-lg mb-1 group-hover:text-yellow-400 transition-colors">{{ $list->name }}</h3>
+                            <p class="text-zinc-500 text-sm">by {{ $list->user->name }}</p>
+                        </div>
+                    </div>
+                    @if($list->description)
+                        <p class="text-zinc-400 text-sm mb-4 line-clamp-2">{{ Str::limit($list->description, 120) }}</p>
+                    @endif
+                    <div class="flex items-center justify-between text-sm text-zinc-500 mb-4">
+                        <span>{{ $list->items_count }} games</span>
+                        <span>{{ $list->followers_count }} followers</span>
+                    </div>
+                    <a href="{{ route('lists.public', $list->slug) }}" 
+                       class="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 block text-center transform hover:scale-105 font-['Inter']">
+                        View List
+                    </a>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
     <!-- Call to Action -->
     <section class="bg-gradient-to-r from-[#E53E3E] to-purple-600 py-16">
         <div class="max-w-4xl mx-auto text-center px-4">

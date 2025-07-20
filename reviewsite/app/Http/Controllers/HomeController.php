@@ -9,6 +9,7 @@ use App\Models\Review;
 use App\Models\Product;
 use App\Models\StreamerProfile;
 use App\Models\Podcast;
+use App\Models\ListModel;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -52,6 +53,14 @@ class HomeController extends Controller
             ->take(6)
             ->get();
 
+        // Recent Lists (recently created public lists)
+        $recentLists = ListModel::where('is_public', true)
+            ->with(['user'])
+            ->withCount(['items', 'followers', 'comments'])
+            ->latest()
+            ->take(6)
+            ->get();
+
         // Featured Posts (keeping existing functionality)
         $featuredPosts = Post::where('is_featured', true)
             ->latest()
@@ -63,6 +72,7 @@ class HomeController extends Controller
             'recentGames' => $recentGames,
             'recentStreamers' => $recentStreamers,
             'recentPodcasts' => $recentPodcasts,
+            'recentLists' => $recentLists,
             'featuredPosts' => $featuredPosts,
         ]);
     }

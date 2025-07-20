@@ -470,6 +470,44 @@ Route::get('/api/search/users', function(Illuminate\Http\Request $request) {
     return response()->json($users);
 })->name('api.search.users');
 
+Route::get('/api/search/publishers', function(Illuminate\Http\Request $request) {
+    if (!$request->filled('q') || strlen($request->q) < 2) {
+        return response()->json([]);
+    }
+    
+    $publishers = \App\Models\Publisher::where('is_active', true)
+        ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($request->q) . '%'])
+        ->limit(10)
+        ->get(['name', 'slug'])
+        ->map(function($publisher) {
+            return [
+                'name' => $publisher->name,
+                'slug' => $publisher->slug
+            ];
+        });
+    
+    return response()->json($publishers);
+})->name('api.search.publishers');
+
+Route::get('/api/search/developers', function(Illuminate\Http\Request $request) {
+    if (!$request->filled('q') || strlen($request->q) < 2) {
+        return response()->json([]);
+    }
+    
+    $developers = \App\Models\Developer::where('is_active', true)
+        ->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($request->q) . '%'])
+        ->limit(10)
+        ->get(['name', 'slug'])
+        ->map(function($developer) {
+            return [
+                'name' => $developer->name,
+                'slug' => $developer->slug
+            ];
+        });
+    
+    return response()->json($developers);
+})->name('api.search.developers');
+
 Route::get('/api/search/streamers', function(Illuminate\Http\Request $request) {
     if (!$request->filled('q') || strlen($request->q) < 2) {
         return response()->json([]);

@@ -47,17 +47,17 @@
     <div class="container mx-auto px-4 py-8">
 
         <!-- Search and Filter Section -->
-        <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl border border-[#3F3F46] p-8 mb-12">
-            <form method="GET" action="{{ route('lists.index') }}" class="space-y-6">
+        <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl border border-[#3F3F46] p-6 mb-10">
+            <form method="GET" action="{{ route('lists.index') }}" class="space-y-4">
                 <!-- Main Search Bar -->
                 <x-search-input 
                     name="search" 
                     :value="request('search')" 
                     placeholder="Search lists by name or description..."
-                    class="rounded-xl py-4 text-lg" />
+                    class="rounded-xl py-3 text-base" />
 
                 <!-- Advanced Filters -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                     <!-- Category Filter -->
                     <div>
                         <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Category</label>
@@ -97,30 +97,30 @@
                         </select>
                     </div>
 
-                    <!-- Publisher Filter -->
-                    <div>
+                    <!-- Publisher Search with Autocomplete -->
+                    <div class="relative">
                         <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Publisher</label>
-                        <select name="publisher" class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]">
-                            <option value="">All Publishers</option>
-                            @foreach($publishers as $publisher)
-                                <option value="{{ $publisher->slug }}" {{ request('publisher') == $publisher->slug ? 'selected' : '' }}>
-                                    {{ $publisher->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <input type="text" 
+                               id="publisher-search"
+                               name="publisher" 
+                               value="{{ request('publisher') }}" 
+                               placeholder="Search by publisher name..."
+                               autocomplete="off"
+                               class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-3 py-2 text-white placeholder-[#71717A] focus:outline-none focus:ring-2 focus:ring-[#2563EB]">
+                        <div id="publisher-suggestions" class="absolute z-50 w-full bg-[#18181B] border border-[#3F3F46] rounded-lg mt-1 max-h-48 overflow-y-auto hidden"></div>
                     </div>
 
-                    <!-- Developer Filter -->
-                    <div>
+                    <!-- Developer Search with Autocomplete -->
+                    <div class="relative">
                         <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Developer</label>
-                        <select name="developer" class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]">
-                            <option value="">All Developers</option>
-                            @foreach($developers as $developer)
-                                <option value="{{ $developer->slug }}" {{ request('developer') == $developer->slug ? 'selected' : '' }}>
-                                    {{ $developer->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <input type="text" 
+                               id="developer-search"
+                               name="developer" 
+                               value="{{ request('developer') }}" 
+                               placeholder="Search by developer name..."
+                               autocomplete="off"
+                               class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-3 py-2 text-white placeholder-[#71717A] focus:outline-none focus:ring-2 focus:ring-[#2563EB]">
+                        <div id="developer-suggestions" class="absolute z-50 w-full bg-[#18181B] border border-[#3F3F46] rounded-lg mt-1 max-h-48 overflow-y-auto hidden"></div>
                     </div>
 
                     <!-- Game Mode Filter -->
@@ -422,6 +422,96 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300);
     });
 
+    // Publisher autocomplete functionality
+    const publisherInput = document.getElementById('publisher-search');
+    const publisherSuggestions = document.getElementById('publisher-suggestions');
+    let publisherTimeout;
+
+    publisherInput.addEventListener('input', function() {
+        clearTimeout(publisherTimeout);
+        const query = this.value.trim();
+        
+        if (query.length < 2) {
+            publisherSuggestions.classList.add('hidden');
+            return;
+        }
+        
+        publisherTimeout = setTimeout(() => {
+            fetch(`/api/search/publishers?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(publishers => {
+                    publisherSuggestions.innerHTML = '';
+                    
+                    if (publishers.length === 0) {
+                        publisherSuggestions.classList.add('hidden');
+                        return;
+                    }
+                    
+                    publishers.forEach(publisher => {
+                        const suggestion = document.createElement('div');
+                        suggestion.className = 'px-3 py-2 text-white hover:bg-[#2563EB] cursor-pointer border-b border-[#3F3F46] last:border-b-0';
+                        suggestion.textContent = publisher.name;
+                        suggestion.addEventListener('click', () => {
+                            publisherInput.value = publisher.name;
+                            publisherSuggestions.classList.add('hidden');
+                        });
+                        publisherSuggestions.appendChild(suggestion);
+                    });
+                    
+                    publisherSuggestions.classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Error fetching publisher suggestions:', error);
+                    publisherSuggestions.classList.add('hidden');
+                });
+        }, 300);
+    });
+
+    // Developer autocomplete functionality
+    const developerInput = document.getElementById('developer-search');
+    const developerSuggestions = document.getElementById('developer-suggestions');
+    let developerTimeout;
+
+    developerInput.addEventListener('input', function() {
+        clearTimeout(developerTimeout);
+        const query = this.value.trim();
+        
+        if (query.length < 2) {
+            developerSuggestions.classList.add('hidden');
+            return;
+        }
+        
+        developerTimeout = setTimeout(() => {
+            fetch(`/api/search/developers?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(developers => {
+                    developerSuggestions.innerHTML = '';
+                    
+                    if (developers.length === 0) {
+                        developerSuggestions.classList.add('hidden');
+                        return;
+                    }
+                    
+                    developers.forEach(developer => {
+                        const suggestion = document.createElement('div');
+                        suggestion.className = 'px-3 py-2 text-white hover:bg-[#2563EB] cursor-pointer border-b border-[#3F3F46] last:border-b-0';
+                        suggestion.textContent = developer.name;
+                        suggestion.addEventListener('click', () => {
+                            developerInput.value = developer.name;
+                            developerSuggestions.classList.add('hidden');
+                        });
+                        developerSuggestions.appendChild(suggestion);
+                    });
+                    
+                    developerSuggestions.classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Error fetching developer suggestions:', error);
+                    developerSuggestions.classList.add('hidden');
+                });
+        }, 300);
+    });
+
     // Hide suggestions when clicking outside
     document.addEventListener('click', function(e) {
         if (!gameInput.contains(e.target) && !gameSuggestions.contains(e.target)) {
@@ -429,6 +519,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (!userInput.contains(e.target) && !userSuggestions.contains(e.target)) {
             userSuggestions.classList.add('hidden');
+        }
+        if (!publisherInput.contains(e.target) && !publisherSuggestions.contains(e.target)) {
+            publisherSuggestions.classList.add('hidden');
+        }
+        if (!developerInput.contains(e.target) && !developerSuggestions.contains(e.target)) {
+            developerSuggestions.classList.add('hidden');
         }
     });
 
@@ -472,6 +568,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     handleKeyNavigation(gameInput, gameSuggestions);
     handleKeyNavigation(userInput, userSuggestions);
+    handleKeyNavigation(publisherInput, publisherSuggestions);
+    handleKeyNavigation(developerInput, developerSuggestions);
 });
 </script>
 </x-layouts.app> 
