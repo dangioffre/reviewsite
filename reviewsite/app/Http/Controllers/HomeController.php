@@ -25,7 +25,7 @@ class HomeController extends Controller
             ->where('is_published', true)
             ->with(['product.genre', 'product.platform', 'user'])
             ->latest()
-            ->take(3)
+            ->take(4)
             ->get();
 
         // Recently Released Games (most recently released games)

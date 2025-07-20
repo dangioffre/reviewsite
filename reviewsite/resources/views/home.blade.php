@@ -76,9 +76,9 @@
                 </div>
 
                 <!-- Side Reviews -->
-                <div class="space-y-6">
-                    @foreach($heroReviews->skip(1)->take(2) as $review)
-                    <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl shadow-xl p-6 border border-zinc-700 group hover:border-purple-500 transition-all duration-300 transform hover:-translate-y-1">
+                <div class="space-y-4">
+                    @foreach($heroReviews->skip(1)->take(3) as $review)
+                    <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl shadow-xl p-4 border border-zinc-700 group hover:border-purple-500 transition-all duration-300 transform hover:-translate-y-1">
                         <div class="flex items-center gap-3 mb-3">
                             <div class="flex items-center bg-black/50 text-white px-2 py-1 rounded text-xs font-bold">
                                 <svg class="w-3 h-3 mr-1 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
