@@ -106,12 +106,12 @@
 
     <!-- Recently Released Games -->
     @if($recentGames->count() > 0)
-    <section class="bg-[#1A1A1A] py-16">
+    <section class="bg-[#1A1A1A] py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between mb-12">
+            <div class="flex items-center justify-between mb-8">
                 <div>
-                    <h2 class="text-4xl font-bold text-white mb-2 font-['Share_Tech_Mono']">Recently Released Games</h2>
-                    <p class="text-zinc-400 font-['Inter']">Hot off the press - the latest games to hit the market</p>
+                    <h2 class="text-3xl font-bold text-white mb-2 font-['Share_Tech_Mono']">Recently Released Games</h2>
+                    <p class="text-zinc-400 font-['Inter']">The newest games in our collection, ordered by release date</p>
                 </div>
                 <a href="{{ route('games.index') }}" class="text-[#E53E3E] hover:text-red-400 font-semibold transition-colors font-['Inter'] flex items-center gap-2">
                     View All Games
@@ -121,10 +121,10 @@
                 </a>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
-                @foreach($recentGames->take(8) as $game)
-                <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl shadow-xl border border-zinc-700 overflow-hidden group hover:border-[#E53E3E] transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
-                    <div class="aspect-[3/4] bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center relative overflow-hidden">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                @foreach($recentGames as $game)
+                <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg shadow-lg border border-zinc-700 overflow-hidden group hover:border-[#E53E3E] transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl flex flex-col h-full">
+                    <div class="aspect-[4/3] bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center relative overflow-hidden">
                         @if($game->thumbnail_url)
                             <img src="{{ $game->thumbnail_url }}" alt="{{ $game->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                         @else
@@ -137,17 +137,15 @@
                             </div>
                         @endif
                     </div>
-                    <div class="p-4">
-                        <h3 class="text-white font-semibold mb-2 line-clamp-2 group-hover:text-[#E53E3E] transition-colors">{{ $game->name }}</h3>
-                        <div class="flex items-center justify-between text-sm">
+                    <div class="p-3 flex flex-col flex-grow">
+                        <h3 class="text-white font-semibold mb-1 line-clamp-2 text-sm group-hover:text-[#E53E3E] transition-colors flex-grow">{{ $game->name }}</h3>
+                        <div class="flex items-center justify-between text-xs mb-2">
                             <span class="text-zinc-400">{{ $game->genre->name ?? 'Gaming' }}</span>
                             <span class="text-zinc-500">{{ $game->release_date ? $game->release_date->format('M j') : 'TBA' }}</span>
                         </div>
-                        <div class="mt-3">
-                            <a href="{{ route('games.show', $game) }}" class="w-full bg-[#E53E3E] hover:bg-red-700 text-white py-2 px-3 rounded-lg text-sm font-semibold transition-all duration-300 block text-center transform hover:scale-105">
-                                View Game
-                            </a>
-                        </div>
+                        <a href="{{ route('games.show', $game) }}" class="w-full bg-[#E53E3E] hover:bg-red-700 text-white py-1.5 px-2 rounded text-xs font-semibold transition-all duration-300 block text-center transform hover:scale-105 mt-auto">
+                            View Game
+                        </a>
                     </div>
                 </div>
                 @endforeach

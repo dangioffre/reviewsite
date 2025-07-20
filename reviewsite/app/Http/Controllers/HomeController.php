@@ -28,13 +28,13 @@ class HomeController extends Controller
             ->take(3)
             ->get();
 
-        // Recently Released Games (released in the last 90 days)
+        // Recently Released Games (most recently released games)
         $recentGames = Product::where('type', 'game')
-            ->where('release_date', '>=', now()->subDays(90))
-            ->where('release_date', '<=', now())
+            ->whereNotNull('release_date')
+            ->where('release_date', '<=', now()) // Only released games, not future ones
             ->with(['genre', 'platform', 'developers'])
             ->orderBy('release_date', 'desc')
-            ->take(8)
+            ->take(6)
             ->get();
 
         // Recent Streamers (recently joined and approved)
