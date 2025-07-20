@@ -213,6 +213,29 @@ class DashboardController extends Controller
             
         $activities = $activities->merge($recentLikes);
         
+        // Add streamer follow activities
+        $recentFollows = $user->followedStreamers()
+            ->approved()
+            ->wherePivot('created_at', '>=', now()->subDays(30))
+            ->orderBy('streamer_followers.created_at', 'desc')
+            ->limit(10)
+            ->get()
+            ->map(function($streamer) {
+                return [
+                    'type' => 'follow',
+                    'action' => 'followed',
+                    'title' => $streamer->channel_name,
+                    'product' => $streamer->channel_name,
+                    'product_type' => 'Streamer',
+                    'platform' => ucfirst($streamer->platform),
+                    'is_live' => $streamer->isLive(),
+                    'created_at' => $streamer->pivot->created_at,
+                    'url' => route('streamer.profile.show', $streamer)
+                ];
+            });
+            
+        $activities = $activities->merge($recentFollows);
+        
         // Sort by created_at and take the most recent 15
         return $activities->sortByDesc('created_at')->take(15);
     }
