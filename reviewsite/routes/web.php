@@ -193,8 +193,11 @@ Route::middleware('auth')->group(function () {
         ->name('streamer.profile.check-vod-health');
     
     // Game Showcase Management Routes
-    Route::get('/streamers/{streamerProfile}/showcase', [App\Http\Controllers\StreamerProfileController::class, 'manageShowcase'])
+    Route::get('/streamer-profiles/{streamerProfile}/manage-showcase', [App\Http\Controllers\StreamerProfileController::class, 'manageShowcase'])
         ->name('streamer.profile.manage-showcase');
+    
+    Route::delete('/streamer-profiles/{streamerProfile}', [App\Http\Controllers\StreamerProfileController::class, 'destroy'])
+        ->name('streamer.profile.destroy');
     
     // Verification system removed - all OAuth-connected streamers are automatically verified
 });

@@ -35,6 +35,18 @@
                         </svg>
                         View Profile
                     </a>
+                    <form id="delete-profile-form" action="{{ route('streamer.profile.destroy', $streamerProfile) }}" method="POST" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="button" 
+                                onclick="confirmDelete()"
+                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-['Inter'] flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Delete Profile
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -255,11 +267,51 @@
 
 @push('scripts')
 <script>
+// Make confirmDelete globally available
+window.confirmDelete = function() {
+    Swal.fire({
+        title: 'Delete Streamer Profile',
+        text: 'Are you sure you want to delete your streamer profile? This action cannot be undone. Your reviews will be reassigned to your main account.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel',
+        background: '#1f2937',
+        color: '#fff',
+        customClass: {
+            title: 'text-white',
+            content: 'text-gray-300',
+            confirmButton: 'bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg',
+            cancelButton: 'bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg',
+        },
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Show loading state
+            Swal.fire({
+                title: 'Deleting...',
+                text: 'Please wait while we delete your streamer profile.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+                background: '#1f2937',
+                color: '#fff',
+            });
+            
+            // Submit the form
+            document.getElementById('delete-profile-form').submit();
+        }
+    });
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     const setLiveBtn = document.getElementById('setLiveBtn');
     const setOfflineBtn = document.getElementById('setOfflineBtn');
     const clearOverrideBtn = document.getElementById('clearOverrideBtn');
     const profileId = {{ $streamerProfile->id }};
+    
 
     // Set Live Status
     setLiveBtn.addEventListener('click', function() {
@@ -555,6 +607,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    
+    // Delete profile functionality is now handled by the global confirmDelete function
 });
 </script>
 @endpush

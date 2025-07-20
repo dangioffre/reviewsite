@@ -12,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -601,5 +602,50 @@ class StreamerProfileController extends Controller
         }
 
         return view('streamer.profiles.manage-showcase', compact('streamerProfile'));
+    }
+
+    /**
+     * Remove the specified streamer profile and reassign reviews to the main user.
+     */
+    public function destroy(StreamerProfile $streamerProfile): RedirectResponse
+    {
+        // Ensure the authenticated user owns this streamer profile
+        if (Auth::id() !== $streamerProfile->user_id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Start a database transaction
+        DB::beginTransaction();
+
+        try {
+            // Reassign all reviews to the main user account
+            $streamerProfile->reviews()->update([
+                'user_id' => $streamerProfile->user_id,
+                'streamer_profile_id' => null
+            ]);
+
+            // Delete all related data
+            $streamerProfile->schedules()->delete();
+            $streamerProfile->vods()->delete();
+            $streamerProfile->socialLinks()->delete();
+            $streamerProfile->followers()->detach();
+            $streamerProfile->showcasedGames()->delete();
+
+            // Delete the streamer profile
+            $streamerProfile->delete();
+
+            // Commit the transaction
+            DB::commit();
+
+            return redirect()->route('dashboard')
+                ->with('success', 'Streamer profile has been deleted. Reviews have been reassigned to your main account.');
+
+        } catch (\Exception $e) {
+            // Rollback the transaction on error
+            DB::rollBack();
+            
+            return redirect()->back()
+                ->with('error', 'Failed to delete streamer profile. Please try again.');
+        }
     }
 }
