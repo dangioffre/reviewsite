@@ -256,7 +256,7 @@ class ListModelResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\CollaboratorsRelationManager::class,
         ];
     }
 
