@@ -71,6 +71,10 @@ class StreamerProfileResource extends Resource
                         Forms\Components\Toggle::make('is_approved')
                             ->label('Approved')
                             ->helperText('Whether this streamer profile is approved for public display'),
+                        Forms\Components\Toggle::make('is_featured')
+                            ->label('Featured Streamer')
+                            ->helperText('Featured streamers appear in a special section on the homepage')
+                            ->default(false),
                         Forms\Components\Select::make('verification_status')
                             ->label('Verification Status')
                             ->options([
@@ -134,6 +138,10 @@ class StreamerProfileResource extends Resource
                     ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('danger'),
+                Tables\Columns\ToggleColumn::make('is_featured')
+                    ->label('Featured')
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\BadgeColumn::make('verification_status')
                     ->label('Verification')
                     ->colors([
@@ -176,6 +184,13 @@ class StreamerProfileResource extends Resource
                     ->placeholder('All profiles')
                     ->trueLabel('Approved only')
                     ->falseLabel('Pending approval'),
+                Tables\Filters\SelectFilter::make('is_featured')
+                    ->label('Featured Status')
+                    ->options([
+                        true => 'Featured',
+                        false => 'Not Featured',
+                    ])
+                    ->placeholder('All Streamers'),
                 Tables\Filters\SelectFilter::make('verification_status')
                     ->label('Verification Status')
                     ->options([

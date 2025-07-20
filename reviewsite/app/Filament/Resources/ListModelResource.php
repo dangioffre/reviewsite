@@ -69,10 +69,15 @@ class ListModelResource extends Resource
                     
                 Forms\Components\Section::make('Privacy & Settings')
                     ->schema([
-                        Forms\Components\Toggle::make('is_public')
-                            ->label('Public List')
-                            ->helperText('Public lists can be viewed by anyone and appear on the public lists page')
-                            ->default(false),
+                                                 Forms\Components\Toggle::make('is_public')
+                             ->label('Public List')
+                             ->helperText('Public lists can be viewed by anyone and appear on the public lists page')
+                             ->default(false),
+                             
+                         Forms\Components\Toggle::make('is_featured')
+                             ->label('Featured List')
+                             ->helperText('Featured lists appear in a special section on the homepage')
+                             ->default(false),
                             
                         Forms\Components\Toggle::make('allow_collaboration')
                             ->label('Allow Collaboration')
@@ -129,6 +134,11 @@ class ListModelResource extends Resource
                         'heroicon-m-lock-closed' => fn ($state): bool => $state === false,
                     ])
                     ->sortable(),
+                    
+                Tables\Columns\ToggleColumn::make('is_featured')
+                    ->label('Featured')
+                    ->sortable()
+                    ->toggleable(),
                     
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Owner')
@@ -191,6 +201,14 @@ class ListModelResource extends Resource
                     ->options([
                         true => 'Public',
                         false => 'Private',
+                    ])
+                    ->placeholder('All Lists'),
+                    
+                Tables\Filters\SelectFilter::make('is_featured')
+                    ->label('Featured Status')
+                    ->options([
+                        true => 'Featured',
+                        false => 'Not Featured',
                     ])
                     ->placeholder('All Lists'),
                     

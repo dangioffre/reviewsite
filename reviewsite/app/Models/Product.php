@@ -22,6 +22,7 @@ class Product extends Model
         'videos',
         'release_date',
         'type',
+        'is_featured',
         'genre_id',
         'platform_id',
     ];
@@ -30,6 +31,7 @@ class Product extends Model
         'release_date' => 'date',
         'photos' => 'array',
         'videos' => 'array',
+        'is_featured' => 'boolean',
     ];
 
     /**
@@ -78,6 +80,14 @@ class Product extends Model
         }
 
         return $slug;
+    }
+
+    /**
+     * Scope a query to only include featured products.
+     */
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
     }
 
     public function reviews()

@@ -28,6 +28,7 @@ class Podcast extends Model
         'rss_error',
         'approved_at',
         'approved_by',
+        'is_featured',
         'admin_notes',
     ];
 
@@ -35,6 +36,7 @@ class Podcast extends Model
         'hosts' => 'array',
         'links' => 'array',
         'verification_status' => 'boolean',
+        'is_featured' => 'boolean',
         'last_rss_check' => 'datetime',
         'approved_at' => 'datetime',
     ];
@@ -119,6 +121,11 @@ class Podcast extends Model
     public function scopeRejected($query)
     {
         return $query->where('status', 'rejected');
+    }
+
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
     }
 
     // Helper methods

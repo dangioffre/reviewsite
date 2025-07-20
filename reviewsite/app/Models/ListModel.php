@@ -10,12 +10,13 @@ class ListModel extends Model
     use HasFactory;
     protected $table = 'lists';
     protected $fillable = [
-        'user_id', 'name', 'description', 'slug', 'is_public', 'category', 'sort_by', 'sort_direction',
+        'user_id', 'name', 'description', 'slug', 'is_public', 'is_featured', 'category', 'sort_by', 'sort_direction',
         'cloned_from', 'allow_collaboration', 'allow_comments', 'followers_count', 'comments_count'
     ];
 
     protected $casts = [
         'is_public' => 'boolean',
+        'is_featured' => 'boolean',
         'allow_collaboration' => 'boolean',
         'allow_comments' => 'boolean',
     ];
@@ -24,6 +25,7 @@ class ListModel extends Model
         'sort_by' => 'date_added',
         'sort_direction' => 'desc',
         'is_public' => false,
+        'is_featured' => false,
         'allow_collaboration' => false,
         'allow_comments' => true,
         'category' => 'general',
@@ -51,6 +53,14 @@ class ListModel extends Model
         'release_date' => 'Release Date',
         'manual' => 'Manual Order'
     ];
+
+    /**
+     * Scope a query to only include featured lists.
+     */
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
+    }
 
     public function user()
     {

@@ -71,6 +71,11 @@ class GameResource extends Resource
                                         Forms\Components\DatePicker::make('release_date')
                                             ->label('Release Date'),
                                         
+                                        Forms\Components\Toggle::make('is_featured')
+                                            ->label('Featured Game')
+                                            ->helperText('Featured games appear in a special section on the homepage')
+                                            ->default(false),
+                                        
                                         Forms\Components\Select::make('theme_ids')
                                             ->label('Themes')
                                             ->multiple()
@@ -236,6 +241,11 @@ class GameResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->copyable(),
                 
+                Tables\Columns\ToggleColumn::make('is_featured')
+                    ->label('Featured')
+                    ->sortable()
+                    ->toggleable(),
+                
                 Tables\Columns\TextColumn::make('genre.name')
                     ->label('Genre')
                     ->badge()
@@ -292,6 +302,14 @@ class GameResource extends Resource
                 
                 Tables\Filters\SelectFilter::make('platform')
                     ->relationship('platform', 'name'),
+                
+                Tables\Filters\SelectFilter::make('is_featured')
+                    ->label('Featured Status')
+                    ->options([
+                        true => 'Featured',
+                        false => 'Not Featured',
+                    ])
+                    ->placeholder('All Games'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

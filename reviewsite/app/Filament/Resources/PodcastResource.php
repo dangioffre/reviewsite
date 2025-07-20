@@ -106,6 +106,11 @@ class PodcastResource extends Resource
                             ->label('Verified')
                             ->disabled(),
 
+                        Forms\Components\Toggle::make('is_featured')
+                            ->label('Featured Podcast')
+                            ->helperText('Featured podcasts appear in a special section on the homepage')
+                            ->default(false),
+
                         Forms\Components\TextInput::make('verification_token')
                             ->label('Verification Token')
                             ->disabled()
@@ -185,6 +190,11 @@ class PodcastResource extends Resource
                     ->boolean()
                     ->sortable(),
 
+                Tables\Columns\ToggleColumn::make('is_featured')
+                    ->label('Featured')
+                    ->sortable()
+                    ->toggleable(),
+
                 Tables\Columns\TextColumn::make('episodes_count')
                     ->label('Episodes')
                     ->counts('episodes')
@@ -221,6 +231,14 @@ class PodcastResource extends Resource
                     ->placeholder('All podcasts')
                     ->trueLabel('Verified')
                     ->falseLabel('Not verified'),
+
+                Tables\Filters\SelectFilter::make('is_featured')
+                    ->label('Featured Status')
+                    ->options([
+                        true => 'Featured',
+                        false => 'Not Featured',
+                    ])
+                    ->placeholder('All Podcasts'),
 
                 Tables\Filters\Filter::make('has_rss_error')
                     ->label('Has RSS Error')

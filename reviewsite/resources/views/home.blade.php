@@ -121,9 +121,9 @@
                 </a>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 @foreach($recentGames as $game)
-                <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg shadow-lg border border-zinc-700 overflow-hidden group hover:border-[#E53E3E] transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl flex flex-col h-full">
+                <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg shadow-lg border {{ $game->is_featured ? 'border-2 border-[#E53E3E]' : 'border border-zinc-700' }} overflow-hidden group hover:border-[#E53E3E] transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl flex flex-col h-full relative">
                     <div class="aspect-[4/3] bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center relative overflow-hidden">
                         @if($game->thumbnail_url)
                             <img src="{{ $game->thumbnail_url }}" alt="{{ $game->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
@@ -131,7 +131,7 @@
                             <div class="absolute inset-0 bg-gradient-to-br from-green-500 to-blue-600 opacity-20"></div>
                             <span class="text-3xl font-bold text-white opacity-50">{{ substr($game->name, 0, 1) }}</span>
                         @endif
-                        @if($game->release_date && $game->release_date->gt(now()->subDays(7)))
+                        @if(!$game->is_featured && $game->release_date && $game->release_date->gt(now()->subDays(7)))
                             <div class="absolute top-2 left-2">
                                 <span class="bg-green-500 text-white px-2 py-1 rounded text-xs font-bold">NEW</span>
                             </div>
@@ -173,7 +173,7 @@
 
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 @foreach($recentStreamers as $streamer)
-                <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg shadow-lg border border-zinc-700 p-4 group hover:border-purple-500 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl flex flex-col h-full">
+                <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg shadow-lg border {{ $streamer->is_featured ? 'border-2 border-purple-500' : 'border border-zinc-700' }} p-4 group hover:border-purple-500 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl flex flex-col h-full relative">
                     <div class="flex flex-col flex-grow">
                         <div class="flex items-center mb-3">
                             <div class="w-12 h-12 flex-shrink-0 mr-3 relative">
@@ -243,7 +243,7 @@
 
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 @foreach($recentPodcasts as $podcast)
-                <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg shadow-lg border border-zinc-700 p-4 group hover:border-green-500 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl flex flex-col h-full">
+                <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg shadow-lg border {{ $podcast->is_featured ? 'border-2 border-green-500' : 'border border-zinc-700' }} p-4 group hover:border-green-500 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl flex flex-col h-full relative">
                     <div class="flex flex-col flex-grow">
                         <div class="flex items-start gap-3 mb-3">
                             <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -298,7 +298,7 @@
 
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 @foreach($recentLists as $list)
-                <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg shadow-lg border border-zinc-700 p-4 group hover:border-yellow-500 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl flex flex-col h-full">
+                <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg shadow-lg border {{ $list->is_featured ? 'border-2 border-yellow-500' : 'border border-zinc-700' }} p-4 group hover:border-yellow-500 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl flex flex-col h-full relative">
                     <div class="flex flex-col flex-grow">
                         <div class="flex items-start gap-3 mb-3">
                             <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -329,6 +329,8 @@
         </div>
     </section>
     @endif
+
+
 
     <!-- Call to Action -->
     <section class="bg-gradient-to-r from-[#E53E3E] to-purple-600 py-16">

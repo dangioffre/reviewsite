@@ -22,6 +22,7 @@ class StreamerProfile extends Model
         'bio',
         'is_verified',
         'is_approved',
+        'is_featured',
         'oauth_token',
         'oauth_refresh_token',
         'oauth_expires_at',
@@ -39,6 +40,7 @@ class StreamerProfile extends Model
     protected $casts = [
         'is_verified' => 'boolean',
         'is_approved' => 'boolean',
+        'is_featured' => 'boolean',
         'is_live' => 'boolean',
         'manual_live_override' => 'boolean',
         'oauth_expires_at' => 'datetime',
@@ -51,6 +53,14 @@ class StreamerProfile extends Model
         'oauth_token',
         'oauth_refresh_token',
     ];
+
+    /**
+     * Scope a query to only include featured streamers.
+     */
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
+    }
 
     /**
      * Get the user that owns the streamer profile.
