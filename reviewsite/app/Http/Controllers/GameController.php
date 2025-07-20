@@ -48,6 +48,20 @@ class GameController extends Controller
             }
         }
 
+        // Developer filter
+        if ($request->filled('developer')) {
+            $query->whereHas('developers', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->developer . '%');
+            });
+        }
+
+        // Publisher filter
+        if ($request->filled('publisher')) {
+            $query->whereHas('publishers', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->publisher . '%');
+            });
+        }
+
         // Sorting
         switch ($request->get('sort', 'latest')) {
             case 'oldest':

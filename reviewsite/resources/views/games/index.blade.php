@@ -1,7 +1,7 @@
 <x-layouts.app>
     <div class="min-h-screen bg-[#151515]">
         <!-- Enhanced Header Section -->
-        <div class="relative bg-gradient-to-br from-[#27272A] via-[#1A1A1B] to-[#151515] py-16 overflow-hidden">
+        <div class="relative bg-gradient-to-br from-[#27272A] via-[#1A1A1B] to-[#151515] py-12 overflow-hidden">
             <!-- Background Pattern -->
             <div class="absolute inset-0 opacity-10">
                 <div class="absolute top-0 left-0 w-full h-full" style="background-image: radial-gradient(circle at 25% 25%, #E53E3E 0%, transparent 50%), radial-gradient(circle at 75% 75%, #2563EB 0%, transparent 50%)"></div>
@@ -25,98 +25,45 @@
                         </div>
                     </nav>
 
-                    <div class="grid lg:grid-cols-3 gap-12 items-center">
-                        <!-- Main Content -->
-                        <div class="lg:col-span-2">
-                            <div class="mb-6">
-                                <span class="inline-block bg-gradient-to-r from-[#E53E3E] to-[#DC2626] text-white text-sm font-['Share_Tech_Mono'] px-4 py-2 rounded-full uppercase tracking-wider mb-4">
-                                    GAME LIBRARY
-                                </span>
-                                <h1 class="text-5xl lg:text-6xl font-bold text-white mb-6 font-['Share_Tech_Mono'] leading-tight">
-                                    <span class="block text-transparent bg-clip-text bg-gradient-to-r from-[#E53E3E] to-[#2563EB]">
-                                        Games
-                                    </span>
-                                </h1>
-                                <p class="text-xl text-[#A1A1AA] leading-relaxed font-['Inter'] max-w-2xl">
-                                    Explore our comprehensive game library with detailed reviews, videos, and community ratings. 
-                                    From indie gems to AAA blockbusters.
-                                </p>
+                    <!-- Hero Content -->
+                    <div class="text-center max-w-4xl mx-auto">
+                        <div class="mb-6">
+                            <!-- Game Controller Icon -->
+                            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#E53E3E] to-red-600 rounded-2xl mb-4 shadow-xl transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.01M15 10h1.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
                             </div>
 
-                            <!-- Quick Actions -->
-                            <div class="flex flex-wrap gap-4">
-                                <a href="#trending" class="bg-[#E53E3E] hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors font-['Inter'] flex items-center gap-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                                    </svg>
-                                    Trending Now
-                                </a>
-                            </div>
+                            <h1 class="text-5xl lg:text-7xl font-bold text-white mb-6 font-['Share_Tech_Mono'] leading-tight">
+                                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#E53E3E] via-[#2563EB] to-[#E53E3E] animate-pulse">
+                                    Games
+                                </span>
+                            </h1>
+                            
+                            <p class="text-lg lg:text-xl text-[#A1A1AA] leading-relaxed font-['Inter'] mb-8 max-w-3xl mx-auto">
+                                Discover your next gaming adventure. Explore detailed reviews, community ratings, and comprehensive game information from indie gems to blockbuster titles.
+                            </p>
                         </div>
 
-                        <!-- Stats Panel -->
-                        <div class="lg:col-span-1">
-                            <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl border border-[#3F3F46] p-6 shadow-2xl">
-                                <h3 class="text-lg font-bold text-white mb-6 font-['Share_Tech_Mono'] uppercase tracking-wider">
-                                    Game Stats
-                                </h3>
-                                <div class="space-y-6">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <div class="text-2xl font-bold text-white font-['Share_Tech_Mono']">{{ $products->total() ?? 0 }}</div>
-                                            <div class="text-sm text-[#A1A1AA] font-['Inter']">Total Games</div>
-                                        </div>
-                                        <div class="w-12 h-12 bg-[#E53E3E] bg-opacity-20 rounded-lg flex items-center justify-center">
-                                            <svg class="w-6 h-6 text-[#E53E3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <div class="text-2xl font-bold text-white font-['Share_Tech_Mono']">{{ $genres->count() }}</div>
-                                            <div class="text-sm text-[#A1A1AA] font-['Inter']">Genres Covered</div>
-                                        </div>
-                                        <div class="w-12 h-12 bg-[#2563EB] bg-opacity-20 rounded-lg flex items-center justify-center">
-                                            <svg class="w-6 h-6 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <div class="text-2xl font-bold text-white font-['Share_Tech_Mono']">{{ $platforms->count() }}</div>
-                                            <div class="text-sm text-[#A1A1AA] font-['Inter']">Platforms</div>
-                                        </div>
-                                        <div class="w-12 h-12 bg-[#4CAF50] bg-opacity-20 rounded-lg flex items-center justify-center">
-                                            <svg class="w-6 h-6 text-[#4CAF50]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-
-                                    @php
-                                        $avgRating = $products->avg('staff_rating') ?? 0;
-                                    @endphp
-                                    <div class="pt-4 border-t border-[#3F3F46]">
-                                        <div class="flex items-center justify-between">
-                                            <div>
-                                                <div class="text-2xl font-bold text-white font-['Share_Tech_Mono']">{{ number_format($avgRating, 1) }}</div>
-                                                <div class="text-sm text-[#A1A1AA] font-['Inter']">Average Rating</div>
-                                            </div>
-                                            <div class="flex">
-                                                @for($i = 1; $i <= 5; $i++)
-                                                    <svg class="w-4 h-4 {{ ($avgRating/2) >= $i ? 'text-[#FFC107]' : 'text-[#3F3F46]' }}" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                    </svg>
-                                                @endfor
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <!-- Enhanced Quick Actions -->
+                        <div class="flex flex-wrap justify-center gap-4">
+                            <a href="#trending" class="group bg-gradient-to-r from-[#E53E3E] to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 font-['Inter'] flex items-center gap-3 shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
+                                <svg class="w-6 h-6 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                                Trending Now
+                                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                            
+                            <a href="#filters" class="group bg-transparent border-2 border-[#A1A1AA] hover:border-[#E53E3E] text-[#A1A1AA] hover:text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 font-['Inter'] flex items-center gap-3 hover:bg-[#E53E3E]/10 transform hover:-translate-y-1">
+                                <svg class="w-6 h-6 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                                </svg>
+                                Browse & Filter
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -124,7 +71,7 @@
         </div>
 
         <!-- Enhanced Filter Section -->
-        <div class="container mx-auto px-4 py-8">
+        <div id="filters" class="container mx-auto px-4 py-8">
             <form method="GET" action="{{ route('games.index') }}" class="bg-[#27272A] rounded-lg shadow-md border border-[#3F3F46] overflow-hidden">
                 <!-- Advanced Filters -->
                 <div class="p-6">
@@ -170,6 +117,24 @@
                                     </option>
                                 @endforeach
                             </select>
+
+                            <!-- Developer Search -->
+                            <input 
+                                type="text" 
+                                name="developer" 
+                                placeholder="Search by developer..." 
+                                value="{{ request('developer') }}"
+                                class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white text-sm font-['Inter'] focus:border-[#2563EB] focus:ring-[#2563EB] min-w-[160px] placeholder-[#A1A1AA]"
+                            >
+
+                            <!-- Publisher Search -->
+                            <input 
+                                type="text" 
+                                name="publisher" 
+                                placeholder="Search by publisher..." 
+                                value="{{ request('publisher') }}"
+                                class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white text-sm font-['Inter'] focus:border-[#2563EB] focus:ring-[#2563EB] min-w-[160px] placeholder-[#A1A1AA]"
+                            >
                         </div>
                     </div>
 
@@ -190,7 +155,7 @@
                             </svg>
                             Search
                         </button>
-                        @if(request()->hasAny(['search', 'sort', 'score_range', 'platform', 'genre']))
+                        @if(request()->hasAny(['search', 'sort', 'score_range', 'platform', 'genre', 'developer', 'publisher']))
                             <a href="{{ route('games.index') }}" class="bg-[#27272A] text-white px-4 py-2.5 rounded-lg border border-[#E53E3E] hover:bg-red-900/50 transition-colors font-['Inter'] flex items-center">
                                 Clear Filters
                             </a>
@@ -224,7 +189,7 @@
             @endif
 
             <!-- Active Filters Display -->
-            @if(request()->hasAny(['search', 'sort', 'score_range', 'platform', 'genre']))
+            @if(request()->hasAny(['search', 'sort', 'score_range', 'platform', 'genre', 'developer', 'publisher']))
                 <div class="mb-6 mt-4">
                     <div class="flex flex-wrap gap-2">
                         <span class="text-sm text-[#A1A1AA] font-['Inter'] mr-2">Active filters:</span>
@@ -248,13 +213,23 @@
                                 {{ ucfirst(request('genre')) }}
                             </span>
                         @endif
+                        @if(request('developer'))
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-['Share_Tech_Mono'] bg-[#2563EB] text-white">
+                                Developer: {{ request('developer') }}
+                            </span>
+                        @endif
+                        @if(request('publisher'))
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-['Share_Tech_Mono'] bg-[#7C3AED] text-white">
+                                Publisher: {{ request('publisher') }}
+                            </span>
+                        @endif
 
                     </div>
                 </div>
             @endif
 
             <!-- Results Section -->
-            <div class="grid gap-8 mt-8">
+            <div id="trending" class="grid gap-8 mt-8">
                 @forelse($products as $product)
                     <div class="group relative bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] overflow-hidden hover:border-[#E53E3E] transition-all duration-500 hover:shadow-[0_20px_40px_rgba(229,62,62,0.15)] hover:-translate-y-1">
                         <!-- Background Pattern -->
