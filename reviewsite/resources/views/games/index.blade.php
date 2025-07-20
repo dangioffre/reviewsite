@@ -28,12 +28,7 @@
                     <!-- Hero Content -->
                     <div class="text-center max-w-4xl mx-auto">
                         <div class="mb-6">
-                            <!-- Game Controller Icon -->
-                            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#E53E3E] to-red-600 rounded-2xl mb-4 shadow-xl transform rotate-3 hover:rotate-0 transition-transform duration-300">
-                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.01M15 10h1.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
+
 
                             <h1 class="text-5xl lg:text-7xl font-bold text-white mb-6 font-['Share_Tech_Mono'] leading-tight">
                                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#E53E3E] via-[#2563EB] to-[#E53E3E] animate-pulse">
@@ -46,25 +41,7 @@
                             </p>
                         </div>
 
-                        <!-- Enhanced Quick Actions -->
-                        <div class="flex flex-wrap justify-center gap-4">
-                            <a href="#trending" class="group bg-gradient-to-r from-[#E53E3E] to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 font-['Inter'] flex items-center gap-3 shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
-                                <svg class="w-6 h-6 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                                </svg>
-                                Trending Now
-                                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                </svg>
-                            </a>
-                            
-                            <a href="#filters" class="group bg-transparent border-2 border-[#A1A1AA] hover:border-[#E53E3E] text-[#A1A1AA] hover:text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 font-['Inter'] flex items-center gap-3 hover:bg-[#E53E3E]/10 transform hover:-translate-y-1">
-                                <svg class="w-6 h-6 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                                </svg>
-                                Browse & Filter
-                            </a>
-                        </div>
+
                     </div>
                 </div>
             </div>
