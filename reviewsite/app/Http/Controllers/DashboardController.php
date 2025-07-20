@@ -49,6 +49,15 @@ class DashboardController extends Controller
         // Get recent activity
         $recentActivity = $this->getRecentActivity($user);
         
+        // Get followed streamers
+        $followedStreamers = $user->followedStreamers()
+            ->approved()
+            ->with(['user'])
+            ->withCount('followers')
+            ->orderBy('streamer_followers.created_at', 'desc')
+            ->limit(6)
+            ->get();
+        
         return view('dashboard.index', compact(
             'user',
             'stats',
@@ -56,7 +65,8 @@ class DashboardController extends Controller
             'mostLikedReviews',
             'recentLikes',
             'gameStats',
-            'recentActivity'
+            'recentActivity',
+            'followedStreamers'
         ));
     }
     
@@ -82,6 +92,8 @@ class DashboardController extends Controller
             ->withCount('likes')
             ->get()
             ->sum('likes_count');
+            
+        $followedStreamersCount = $user->followedStreamers()->count();
         
         return [
             'total_reviews' => $totalReviews,
@@ -92,6 +104,7 @@ class DashboardController extends Controller
             'average_rating' => round($averageRating, 1),
             'reviews_this_month' => $reviewsThisMonth,
             'likes_this_month' => $likesThisMonth,
+            'followed_streamers' => $followedStreamersCount,
         ];
     }
     

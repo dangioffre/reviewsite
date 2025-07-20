@@ -179,13 +179,35 @@
                     
                     @auth
                         @if(auth()->id() !== $streamerProfile->user_id)
-                            <button class="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-semibold shadow-lg" 
-                                    id="followBtn" data-profile-id="{{ $streamerProfile->id }}">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                                </svg>
-                                Follow
-                            </button>
+                            @php
+                                $isFollowing = auth()->user()->followedStreamers()->where('streamer_profiles.id', $streamerProfile->id)->exists();
+                            @endphp
+                            
+                            @if($isFollowing)
+                                <form action="{{ route('streamer.unfollow', $streamerProfile) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" 
+                                            class="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-semibold shadow-lg"
+                                            onclick="return confirm('Are you sure you want to unfollow {{ $streamerProfile->channel_name }}?')">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                        Unfollow
+                                    </button>
+                                </form>
+                            @else
+                                <form action="{{ route('streamer.follow', $streamerProfile) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" 
+                                            class="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-semibold shadow-lg">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                        </svg>
+                                        Follow
+                                    </button>
+                                </form>
+                            @endif
                         @endif
                     @endauth
                 </div>
