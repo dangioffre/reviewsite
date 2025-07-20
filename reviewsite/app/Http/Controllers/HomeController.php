@@ -42,7 +42,7 @@ class HomeController extends Controller
             ->with(['user'])
             ->withCount('followers')
             ->latest()
-            ->take(6)
+            ->take(5)
             ->get();
 
         // Recent Podcasts (recently added and approved)
@@ -50,7 +50,7 @@ class HomeController extends Controller
             ->with(['owner'])
             ->withCount(['episodes', 'reviews'])
             ->latest()
-            ->take(6)
+            ->take(5)
             ->get();
 
         // Recent Lists (recently created public lists)
@@ -58,7 +58,7 @@ class HomeController extends Controller
             ->with(['user'])
             ->withCount(['items', 'followers', 'comments'])
             ->latest()
-            ->take(6)
+            ->take(5)
             ->get();
 
         // Featured Posts (keeping existing functionality)

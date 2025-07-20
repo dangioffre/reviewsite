@@ -156,11 +156,11 @@
 
     <!-- Recent Streamers -->
     @if($recentStreamers->count() > 0)
-    <section class="bg-[#151515] py-16">
+    <section class="bg-[#151515] py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between mb-12">
+            <div class="flex items-center justify-between mb-8">
                 <div>
-                    <h2 class="text-4xl font-bold text-white mb-2 font-['Share_Tech_Mono']">Featured Streamers</h2>
+                    <h2 class="text-3xl font-bold text-white mb-2 font-['Share_Tech_Mono']">Featured Streamers</h2>
                     <p class="text-zinc-400 font-['Inter']">Meet the latest creators joining our community</p>
                 </div>
                 <a href="{{ route('streamer.profiles.index') }}" class="text-purple-400 hover:text-purple-300 font-semibold transition-colors font-['Inter'] flex items-center gap-2">
@@ -171,50 +171,52 @@
                 </a>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 @foreach($recentStreamers as $streamer)
-                <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-2xl shadow-xl border border-zinc-700 p-6 group hover:border-purple-500 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
-                    <div class="flex items-center mb-4">
-                        <div class="w-16 h-16 flex-shrink-0 mr-4 relative">
-                            @if($streamer->profile_photo_url)
-                                <img src="{{ $streamer->profile_photo_url }}" alt="{{ $streamer->channel_name }}" class="w-full h-full rounded-full object-cover border-2 border-purple-500">
-                            @else
-                                <div class="w-full h-full bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center border-2 border-purple-500">
-                                    <span class="text-white font-bold text-xl">{{ substr($streamer->channel_name, 0, 1) }}</span>
-                                </div>
-                            @endif
-                            @if($streamer->isLive())
-                                <div class="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold flex items-center gap-1">
-                                    <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                                    LIVE
-                                </div>
-                            @endif
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="text-white font-semibold text-lg group-hover:text-purple-400 transition-colors">{{ $streamer->channel_name }}</h3>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium {{ $streamer->platform === 'twitch' ? 'bg-purple-600 text-white' : ($streamer->platform === 'youtube' ? 'bg-red-600 text-white' : 'bg-green-600 text-white') }}">
-                                    {{ ucfirst($streamer->platform) }}
-                                </span>
-                                @if($streamer->is_verified)
-                                    <svg class="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
+                <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg shadow-lg border border-zinc-700 p-4 group hover:border-purple-500 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl flex flex-col h-full">
+                    <div class="flex flex-col flex-grow">
+                        <div class="flex items-center mb-3">
+                            <div class="w-12 h-12 flex-shrink-0 mr-3 relative">
+                                @if($streamer->profile_photo_url)
+                                    <img src="{{ $streamer->profile_photo_url }}" alt="{{ $streamer->channel_name }}" class="w-full h-full rounded-full object-cover border-2 border-purple-500">
+                                @else
+                                    <div class="w-full h-full bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center border-2 border-purple-500">
+                                        <span class="text-white font-bold text-sm">{{ substr($streamer->channel_name, 0, 1) }}</span>
+                                    </div>
+                                @endif
+                                @if($streamer->isLive())
+                                    <div class="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full font-bold">
+                                        <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse inline-block mr-1"></span>
+                                        LIVE
+                                    </div>
                                 @endif
                             </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-white font-semibold text-base group-hover:text-purple-400 transition-colors line-clamp-2 leading-tight">{{ $streamer->channel_name }}</h3>
+                                <div class="flex items-center gap-1.5 mt-1">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $streamer->platform === 'twitch' ? 'bg-purple-600 text-white' : ($streamer->platform === 'youtube' ? 'bg-red-600 text-white' : 'bg-green-600 text-white') }}">
+                                        {{ ucfirst($streamer->platform) }}
+                                    </span>
+                                    @if($streamer->is_verified)
+                                        <svg class="w-3.5 h-3.5 text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
+                        @if($streamer->bio)
+                            <p class="text-zinc-400 text-sm mb-3 line-clamp-2 flex-grow">{{ Str::limit($streamer->bio, 100) }}</p>
+                        @endif
+                        <div class="flex items-center justify-between text-sm text-zinc-500 mb-3">
+                            <span>{{ number_format($streamer->followers_count) }} followers</span>
+                            <span>{{ $streamer->created_at->format('M j') }}</span>
+                        </div>
+                        <a href="{{ route('streamer.profile.show', $streamer) }}" 
+                           class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-3 rounded text-sm font-semibold transition-all duration-300 block text-center transform hover:scale-105 mt-auto">
+                            View Profile
+                        </a>
                     </div>
-                    @if($streamer->bio)
-                        <p class="text-zinc-400 text-sm mb-4 line-clamp-2">{{ Str::limit($streamer->bio, 100) }}</p>
-                    @endif
-                    <div class="flex items-center justify-between text-sm text-zinc-500 mb-4">
-                        <span>{{ number_format($streamer->followers_count) }} followers</span>
-                        <span>{{ $streamer->created_at->diffForHumans() }}</span>
-                    </div>
-                    <a href="{{ route('streamer.profile.show', $streamer) }}" 
-                       class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 block text-center transform hover:scale-105 font-['Inter']">
-                        View Profile
-                    </a>
                 </div>
                 @endforeach
             </div>
@@ -224,11 +226,11 @@
 
     <!-- Recent Podcasts -->
     @if($recentPodcasts->count() > 0)
-    <section class="bg-[#1A1A1A] py-16">
+    <section class="bg-[#1A1A1A] py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between mb-12">
+            <div class="flex items-center justify-between mb-8">
                 <div>
-                    <h2 class="text-4xl font-bold text-white mb-2 font-['Share_Tech_Mono']">Gaming Podcasts</h2>
+                    <h2 class="text-3xl font-bold text-white mb-2 font-['Share_Tech_Mono']">Gaming Podcasts</h2>
                     <p class="text-zinc-400 font-['Inter']">Dive deep into gaming discussions and insights</p>
                 </div>
                 <a href="{{ route('podcasts.index') }}" class="text-green-400 hover:text-green-300 font-semibold transition-colors font-['Inter'] flex items-center gap-2">
@@ -239,35 +241,37 @@
                 </a>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 @foreach($recentPodcasts as $podcast)
-                <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-2xl shadow-xl border border-zinc-700 p-6 group hover:border-green-500 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
-                    <div class="flex items-start gap-4 mb-4">
-                        <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                            @if($podcast->cover_image)
-                                <img src="{{ $podcast->cover_image }}" alt="{{ $podcast->name }}" class="w-full h-full object-cover rounded-xl">
-                            @else
-                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
-                                </svg>
-                            @endif
+                <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg shadow-lg border border-zinc-700 p-4 group hover:border-green-500 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl flex flex-col h-full">
+                    <div class="flex flex-col flex-grow">
+                        <div class="flex items-start gap-3 mb-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                @if($podcast->cover_image)
+                                    <img src="{{ $podcast->cover_image }}" alt="{{ $podcast->name }}" class="w-full h-full object-cover rounded-lg">
+                                @else
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                    </svg>
+                                @endif
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-white font-semibold text-base mb-1 group-hover:text-green-400 transition-colors line-clamp-2 leading-tight">{{ $podcast->name }}</h3>
+                                <p class="text-zinc-500 text-sm truncate">by {{ $podcast->owner->name }}</p>
+                            </div>
                         </div>
-                        <div class="flex-1">
-                            <h3 class="text-white font-semibold text-lg mb-1 group-hover:text-green-400 transition-colors">{{ $podcast->name }}</h3>
-                            <p class="text-zinc-500 text-sm">by {{ $podcast->owner->name }}</p>
+                        @if($podcast->description)
+                            <p class="text-zinc-400 text-sm mb-3 line-clamp-2 flex-grow">{{ Str::limit($podcast->description, 100) }}</p>
+                        @endif
+                        <div class="flex items-center justify-between text-sm text-zinc-500 mb-3">
+                            <span>{{ $podcast->episodes_count }} episodes</span>
+                            <span>{{ $podcast->reviews_count }} reviews</span>
                         </div>
+                        <a href="{{ route('podcasts.show', $podcast) }}" 
+                           class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-3 rounded text-sm font-semibold transition-all duration-300 block text-center transform hover:scale-105 mt-auto">
+                            Listen Now
+                        </a>
                     </div>
-                    @if($podcast->description)
-                        <p class="text-zinc-400 text-sm mb-4 line-clamp-2">{{ Str::limit($podcast->description, 120) }}</p>
-                    @endif
-                    <div class="flex items-center justify-between text-sm text-zinc-500 mb-4">
-                        <span>{{ $podcast->episodes_count }} episodes</span>
-                        <span>{{ $podcast->reviews_count }} reviews</span>
-                    </div>
-                    <a href="{{ route('podcasts.show', $podcast) }}" 
-                       class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 block text-center transform hover:scale-105 font-['Inter']">
-                        Listen Now
-                    </a>
                 </div>
                 @endforeach
             </div>
@@ -277,11 +281,11 @@
 
     <!-- Recent Lists -->
     @if($recentLists->count() > 0)
-    <section class="bg-[#151515] py-16">
+    <section class="bg-[#151515] py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between mb-12">
+            <div class="flex items-center justify-between mb-8">
                 <div>
-                    <h2 class="text-4xl font-bold text-white mb-2 font-['Share_Tech_Mono']">Community Lists</h2>
+                    <h2 class="text-3xl font-bold text-white mb-2 font-['Share_Tech_Mono']">Community Lists</h2>
                     <p class="text-zinc-400 font-['Inter']">Discover curated collections created by our community</p>
                 </div>
                 <a href="{{ route('lists.index') }}" class="text-yellow-400 hover:text-yellow-300 font-semibold transition-colors font-['Inter'] flex items-center gap-2">
@@ -292,31 +296,33 @@
                 </a>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 @foreach($recentLists as $list)
-                <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-2xl shadow-xl border border-zinc-700 p-6 group hover:border-yellow-500 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
-                    <div class="flex items-start gap-4 mb-4">
-                        <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-                            </svg>
+                <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg shadow-lg border border-zinc-700 p-4 group hover:border-yellow-500 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl flex flex-col h-full">
+                    <div class="flex flex-col flex-grow">
+                        <div class="flex items-start gap-3 mb-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-white font-semibold text-base mb-1 group-hover:text-yellow-400 transition-colors line-clamp-2 leading-tight">{{ $list->name }}</h3>
+                                <p class="text-zinc-500 text-sm truncate">by {{ $list->user->name }}</p>
+                            </div>
                         </div>
-                        <div class="flex-1">
-                            <h3 class="text-white font-semibold text-lg mb-1 group-hover:text-yellow-400 transition-colors">{{ $list->name }}</h3>
-                            <p class="text-zinc-500 text-sm">by {{ $list->user->name }}</p>
+                        @if($list->description)
+                            <p class="text-zinc-400 text-sm mb-3 line-clamp-2 flex-grow">{{ Str::limit($list->description, 100) }}</p>
+                        @endif
+                        <div class="flex items-center justify-between text-sm text-zinc-500 mb-3">
+                            <span>{{ $list->items_count }} games</span>
+                            <span>{{ $list->followers_count }} followers</span>
                         </div>
+                        <a href="{{ route('lists.public', $list->slug) }}" 
+                           class="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-3 rounded text-sm font-semibold transition-all duration-300 block text-center transform hover:scale-105 mt-auto">
+                            View List
+                        </a>
                     </div>
-                    @if($list->description)
-                        <p class="text-zinc-400 text-sm mb-4 line-clamp-2">{{ Str::limit($list->description, 120) }}</p>
-                    @endif
-                    <div class="flex items-center justify-between text-sm text-zinc-500 mb-4">
-                        <span>{{ $list->items_count }} games</span>
-                        <span>{{ $list->followers_count }} followers</span>
-                    </div>
-                    <a href="{{ route('lists.public', $list->slug) }}" 
-                       class="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-300 block text-center transform hover:scale-105 font-['Inter']">
-                        View List
-                    </a>
                 </div>
                 @endforeach
             </div>
