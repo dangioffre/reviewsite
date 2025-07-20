@@ -2,17 +2,49 @@
 @section('description', 'Explore thousands of curated game lists created by our community. Search by name, genre, platform, game mode, and more to find the perfect gaming collection.')
 
 <x-layouts.app>
-<div class="min-h-screen bg-gradient-to-br from-[#0F0F0F] via-[#1A1A1A] to-[#0F0F0F]">
-    <div class="container mx-auto px-4 py-8">
-        <!-- Header Section -->
-        <div class="text-center mb-12">
-            <h1 class="text-5xl lg:text-7xl font-bold text-white mb-4 font-['Share_Tech_Mono']">
-                Discover Lists
-            </h1>
-            <p class="text-xl text-[#A1A1AA] font-['Inter'] max-w-3xl mx-auto">
-                Explore curated game collections from our community. Find lists by name, games, genres, platforms, and more.
-            </p>
+<div class="min-h-screen bg-[#151515]">
+    <!-- Hero Section -->
+    <div class="relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-red-600/20"></div>
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
+        
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl mb-4 shadow-2xl">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                    </svg>
+                </div>
+                
+                <h1 class="text-4xl lg:text-5xl font-bold text-white mb-4 font-['Share_Tech_Mono'] bg-gradient-to-r from-white via-yellow-200 to-orange-200 bg-clip-text text-transparent">
+                    Community Lists
+                </h1>
+                
+                <p class="text-lg lg:text-xl text-zinc-400 mb-6 max-w-2xl mx-auto font-['Inter'] leading-relaxed">
+                    Explore curated game collections from our community. Find lists by name, games, genres, platforms, and more.
+                </p>
+                
+                <div class="flex items-center justify-center gap-8 text-zinc-400">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 bg-yellow-500 rounded-full animate-pulse"></div>
+                        <span class="font-medium">{{ $lists->total() }} Lists</span>
+                    </div>
+                    <div class="w-px h-6 bg-zinc-600"></div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
+                        <span class="font-medium">Curated Collections</span>
+                    </div>
+                    <div class="w-px h-6 bg-zinc-600"></div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                        <span class="font-medium">All Categories</span>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
 
         <!-- Search and Filter Section -->
         <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl border border-[#3F3F46] p-8 mb-12">

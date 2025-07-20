@@ -1,23 +1,55 @@
 <x-layouts.app>
-    <div class="min-h-screen bg-gradient-to-br from-[#1A1A1B] to-[#2D2D30] text-white py-12">
-        <div class="max-w-7xl mx-auto px-4">
-            <!-- New Combined Header -->
-            <div class="flex justify-between items-center mb-12">
-                <div>
-                    <h1 class="text-4xl font-bold text-white font-['Share_Tech_Mono']">
-                        Gaming Podcasts
-                    </h1>
-                    <p class="text-xl text-[#A1A1AA] mt-2 font-['Inter']">
-                        Discover gaming podcasts from our community and their reviews
-                    </p>
+<div class="min-h-screen bg-[#151515]">
+    <!-- Hero Section -->
+    <div class="relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-red-600/20"></div>
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
+        
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-2xl mb-4 shadow-2xl">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                    </svg>
                 </div>
-                <div>
-                    <a href="{{ route('podcasts.create') }}" 
-                       class="bg-[#E53E3E] text-white font-bold py-4 px-8 rounded-lg font-['Inter'] hover:bg-[#DC2626] transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-110 inline-block">
-                        Submit Your Podcast
-                    </a>
+                
+                <h1 class="text-4xl lg:text-5xl font-bold text-white mb-4 font-['Share_Tech_Mono'] bg-gradient-to-r from-white via-green-200 to-blue-200 bg-clip-text text-transparent">
+                    Gaming Podcasts
+                </h1>
+                
+                <p class="text-lg lg:text-xl text-zinc-400 mb-6 max-w-2xl mx-auto font-['Inter'] leading-relaxed">
+                    Dive deep into gaming discussions and insights. Discover podcasts from our community and their reviews.
+                </p>
+                
+                <div class="flex items-center justify-center gap-8 text-zinc-400 mb-8">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                        <span class="font-medium">{{ $podcasts->total() }} Podcasts</span>
+                    </div>
+                    <div class="w-px h-6 bg-zinc-600"></div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                        <span class="font-medium">Community Reviews</span>
+                    </div>
+                    <div class="w-px h-6 bg-zinc-600"></div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+                        <span class="font-medium">All Genres</span>
+                    </div>
                 </div>
+
+                <a href="{{ route('podcasts.create') }}" 
+                   class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-['Inter'] flex items-center justify-center gap-2 inline-flex">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    Submit Your Podcast
+                </a>
             </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 mt-8">
 
             @if($podcasts->count() > 0)
                 <!-- Podcasts Grid -->

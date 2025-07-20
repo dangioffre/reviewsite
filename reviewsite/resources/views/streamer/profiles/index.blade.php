@@ -9,19 +9,19 @@
         <div class="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-red-600/20"></div>
         <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
         
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-            <div class="text-center mb-16">
-                <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-purple-500 to-red-500 rounded-2xl mb-6 shadow-2xl">
-                    <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-red-500 rounded-2xl mb-4 shadow-2xl">
+                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                     </svg>
                 </div>
                 
-                <h1 class="text-5xl lg:text-7xl font-bold text-white mb-6 font-['Share_Tech_Mono'] bg-gradient-to-r from-white via-purple-200 to-red-200 bg-clip-text text-transparent">
+                <h1 class="text-4xl lg:text-5xl font-bold text-white mb-4 font-['Share_Tech_Mono'] bg-gradient-to-r from-white via-purple-200 to-red-200 bg-clip-text text-transparent">
                     Discover Streamers
                 </h1>
                 
-                <p class="text-xl lg:text-2xl text-zinc-400 mb-8 max-w-3xl mx-auto font-['Inter'] leading-relaxed">
+                <p class="text-lg lg:text-xl text-zinc-400 mb-6 max-w-2xl mx-auto font-['Inter'] leading-relaxed">
                     Find amazing content creators across Twitch, YouTube, and Kick. Connect with streamers who share your gaming passion.
                 </p>
                 
