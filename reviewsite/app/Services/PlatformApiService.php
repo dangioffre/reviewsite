@@ -60,6 +60,28 @@ class PlatformApiService
     private const REQUEST_TIMEOUT = 30;
 
     /**
+     * Create HTTP client with SSL configuration for development
+     */
+    private function createHttpClient(): \Illuminate\Http\Client\PendingRequest
+    {
+        $client = Http::timeout(self::REQUEST_TIMEOUT);
+        
+        // Apply SSL bypass for development
+        if (env('KICK_DISABLE_SSL', false) || env('DISABLE_SSL_VERIFICATION', false)) {
+            $client = $client->withOptions(['verify' => false]);
+        } else {
+            $caCertPath = env('CURL_CA_BUNDLE');
+            if ($caCertPath && file_exists($caCertPath)) {
+                $client = $client->withOptions(['verify' => $caCertPath]);
+            } else {
+                $client = $client->withOptions(['verify' => false]);
+            }
+        }
+        
+        return $client;
+    }
+
+    /**
      * Fetch channel data from streaming platform
      *
      * @param StreamerProfile $profile
@@ -224,7 +246,7 @@ class PlatformApiService
     public function checkVodHealth(StreamerVod $vod): bool
     {
         try {
-            $response = Http::timeout(10)->head($vod->vod_url);
+            $response = $this->createHttpClient()->head($vod->vod_url);
             return $response->successful();
         } catch (Exception $e) {
             Log::warning("VOD health check failed", [
@@ -436,7 +458,7 @@ class PlatformApiService
         // Kick API might use username instead of user ID
         $username = $this->extractUsernameFromUrl($profile->channel_url) ?? $profile->platform_user_id;
         
-        $response = Http::timeout(self::REQUEST_TIMEOUT)
+        $response = $this->createHttpClient()
             ->get(self::PLATFORM_ENDPOINTS['kick']['base_url'] . self::PLATFORM_ENDPOINTS['kick']['user_endpoint'] . '/' . $username);
 
         if ($response->failed()) {
@@ -551,7 +573,7 @@ class PlatformApiService
     {
         $username = $this->extractUsernameFromUrl($profile->channel_url) ?? $profile->platform_user_id;
         
-        $response = Http::timeout(self::REQUEST_TIMEOUT)
+        $response = $this->createHttpClient()
             ->get(str_replace('{username}', $username, self::PLATFORM_ENDPOINTS['kick']['base_url'] . self::PLATFORM_ENDPOINTS['kick']['videos_endpoint']), [
                 'limit' => $limit
             ]);
@@ -640,7 +662,7 @@ class PlatformApiService
     {
         $username = $this->extractUsernameFromUrl($profile->channel_url) ?? $profile->platform_user_id;
         
-        $response = Http::timeout(self::REQUEST_TIMEOUT)
+        $response = $this->createHttpClient()
             ->get(str_replace('{username}', $username, self::PLATFORM_ENDPOINTS['kick']['base_url'] . self::PLATFORM_ENDPOINTS['kick']['live_endpoint']));
 
         if ($response->failed()) {
