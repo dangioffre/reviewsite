@@ -1,0 +1,175 @@
+/* VOD Card Hover Effects */
+.vod-card {
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #27272A 0%, #1A1A1B 100%);
+    min-height: 400px;
+}
+
+.vod-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    border-color: #2563EB !important;
+}
+
+.vod-thumbnail {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.vod-card:hover .vod-thumbnail img {
+    transform: scale(1.05);
+}
+
+/* Action Button Styles */
+.action-btn {
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Modal Styling */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    outline: 0;
+}
+
+.modal.show {
+    display: block !important;
+}
+
+.modal-dialog {
+    position: relative;
+    width: auto;
+    margin: 1.75rem;
+    pointer-events: none;
+}
+
+.modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background: linear-gradient(135deg, #27272A 0%, #1A1A1B 100%);
+    border: 1px solid #3F3F46;
+    border-radius: 0.5rem;
+    outline: 0;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 1.5rem;
+    border-bottom: none;
+    border-top-left-radius: calc(0.5rem - 1px);
+    border-top-right-radius: calc(0.5rem - 1px);
+}
+
+.modal-body {
+    position: relative;
+    flex: 1 1 auto;
+    padding: 1rem;
+}
+
+.modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #3F3F46;
+    border-bottom-right-radius: calc(0.5rem - 1px);
+    border-bottom-left-radius: calc(0.5rem - 1px);
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1040;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-backdrop.fade {
+    opacity: 0;
+}
+
+.modal-backdrop.show {
+    opacity: 1;
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+@media (min-width: 576px) {
+    .modal-dialog {
+        max-width: 500px;
+        margin: 1.75rem auto;
+    }
+}
+
+@media (min-width: 992px) {
+    .modal-lg {
+        max-width: 800px;
+    }
+    
+    .modal-xl {
+        max-width: 1200px;
+    }
+}
+
+/* Aspect ratio for video container */
+.aspect-video {
+    aspect-ratio: 16 / 9;
+}
+
+/* Custom Form Styling */
+.form-control {
+    background-color: #1A1A1B;
+    border: 1px solid #3F3F46;
+    color: #FFFFFF;
+}
+
+.form-control:focus {
+    background-color: #1A1A1B;
+    border-color: #2563EB;
+    color: #FFFFFF;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+}
+
+.form-control::placeholder {
+    color: #A1A1AA;
+}
+
+/* Line clamp utility for text truncation */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Modal backdrop styling */
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+    transition-property: color, background-color, border-color, transform, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+} 
