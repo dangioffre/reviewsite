@@ -574,6 +574,10 @@ class PlatformApiService
         $username = $this->extractUsernameFromUrl($profile->channel_url) ?? $profile->platform_user_id;
         
         $response = $this->createHttpClient()
+            ->withHeaders([
+                'User-Agent' => 'ReviewSite/1.0 (API Client)',
+                'Accept' => 'application/json',
+            ])
             ->get(str_replace('{username}', $username, self::PLATFORM_ENDPOINTS['kick']['base_url'] . self::PLATFORM_ENDPOINTS['kick']['videos_endpoint']), [
                 'limit' => $limit
             ]);

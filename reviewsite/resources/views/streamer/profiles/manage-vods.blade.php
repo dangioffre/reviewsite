@@ -309,6 +309,25 @@
                                 $twitchClipId = $matches[1];
                                 $embedType = 'clip';
                             }
+                            
+                            // Kick URL parsing
+                            $kickVideoId = null;
+                            $kickClipId = null;
+                            $kickUsername = null;
+                            $kickEmbedType = null;
+                            
+                            // Handle Kick clip URLs
+                            if (preg_match('/kick\.com\/([^\/]+)\/clips\/([^\/\?]+)/', $url, $matches)) {
+                                $kickUsername = $matches[1];
+                                $kickClipId = $matches[2];
+                                $kickEmbedType = 'clip';
+                            }
+                            // Handle Kick video URLs
+                            elseif (preg_match('/kick\.com\/([^\/]+)\/videos\/(\d+)/', $url, $matches)) {
+                                $kickUsername = $matches[1];
+                                $kickVideoId = $matches[2];
+                                $kickEmbedType = 'video';
+                            }
                         @endphp
                         
                         <div class="vod-card rounded-xl border border-[#3F3F46] flex flex-col h-full">
@@ -414,11 +433,28 @@
                                                     data-channel="{{ $twitchChannel }}"
                                                     data-vod-title="{{ $vod->title }}"
                                                     data-original-url="{{ $vod->vod_url }}"
+                                                    data-platform="twitch"
                                                     title="Watch embedded Twitch {{ $embedType === 'clip' ? 'Clip' : 'VOD' }}">
                                                 <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
                                                     <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
                                                 </svg>
                                                 {{ $embedType === 'clip' ? 'Play Clip' : 'Watch' }}
+                                            </button>
+                                        @elseif($kickEmbedType)
+                                            <button type="button" 
+                                                    class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-center text-xs font-['Inter'] watch-embed-btn"
+                                                    data-embed-type="{{ $kickEmbedType }}"
+                                                    data-vod-id="{{ $kickVideoId }}" 
+                                                    data-clip-id="{{ $kickClipId }}"
+                                                    data-username="{{ $kickUsername }}"
+                                                    data-vod-title="{{ $vod->title }}"
+                                                    data-original-url="{{ $vod->vod_url }}"
+                                                    data-platform="kick"
+                                                    title="Watch Kick {{ $kickEmbedType === 'clip' ? 'Clip' : 'VOD' }} (opens in new tab)">
+                                                <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M8 5v14l11-7z"/>
+                                                </svg>
+                                                {{ $kickEmbedType === 'clip' ? 'Play Clip' : 'Watch' }}
                                             </button>
                                         @else
                                             <!-- Debug: Show why embed isn't available -->
@@ -553,7 +589,7 @@
                                 <input type="url" 
                                        class="w-full px-4 py-3 bg-[#1A1A1B] border-2 border-[#3F3F46] rounded-lg text-white placeholder-[#A1A1AA] font-['Inter'] focus:border-[#2563EB] focus:outline-none transition-colors @error('vod_url') border-red-500 @enderror" 
                                        id="vod_url" name="vod_url" value="{{ old('vod_url') }}" required maxlength="500"
-                                       placeholder="https://www.twitch.tv/videos/1234567890">
+                                       placeholder="https://kick.com/inourmomsbasement/clips/clip_01K0Q48QZSAKWPEWAN0Q9X31F8">
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-3">
                                     <div id="url-status-icon">
                                         <svg class="w-4 h-4 text-[#A1A1AA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -568,10 +604,18 @@
                                         <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
                                     </svg>
                                     <div class="text-purple-300 text-xs font-['Inter']">
-                                        <div class="font-semibold mb-1">Twitch VODs & Clips support embedded viewing!</div>
-                                        <div class="space-y-1">
-                                            <div>VODs: <code class="bg-purple-900/30 px-1 rounded">https://www.twitch.tv/videos/1234567890</code></div>
-                                            <div>Clips: <code class="bg-purple-900/30 px-1 rounded">https://www.twitch.tv/username/clip/ClipName-abc123</code></div>
+                                        <div class="font-semibold mb-1">Supported Platforms:</div>
+                                        <div class="space-y-2">
+                                            <div>
+                                                <div class="font-medium text-purple-200">Twitch (Embedded Viewing)</div>
+                                                <div>VODs: <code class="bg-purple-900/30 px-1 rounded">https://www.twitch.tv/videos/1234567890</code></div>
+                                                <div>Clips: <code class="bg-purple-900/30 px-1 rounded">https://www.twitch.tv/username/clip/ClipName-abc123</code></div>
+                                            </div>
+                                            <div>
+                                                <div class="font-medium text-green-200">Kick (Embedded Viewing)</div>
+                                                <div>Clips: <code class="bg-green-900/30 px-1 rounded">https://kick.com/username/clips/clip_01K0Q48QZSAKWPEWAN0Q9X31F8</code></div>
+                                                <div>VODs: <code class="bg-green-900/30 px-1 rounded">https://kick.com/username/videos/12345</code></div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -751,6 +795,157 @@
     </div>
 </div>
 
+<!-- Kick Embed Modal -->
+<div class="modal fade" id="kickEmbedModal" tabindex="-1" role="dialog" aria-labelledby="kickEmbedModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content border-0 shadow-2xl">
+            <!-- Modal Header -->
+            <div class="modal-header bg-[#1A1A1B] border-b border-[#3F3F46] px-6 py-4">
+                <div class="flex items-center justify-between w-full">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="text-lg font-bold font-['Share_Tech_Mono'] mb-0" id="kickEmbedModalLabel">
+                                Watch VOD
+                            </h5>
+                            <p class="text-[#A1A1AA] text-sm mb-0 font-['Inter']" id="kickVodTitleDisplay">
+                                Loading...
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button" class="text-[#A1A1AA] hover:text-white transition-colors" data-dismiss="modal" aria-label="Close">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="modal-body p-0">
+                <div class="aspect-video bg-black">
+                    <iframe id="kickEmbed" 
+                            src="" 
+                            height="100%" 
+                            width="100%" 
+                            allowfullscreen="true" 
+                            scrolling="no" 
+                            frameborder="0">
+                    </iframe>
+                </div>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="modal-footer bg-[#1A1A1B] border-t border-[#3F3F46] px-6 py-4">
+                <div class="flex items-center justify-between w-full">
+                    <div class="text-[#A1A1AA] text-sm font-['Inter']">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Embedded Kick player - Full screen available
+                    </div>
+                    <div class="flex gap-3">
+                        <button type="button" 
+                                class="px-4 py-2 bg-[#3F3F46] text-white rounded-lg hover:bg-[#52525B] transition-colors font-['Inter']" 
+                                data-dismiss="modal">
+                            Close
+                        </button>
+                        <a id="openKickLink" 
+                           href="#" 
+                           target="_blank" 
+                           class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-['Inter']">
+                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                            Open on Kick
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Kick Embed Modal -->
+<div class="modal fade" id="kickEmbedModal" tabindex="-1" role="dialog" aria-labelledby="kickEmbedModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content border-0 shadow-2xl">
+            <!-- Modal Header -->
+            <div class="modal-header bg-[#1A1A1B] border-b border-[#3F3F46] px-6 py-4">
+                <div class="flex items-center justify-between w-full">
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-green-400 mr-3" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h5 class="text-lg font-bold font-['Share_Tech_Mono'] mb-0" id="kickEmbedModalLabel">
+                            Watch VOD
+                        </h5>
+                        <div class="text-sm text-[#A1A1AA] font-['Inter']" id="kickVodTitleDisplay">
+                            Loading...
+                        </div>
+                    </div>
+                    <button type="button" 
+                            class="text-[#A1A1AA] hover:text-white transition-colors" 
+                            data-dismiss="modal" 
+                            aria-label="Close">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="modal-body p-0">
+                <div class="aspect-video bg-black">
+                    <iframe id="kickEmbed" 
+                            src="" 
+                            height="100%" 
+                            width="100%" 
+                            allowfullscreen="true" 
+                            scrolling="no" 
+                            frameborder="0">
+                    </iframe>
+                </div>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="modal-footer bg-[#1A1A1B] border-t border-[#3F3F46] px-6 py-4">
+                <div class="flex items-center justify-between w-full">
+                    <div class="text-[#A1A1AA] text-sm font-['Inter']">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Embedded Kick player - Full screen available
+                    </div>
+                    <div class="flex gap-3">
+                        <button type="button" 
+                                class="px-4 py-2 bg-[#3F3F46] text-white rounded-lg hover:bg-[#52525B] transition-colors font-['Inter']" 
+                                data-dismiss="modal">
+                            Close
+                        </button>
+                        <a id="openKickLink" 
+                           href="#" 
+                           target="_blank" 
+                           class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-['Inter']">
+                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                            Open on Kick
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteVodModal" tabindex="-1" role="dialog" aria-labelledby="deleteVodModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -922,23 +1117,39 @@ document.addEventListener('DOMContentLoaded', function() {
         let clipId = null;
         let videoId = null;
         let channelName = null;
+        let platform = null;
         
         // Handle different Twitch URL formats
         if (url.match(/(?:www\.|m\.|go\.)?twitch\.tv\/([^\/]+)\/clip\/([^\/\?]+)/)) {
             const matches = url.match(/(?:www\.|m\.|go\.)?twitch\.tv\/([^\/]+)\/clip\/([^\/\?]+)/);
             channelName = matches[1];
             clipId = matches[2];
+            platform = 'twitch';
         } else if (url.match(/clips\.twitch\.tv\/([^\/\?]+)/)) {
             const matches = url.match(/clips\.twitch\.tv\/([^\/\?]+)/);
             clipId = matches[1];
+            platform = 'twitch';
         } else if (url.match(/(?:www\.|m\.|go\.)?twitch\.tv\/videos\/(\d+)/)) {
             const matches = url.match(/(?:www\.|m\.|go\.)?twitch\.tv\/videos\/(\d+)/);
             videoId = matches[1];
+            platform = 'twitch';
+        }
+        // Handle Kick URL formats
+        else if (url.match(/kick\.com\/([^\/]+)\/clips\/([^\/\?]+)/)) {
+            const matches = url.match(/kick\.com\/([^\/]+)\/clips\/([^\/\?]+)/);
+            channelName = matches[1];
+            clipId = matches[2];
+            platform = 'kick';
+        } else if (url.match(/kick\.com\/([^\/]+)\/videos\/(\d+)/)) {
+            const matches = url.match(/kick\.com\/([^\/]+)\/videos\/(\d+)/);
+            channelName = matches[1];
+            videoId = matches[1];
+            platform = 'kick';
         }
         
         let success = false;
         
-        if (clipId) {
+        if (clipId && platform === 'twitch') {
             // Extract title from clip slug (clips often have descriptive names)
             const clipTitle = extractClipTitle(clipId);
             if (clipTitle) {
@@ -954,9 +1165,22 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!thumbnailInput.value.trim()) {
                 showThumbnailHint(clipId);
             }
-        } else if (videoId) {
-            // For VODs, create a basic title
+        } else if (clipId && platform === 'kick') {
+            // For Kick clips, create a basic title from the clip ID
+            const clipTitle = `${channelName} - Kick Clip`;
+            titleInput.value = clipTitle;
+            titleInput.dispatchEvent(new Event('input'));
+            success = true;
+            showAutoFillMessage(`Auto-filled title: "${clipTitle}"`);
+        } else if (videoId && platform === 'twitch') {
+            // For Twitch VODs, create a basic title
             const vodTitle = channelName ? `${channelName} - VOD ${videoId}` : `Twitch VOD ${videoId}`;
+            titleInput.value = vodTitle;
+            success = true;
+            showAutoFillMessage(`Auto-filled title: "${vodTitle}"`);
+        } else if (videoId && platform === 'kick') {
+            // For Kick VODs, create a basic title
+            const vodTitle = `${channelName} - Kick VOD`;
             titleInput.value = vodTitle;
             success = true;
             showAutoFillMessage(`Auto-filled title: "${vodTitle}"`);
@@ -1119,54 +1343,120 @@ document.addEventListener('DOMContentLoaded', function() {
     const openTwitchLink = document.getElementById('openTwitchLink');
     const watchEmbedButtons = document.querySelectorAll('.watch-embed-btn');
     
-    // Open Twitch embed modal
+    // Kick embed modal elements
+    const kickModal = document.getElementById('kickEmbedModal');
+    const kickEmbed = document.getElementById('kickEmbed');
+    const kickVodTitleDisplay = document.getElementById('kickVodTitleDisplay');
+    const openKickLink = document.getElementById('openKickLink');
+    
+    // Open embed modal (handles both Twitch and Kick)
     watchEmbedButtons.forEach(button => {
         button.addEventListener('click', function() {
+            const platform = this.dataset.platform || 'twitch'; // Default to twitch for backward compatibility
             const embedType = this.dataset.embedType;
             const vodId = this.dataset.vodId;
             const clipId = this.dataset.clipId;
             const channel = this.dataset.channel;
+            const username = this.dataset.username;
             const vodTitle = this.dataset.vodTitle;
             const originalUrl = this.dataset.originalUrl;
             
-            let embedUrl = '';
-            let twitchUrl = originalUrl;
-            
-            // Set up the embed URL based on type
-            if (embedType === 'video' && vodId) {
-                embedUrl = `https://player.twitch.tv/?video=${vodId}&parent=${window.location.hostname}&autoplay=false`;
-                twitchUrl = `https://www.twitch.tv/videos/${vodId}`;
-            } else if (embedType === 'clip' && clipId) {
-                embedUrl = `https://clips.twitch.tv/embed?clip=${clipId}&parent=${window.location.hostname}&autoplay=false`;
-                twitchUrl = originalUrl;
+            if (platform === 'twitch') {
+                openTwitchEmbed(embedType, vodId, clipId, channel, vodTitle, originalUrl);
+            } else if (platform === 'kick') {
+                // For now, open Kick clips/videos in new tab since embedding is problematic
+                window.open(originalUrl, '_blank');
             }
-            
-            // Set up the embed
-            twitchEmbed.src = embedUrl;
-            
-            // Update modal content
-            vodTitleDisplay.textContent = vodTitle;
-            openTwitchLink.href = twitchUrl;
-            
-            // Update modal title based on type
-            const modalTitle = document.querySelector('#twitchEmbedModalLabel');
-            modalTitle.textContent = embedType === 'clip' ? 'Watch Clip' : 'Watch VOD';
-            
-            // Show modal
-            twitchModal.style.display = 'block';
-            twitchModal.classList.add('show');
-            document.body.classList.add('modal-open');
-            
-            // Add backdrop
-            const backdrop = document.createElement('div');
-            backdrop.className = 'modal-backdrop fade show';
-            backdrop.id = 'twitch-modal-backdrop';
-            document.body.appendChild(backdrop);
-            
-            // Close on backdrop click
-            backdrop.addEventListener('click', closeTwitchModal);
         });
     });
+    
+    function openTwitchEmbed(embedType, vodId, clipId, channel, vodTitle, originalUrl) {
+        let embedUrl = '';
+        let twitchUrl = originalUrl;
+        
+        // Set up the embed URL based on type
+        if (embedType === 'video' && vodId) {
+            embedUrl = `https://player.twitch.tv/?video=${vodId}&parent=${window.location.hostname}&autoplay=false`;
+            twitchUrl = `https://www.twitch.tv/videos/${vodId}`;
+        } else if (embedType === 'clip' && clipId) {
+            embedUrl = `https://clips.twitch.tv/embed?clip=${clipId}&parent=${window.location.hostname}&autoplay=false`;
+            twitchUrl = originalUrl;
+        }
+        
+        // Set up the embed
+        twitchEmbed.src = embedUrl;
+        
+        // Update modal content
+        vodTitleDisplay.textContent = vodTitle;
+        openTwitchLink.href = twitchUrl;
+        
+        // Update modal title based on type
+        const modalTitle = document.querySelector('#twitchEmbedModalLabel');
+        modalTitle.textContent = embedType === 'clip' ? 'Watch Clip' : 'Watch VOD';
+        
+        // Show modal
+        twitchModal.style.display = 'block';
+        twitchModal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        // Add backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade show';
+        backdrop.id = 'twitch-modal-backdrop';
+        document.body.appendChild(backdrop);
+        
+        // Close on backdrop click
+        backdrop.addEventListener('click', closeTwitchModal);
+    }
+    
+    function openKickEmbed(embedType, vodId, clipId, username, vodTitle, originalUrl) {
+        let embedUrl = '';
+        let kickUrl = originalUrl;
+        
+        // Set up the embed URL based on type
+        // Kick embed URLs - trying different formats based on Kick's embed system
+        if (embedType === 'clip' && clipId) {
+            // For clips, try the direct embed format
+            embedUrl = `https://kick.com/${username}/clips/${clipId}/embed`;
+            kickUrl = originalUrl;
+        } else if (embedType === 'video' && vodId) {
+            // For videos, try the video embed format  
+            embedUrl = `https://kick.com/${username}/videos/${vodId}/embed`;
+            kickUrl = originalUrl;
+        }
+        
+        // If the above doesn't work, we might need to fall back to direct links
+        if (!embedUrl) {
+            // Fallback: redirect to the original URL
+            window.open(kickUrl, '_blank');
+            return;
+        }
+        
+        // Set up the embed
+        kickEmbed.src = embedUrl;
+        
+        // Update modal content
+        kickVodTitleDisplay.textContent = vodTitle;
+        openKickLink.href = kickUrl;
+        
+        // Update modal title based on type
+        const modalTitle = document.querySelector('#kickEmbedModalLabel');
+        modalTitle.textContent = embedType === 'clip' ? 'Watch Clip' : 'Watch VOD';
+        
+        // Show modal
+        kickModal.style.display = 'block';
+        kickModal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        // Add backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade show';
+        backdrop.id = 'kick-modal-backdrop';
+        document.body.appendChild(backdrop);
+        
+        // Close on backdrop click
+        backdrop.addEventListener('click', closeKickModal);
+    }
     
     // Close Twitch modal
     function closeTwitchModal() {
@@ -1189,10 +1479,34 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', closeTwitchModal);
     });
     
-    // Close Twitch modal on escape key
+    // Close Kick modal
+    function closeKickModal() {
+        kickModal.style.display = 'none';
+        kickModal.classList.remove('show');
+        document.body.classList.remove('modal-open');
+        
+        // Clear the iframe to stop playback
+        kickEmbed.src = '';
+        
+        const backdrop = document.getElementById('kick-modal-backdrop');
+        if (backdrop) {
+            backdrop.remove();
+        }
+    }
+    
+    // Close buttons for Kick modal
+    const kickCloseButtons = kickModal.querySelectorAll('[data-dismiss="modal"]');
+    kickCloseButtons.forEach(button => {
+        button.addEventListener('click', closeKickModal);
+    });
+    
+    // Close modals on escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && twitchModal.classList.contains('show')) {
             closeTwitchModal();
+        }
+        if (e.key === 'Escape' && kickModal.classList.contains('show')) {
+            closeKickModal();
         }
         if (e.key === 'Escape' && deleteModal.classList.contains('show')) {
             closeDeleteModal();
