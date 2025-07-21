@@ -127,6 +127,8 @@
                         </div>
                     </div>
                 </div>
+
+
             </div>
         @else
             <!-- Platform Connected -->
@@ -343,6 +345,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
+
 });
+
+
 </script>
 @endsection

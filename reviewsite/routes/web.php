@@ -122,6 +122,8 @@ Route::middleware('auth')->group(function () {
 Route::get('/test/streamer-oauth', [App\Http\Controllers\TestStreamerController::class, 'testOAuth'])
     ->name('test.streamer.oauth');
 
+
+
 // Debug route for streamer profile ownership (remove in production)
 Route::get('/debug/streamer-profile/{streamerProfile}', function(\App\Models\StreamerProfile $streamerProfile) {
     $currentUser = auth()->user();

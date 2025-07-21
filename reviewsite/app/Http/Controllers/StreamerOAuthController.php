@@ -38,6 +38,12 @@ class StreamerOAuthController extends Controller
             return redirect()->route('dashboard')
                 ->with('error', $userMessage);
         } catch (Exception $e) {
+            // Special handling for Kick OAuth issues
+            if ($platform === 'kick' && (str_contains($e->getMessage(), '404') || str_contains($e->getMessage(), 'cURL error'))) {
+                return redirect()->route('streamer.profiles.create')
+                    ->with('error', 'Kick\'s OAuth service appears to be temporarily unavailable. Please try again later or contact support if the issue persists.');
+            }
+            
             return redirect()->route('dashboard')
                 ->with('error', 'An unexpected error occurred while connecting to ' . ucfirst($platform) . '. Please try again.');
         }

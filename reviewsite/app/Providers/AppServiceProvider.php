@@ -4,11 +4,14 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Event;
 use League\CommonMark\CommonMarkConverter;
 use Livewire\Livewire;
 use App\Http\Livewire\UserLists;
 use App\Livewire\AddToList;
 use App\Livewire\AddToListModal;
+use SocialiteProviders\Manager\SocialiteWasCalled;
+use App\Providers\KickSocialiteProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -42,5 +45,8 @@ class AppServiceProvider extends ServiceProvider
         Livewire::component('user-lists', UserLists::class);
         Livewire::component('add-to-list', AddToList::class);
         Livewire::component('add-to-list-modal', AddToListModal::class);
+
+        // Register custom Kick Socialite provider
+        Event::listen(SocialiteWasCalled::class, KickSocialiteProvider::class . '@handle');
     }
 }

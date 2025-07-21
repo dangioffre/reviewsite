@@ -270,6 +270,8 @@ class StreamerProfileController extends Controller
             ->with('success', 'Profile setup completed successfully!');
     }
 
+
+
     /**
      * Display the specified streamer profile.
      */

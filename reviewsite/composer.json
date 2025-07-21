@@ -19,6 +19,7 @@
         "laravel/telescope": "*",
         "laravel/tinker": "^2.10.1",
         "ralphjsmit/laravel-seo": "^1.7",
+        "socialiteproviders/manager": "^4.8",
         "spatie/laravel-permission": "*"
     },
     "require-dev": {
