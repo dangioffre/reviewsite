@@ -33,22 +33,19 @@
             @endforeach
         </div>
 
-        <!-- Search + User -->
+        <!-- User Menu -->
         <div class="flex items-center space-x-4 ml-auto">
-            <!-- Search Bar -->
-            <form action="{{ route('search.index') }}" method="GET" class="hidden md:block">
-                <input type="text" name="q" placeholder="Search..." class="w-56 bg-[#18181B] border border-[#292929] rounded-lg px-4 py-2 text-sm text-white placeholder-[#A0A0A0] focus:border-[#03A9F4] focus:ring-2 focus:ring-[#03A9F4]/20 transition-all duration-200 outline-none" />
-            </form>
-            <!-- User Menu -->
             @auth
-                <div class="relative group">
-                    <button class="flex items-center text-white font-['Inter'] text-sm focus:outline-none">
+                <div class="relative" tabindex="0">
+                    <button class="flex items-center text-white font-['Inter'] text-sm focus:outline-none" tabindex="-1">
                         {{ Auth::user()->name }}
-                        <svg class="ml-1 w-4 h-4 text-[#A0A0A0] group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="ml-1 w-4 h-4 text-[#A0A0A0] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                         </svg>
                     </button>
-                    <div class="absolute right-0 mt-2 w-48 bg-[#18181B] border border-[#292929] rounded-lg shadow-lg py-2 z-50 hidden group-hover:block">
+                    <div class="absolute right-0 mt-2 w-48 bg-[#18181B] border border-[#292929] rounded-lg shadow-lg py-2 z-50 invisible opacity-0 group-hover:visible group-hover:opacity-100 focus-within:visible focus-within:opacity-100 hover:visible hover:opacity-100 transition-all duration-150"
+                        style="min-width: 10rem;"
+                        onmouseover="this.classList.add('!visible','!opacity-100')" onmouseout="this.classList.remove('!visible','!opacity-100')">
                         <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm text-[#A0A0A0] hover:text-white hover:bg-[#232326] transition-colors">Dashboard</a>
                         <a href="{{ route('profile.show', Auth::user()) }}" class="block px-4 py-2 text-sm text-[#A0A0A0] hover:text-white hover:bg-[#232326] transition-colors">Profile</a>
                         <form method="POST" action="{{ route('logout') }}">
@@ -63,4 +60,12 @@
             @endauth
         </div>
     </div>
+    <style>
+        /* User dropdown fix: keep open on hover/focus */
+        [tabindex="0"]:hover > div,
+        [tabindex="0"]:focus-within > div {
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+    </style>
 </nav> 
