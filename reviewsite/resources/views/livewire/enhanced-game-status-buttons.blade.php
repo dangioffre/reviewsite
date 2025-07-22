@@ -1,60 +1,64 @@
 <div class="w-full">
-
-
-    <!-- Main Action Buttons -->
-    <div class="flex flex-wrap justify-center gap-2 mb-4">
-        <button wire:click="toggle('have')" class="px-5 py-2 rounded-full font-bold text-sm border-2 transition-all duration-200 focus:outline-none flex items-center gap-2 shadow-sm
-            {{ $have ? 'bg-green-600 border-green-600 text-white shadow-lg scale-105' : 'bg-[#232326] border-[#232326] text-[#A1A1AA] hover:bg-green-700 hover:border-green-700 hover:text-white' }}">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Own
-        </button>
-        
-        <button wire:click="toggle('want')" class="px-5 py-2 rounded-full font-bold text-sm border-2 transition-all duration-200 focus:outline-none flex items-center gap-2 shadow-sm
-            {{ $want ? 'bg-blue-600 border-blue-600 text-white shadow-lg scale-105' : 'bg-[#232326] border-[#232326] text-[#A1A1AA] hover:bg-blue-700 hover:border-blue-700 hover:text-white' }}">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Want
-        </button>
-        
-        <button wire:click="openPlayedModal" class="px-5 py-2 rounded-full font-bold text-sm border-2 transition-all duration-200 focus:outline-none flex items-center gap-2 shadow-sm
-            {{ $played ? 'bg-yellow-400 border-yellow-400 text-black shadow-lg scale-105' : 'bg-[#232326] border-[#232326] text-[#A1A1AA] hover:bg-yellow-500 hover:border-yellow-500 hover:text-black' }}">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M8 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            {{ $played ? 'Played' : 'Play' }}
-        </button>
-        
-        @if($userStatus && $userStatus->is_favorite)
-            <button wire:click="toggleFavorite" class="px-4 py-2 rounded-full font-bold text-sm border-2 bg-red-500 border-red-500 text-white shadow-lg scale-105 transition-all duration-200 focus:outline-none flex items-center gap-2">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/>
-                </svg>
-            </button>
-        @elseif($userStatus)
-            <button wire:click="toggleFavorite" class="px-4 py-2 rounded-full font-bold text-sm border-2 bg-[#232326] border-[#232326] text-[#A1A1AA] hover:bg-red-500 hover:border-red-500 hover:text-white transition-all duration-200 focus:outline-none flex items-center gap-2">
+    <!-- Segmented Control Status Buttons -->
+    <div class="flex justify-center mb-6">
+        <div class="flex bg-[#232326] border border-[#292929] rounded-full p-1 gap-1 shadow-sm">
+            <!-- Own -->
+            <button wire:click="toggle('have')"
+                class="flex items-center gap-2 px-5 py-2 rounded-full font-medium text-sm font-['Inter'] transition-all duration-200 focus:outline-none relative group
+                {{ $have ? 'bg-[#DC2626] text-white shadow' : 'bg-transparent text-[#A0A0A0] hover:bg-[#292929] hover:text-white' }}"
+                aria-label="Own">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
+                Own
+                <!-- Tooltip with arrow -->
+                <span class="absolute left-1/2 -bottom-9 -translate-x-1/2 z-20 px-3 py-1.5 bg-[#232326] text-xs text-white rounded shadow-lg opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition pointer-events-none whitespace-nowrap flex flex-col items-center">
+                    You own this game
+                    <span class="w-2 h-2 bg-[#232326] rotate-45 mt-[-3px] shadow-lg" style="margin-top:-3px;"></span>
+                </span>
             </button>
-        @endif
+            <!-- Want -->
+            <button wire:click="toggle('want')"
+                class="flex items-center gap-2 px-5 py-2 rounded-full font-medium text-sm font-['Inter'] transition-all duration-200 focus:outline-none relative group
+                {{ $want ? 'bg-[#2563EB] text-white shadow' : 'bg-transparent text-[#A0A0A0] hover:bg-[#292929] hover:text-white' }}"
+                aria-label="Want">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Want
+                <span class="absolute left-1/2 -bottom-9 -translate-x-1/2 z-20 px-3 py-1.5 bg-[#232326] text-xs text-white rounded shadow-lg opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition pointer-events-none whitespace-nowrap flex flex-col items-center">
+                    Add to wishlist
+                    <span class="w-2 h-2 bg-[#232326] rotate-45 mt-[-3px] shadow-lg" style="margin-top:-3px;"></span>
+                </span>
+            </button>
+            <!-- Play -->
+            <button wire:click="openPlayedModal"
+                class="flex items-center gap-2 px-5 py-2 rounded-full font-medium text-sm font-['Inter'] transition-all duration-200 focus:outline-none relative group
+                {{ $played ? 'bg-[#4CAF50] text-white shadow' : 'bg-transparent text-[#A0A0A0] hover:bg-[#292929] hover:text-white' }}"
+                aria-label="Play">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <polygon points="5,3 19,12 5,21 5,3" fill="currentColor" class="{{ $played ? 'text-white' : 'text-[#A0A0A0]' }}" />
+                </svg>
+                {{ $played ? 'Played' : 'Play' }}
+                <span class="absolute left-1/2 -bottom-9 -translate-x-1/2 z-20 px-3 py-1.5 bg-[#232326] text-xs text-white rounded shadow-lg opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition pointer-events-none whitespace-nowrap flex flex-col items-center">
+                    Mark as played
+                    <span class="w-2 h-2 bg-[#232326] rotate-45 mt-[-3px] shadow-lg" style="margin-top:-3px;"></span>
+                </span>
+            </button>
+        </div>
     </div>
 
     <!-- Additional Actions (when user has status) -->
     @if($userStatus)
         <div class="flex flex-wrap justify-center gap-2 mb-4">
             @if($played)
-                <button wire:click="unselectPlay" class="px-3 py-1.5 rounded-lg text-xs text-[#71717A] hover:text-[#A1A1AA] hover:bg-[#27272A] transition-all duration-200 focus:outline-none flex items-center gap-1.5">
+                <button wire:click="unselectPlay" class="px-3 py-1.5 rounded-lg text-xs text-[#71717A] hover:text-[#A0A0A0] hover:bg-[#27272A] transition-all duration-200 focus:outline-none flex items-center gap-1.5">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     Unselect Play
                 </button>
             @endif
-            
             <button wire:click="confirmDelete" class="px-3 py-1.5 rounded-lg text-xs text-[#71717A] hover:text-red-400 hover:bg-[#27272A] transition-all duration-200 focus:outline-none flex items-center gap-1.5">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round"/>
@@ -77,11 +81,9 @@
                     ({{ $userStatus->completion_percentage }}%)
                 @endif
             </div>
-            
             @if($userStatus->hours_played)
-                <div class="text-xs text-[#A1A1AA] mt-1">{{ $userStatus->formatted_play_time }}</div>
+                <div class="text-xs text-[#A0A0A0] mt-1">{{ $userStatus->formatted_play_time }}</div>
             @endif
-            
             <button wire:click="openDetailModal" class="text-xs text-blue-400 hover:text-blue-300 mt-1 transition-colors">
                 Edit Details
             </button>
@@ -91,7 +93,7 @@
     <!-- Quick Status Buttons (when played but no detailed status) -->
     @if($played && (!$userStatus || !$userStatus->completion_status))
         <div class="text-center mb-4">
-            <p class="text-xs text-[#A1A1AA] mb-2">Quick Status:</p>
+            <p class="text-xs text-[#A0A0A0] mb-2">Quick Status:</p>
             <div class="flex flex-wrap justify-center gap-1">
                 @foreach($this->getCompletionStatuses() as $key => $status)
                     <button wire:click="quickSetStatus('{{ $key }}')" 
