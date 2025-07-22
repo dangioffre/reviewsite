@@ -80,48 +80,56 @@
                     
                     <!-- Right Side: Ratings Section -->
                     <div class="lg:col-span-3">
-                        <div class="bg-gradient-to-br from-[#232326] to-[#18181B] border border-[#3F3F46]/40 rounded-2xl p-8 shadow-2xl">
-                            <!-- Staff Rating -->
-                            @if($product->staff_rating)
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center">
-                                    <div class="bg-green-500 text-black text-lg font-bold px-2 py-1 rounded mr-3">{{ number_format($product->staff_rating, 1) }}</div>
-                                    <div>
-                                        <div class="text-white font-semibold text-sm">Staff Rating</div>
-                                        <div class="text-[#A1A1AA] text-xs">{{ $product->staff_reviews_count }} staff {{ Str::plural('rating', $product->staff_reviews_count) }}</div>
+                        <div class="bg-[#18181B] border border-[#292929] rounded-2xl p-8 shadow-xl flex flex-col items-center max-w-xs mx-auto">
+                            <!-- Ratings Row -->
+                            <div class="flex items-center justify-center gap-4 w-full mb-6">
+                                @if($product->staff_rating)
+                                    <div class="flex flex-col items-center">
+                                        <div class="bg-[#22C55E] text-white text-xl font-bold px-4 py-1 rounded-lg font-['Poppins'] mb-1 shadow-sm">
+                                            {{ number_format($product->staff_rating, 1) }}
+                                        </div>
+                                        <div class="text-xs text-[#A0A0A0] font-['Inter']">Staff Rating</div>
+                                        <div class="text-xs text-[#A0A0A0] font-['Inter']">{{ $product->staff_reviews_count }} staff {{ Str::plural('rating', $product->staff_reviews_count) }}</div>
                                     </div>
+                                @endif
+                                <div class="flex flex-col items-center">
+                                    <div class="bg-[#2563EB] text-white text-xl font-bold px-4 py-1 rounded-lg font-['Poppins'] mb-1 shadow-sm">
+                                        {{ number_format($product->community_rating ?? 0, 1) }}
+                                    </div>
+                                    <div class="text-xs text-[#A0A0A0] font-['Inter']">User Rating</div>
+                                    <div class="text-xs text-[#A0A0A0] font-['Inter']">{{ $product->community_reviews_count ?? 0 }} user {{ Str::plural('rating', $product->community_reviews_count ?? 0) }}</div>
                                 </div>
                             </div>
-                            @endif
-                            
+
                             <!-- Star Rating Component -->
-                            <x-star-rating :product="$product" :userRating="$userRating" />
-                            
-                            <livewire:enhanced-game-status-buttons :product="$product" />
-                            
+                            <div class="w-full flex flex-col items-center mb-6">
+                                <x-star-rating :product="$product" :userRating="$userRating" :showLabel="false" />
+                            </div>
+
+                            <!-- Status Buttons (Own, Want, Play) -->
+                            <div class="flex flex-wrap gap-3 justify-center w-full mb-6">
+                                <livewire:enhanced-game-status-buttons :product="$product" />
+                            </div>
+
                             <!-- Action Buttons -->
-                            <div class="space-y-3 mt-6">
+                            <div class="flex flex-col gap-3 w-full">
                                 <!-- Add to Lists Button -->
-                                <x-add-to-list-button 
-                                    :product-id="$product->id" 
-                                    class="mt-4"
-                                />
-                                
+                                <x-add-to-list-button :product-id="$product->id" class="w-full" />
                                 <!-- Write Review Button -->
                                 @auth
-                                <a href="{{ route('games.reviews.create', $product) }}" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-colors duration-200 flex items-center justify-center shadow-md">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                                    </svg>
-                                    Write a review
-                                </a>
+                                    <a href="{{ route('games.reviews.create', $product) }}" class="w-full bg-[#292929] hover:bg-[#232326] text-white py-3 px-4 rounded-lg font-semibold text-base transition-colors duration-200 flex items-center justify-center gap-2 shadow-sm font-['Inter']">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                        </svg>
+                                        Write a review
+                                    </a>
                                 @else
-                                <button onclick="showLoginPrompt()" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-colors duration-200 flex items-center justify-center shadow-md">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                                    </svg>
-                                    Write a review
-                                </button>
+                                    <button onclick="showLoginPrompt()" class="w-full bg-[#292929] hover:bg-[#232326] text-white py-3 px-4 rounded-lg font-semibold text-base transition-colors duration-200 flex items-center justify-center gap-2 shadow-sm font-['Inter']">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                        </svg>
+                                        Write a review
+                                    </button>
                                 @endauth
                             </div>
                         </div>
