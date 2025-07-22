@@ -94,7 +94,7 @@
                 <!-- Main Content Column -->
                 <div class="lg:col-span-3 space-y-8">
                     <!-- Review Content -->
-                    <article class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] overflow-hidden">
+                    <article class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] overflow-hidden relative">
                         <div class="p-8 lg:p-12">
                             <div class="prose prose-invert prose-lg max-w-none">
                                 <div class="text-[#FFFFFF] font-['Inter'] text-lg leading-relaxed space-y-6">
@@ -107,6 +107,22 @@
                                     {!! $converter->convert($review->content)->getContent() !!}
                                 </div>
                             </div>
+                        </div>
+                        <!-- Thumbs Up Like Button Bottom Right -->
+                        <div class="absolute bottom-4 right-6 z-10" x-data="likeReview(
+                            {{ $review->id }},
+                            '{{ $review->product->type === 'game' ? route('games.reviews.like', [$review->product, $review]) : route('tech.reviews.like', [$review->product, $review]) }}',
+                            {{ (auth()->check() && $review->isLikedBy(auth()->user())) ? 'true' : 'false' }},
+                            {{ $review->likes_count }},
+                            {{ auth()->check() ? 'true' : 'false' }}
+                        )">
+                                    <button @click.prevent="canLike ? toggleLike() : window.location.href='{{ route('login') }}'" :class="[liked ? 'bg-[#DC2626] text-white' : 'bg-[#232326] text-[#A0A0A0] hover:bg-[#292929] hover:text-white']" class="flex items-center gap-2 px-4 py-2 rounded-full shadow-lg transition-colors focus:outline-none cursor-pointer">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 10v12" />
+                <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a2 2 0 0 1 3 3.88Z" />
+            </svg>
+            <span class="font-semibold text-base" x-text="count"></span>
+        </button>
                         </div>
                     </article>
 
