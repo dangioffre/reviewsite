@@ -24,9 +24,9 @@ class PodcastResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-microphone';
 
-    protected static ?string $navigationGroup = 'Content Management';
+    protected static ?string $navigationGroup = 'Podcasts';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {

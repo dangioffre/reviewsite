@@ -132,4 +132,9 @@ class User extends Authenticatable
     {
         return $this->streamerProfile === null;
     }
+
+    public function reviewComments()
+    {
+        return $this->hasMany(ReviewComment::class);
+    }
 }

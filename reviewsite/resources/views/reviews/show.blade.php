@@ -190,6 +190,35 @@
                             @endif
                         </div>
                     @endif
+
+                    <!-- Review Comments Section -->
+                    <section id="review-comments" class="mt-10">
+                        <h2 class="text-2xl font-bold text-white mb-6 font-['Poppins']">Comments</h2>
+                        @if(session('success'))
+                            <div class="mb-4 text-green-500 font-semibold">{{ session('success') }}</div>
+                        @endif
+                        <!-- Comment Form -->
+                        @auth
+                        <form action="{{ $review->product->type === 'game' ? route('games.reviews.comments.store', [$review->product, $review]) : route('tech.reviews.comments.store', [$review->product, $review]) }}" method="POST" class="mb-8 bg-[#18181B] border border-[#232326] rounded-xl p-6">
+                            @csrf
+                            <input type="hidden" name="parent_id" id="parent_id" value="">
+                            <textarea name="content" rows="3" class="w-full bg-[#232326] border border-[#292929] rounded-lg p-3 text-white font-['Inter'] focus:outline-none focus:ring-2 focus:ring-[#2563EB]" placeholder="Write a comment..." required></textarea>
+                            <div class="flex justify-end mt-3">
+                                <button type="submit" class="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold px-6 py-2 rounded-lg font-['Inter'] transition">Post Comment</button>
+                            </div>
+                        </form>
+                        @else
+                        <div class="mb-8">
+                            <a href="{{ route('login') }}" class="text-[#2563EB] hover:underline font-semibold">Log in to comment</a>
+                        </div>
+                        @endauth
+                        <!-- Comments List -->
+                        <div class="space-y-6">
+                            @foreach($review->comments->where('parent_id', null) as $comment)
+                                @include('reviews.partials.comment', ['comment' => $comment])
+                            @endforeach
+                        </div>
+                    </section>
                 </div>
 
                 <!-- Sidebar -->

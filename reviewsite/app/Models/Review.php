@@ -104,6 +104,11 @@ class Review extends Model
         return $this->hasMany(Report::class);
     }
 
+    public function comments()
+    {
+        return $this->hasMany(ReviewComment::class)->orderBy('created_at', 'asc');
+    }
+
     public function scopeStaff($query)
     {
         return $query->where('is_staff_review', true);

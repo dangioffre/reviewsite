@@ -705,4 +705,9 @@ Route::middleware('auth')->group(function () {
     })->name('lists.collaborate');
 });
 
+Route::post('/games/{product}/{review}/comments', [\App\Http\Controllers\ReviewCommentController::class, 'store'])->name('games.reviews.comments.store');
+Route::post('/tech/{product}/{review}/comments', [\App\Http\Controllers\ReviewCommentController::class, 'store'])->name('tech.reviews.comments.store');
+Route::post('/review-comments/{comment}/like', [\App\Http\Controllers\ReviewCommentLikeController::class, 'toggle'])->name('review-comments.like');
+Route::post('/review-comments/{comment}/report', [\App\Http\Controllers\ReviewCommentReportController::class, 'store'])->name('review-comments.report');
+
 
