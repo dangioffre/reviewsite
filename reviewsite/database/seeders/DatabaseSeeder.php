@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
             ListSeeder::class,
             StreamerSeeder::class,
             PodcastSeeder::class,
+            PlayerPerspectiveSeeder::class,
         ]);
     }
 }

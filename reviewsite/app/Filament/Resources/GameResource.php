@@ -71,6 +71,11 @@ class GameResource extends Resource
                                         Forms\Components\DatePicker::make('release_date')
                                             ->label('Release Date'),
                                         
+                                        Forms\Components\TextInput::make('official_website')
+                                            ->label('Official Website')
+                                            ->url()
+                                            ->helperText('Link to the official game website'),
+                                        
                                         Forms\Components\Toggle::make('is_featured')
                                             ->label('Featured Game')
                                             ->helperText('Featured games appear in a special section on the homepage')
@@ -83,6 +88,25 @@ class GameResource extends Resource
                                             ->searchable()
                                             ->preload()
                                             ->helperText('Select themes that apply to this game'),
+                                        Forms\Components\Select::make('player_perspective_ids')
+                                            ->label('Player Perspectives')
+                                            ->multiple()
+                                            ->relationship('playerPerspectives', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->helperText('Select all player perspectives for this game'),
+                                        Forms\Components\Select::make('esrb_rating_id')
+                                            ->label('ESRB Rating')
+                                            ->relationship('esrbRating', 'name', fn ($query) => $query->where('type', 'esrb'))
+                                            ->searchable()
+                                            ->preload()
+                                            ->helperText('Select the ESRB rating for this game'),
+                                        Forms\Components\Select::make('pegi_rating_id')
+                                            ->label('PEGI Rating')
+                                            ->relationship('pegiRating', 'name', fn ($query) => $query->where('type', 'pegi'))
+                                            ->searchable()
+                                            ->preload()
+                                            ->helperText('Select the PEGI rating for this game'),
                                     ])
                                     ->columns(2),
 

@@ -21,6 +21,9 @@ class Product extends Model
         'photos',
         'videos',
         'release_date',
+        'esrb_rating_id',
+        'pegi_rating_id',
+        'official_website',
         'type',
         'is_featured',
         'genre_id',
@@ -138,6 +141,14 @@ class Product extends Model
     }
 
     /**
+     * Many-to-many relationship with PlayerPerspective.
+     */
+    public function playerPerspectives()
+    {
+        return $this->belongsToMany(PlayerPerspective::class, 'player_perspective_product');
+    }
+
+    /**
      * Get the staff review for the product.
      */
     public function staffReview()
@@ -198,5 +209,14 @@ class Product extends Model
             }
         }
         return null;
+    }
+
+    public function esrbRating()
+    {
+        return $this->belongsTo(AgeRating::class, 'esrb_rating_id')->where('type', 'esrb');
+    }
+    public function pegiRating()
+    {
+        return $this->belongsTo(AgeRating::class, 'pegi_rating_id')->where('type', 'pegi');
     }
 }

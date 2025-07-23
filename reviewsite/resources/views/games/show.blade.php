@@ -188,6 +188,17 @@
                                                 </a>
                                             </div>
                                         @endif
+                                        @if($product->platforms && $product->platforms->count() > 1)
+                                            <div><span class="font-bold text-white">Other Platforms:</span>
+                                                @foreach($product->platforms as $platform)
+                                                    @if(!$product->platform || $platform->id !== $product->platform->id)
+                                                        <a href="{{ route('games.by-platform', $platform->slug) }}" class="inline-block bg-blue-600/10 text-blue-300 px-3 py-1 rounded-full text-xs hover:bg-blue-600/20 transition-colors ml-1">
+                                                            {{ $platform->name }}
+                                                        </a>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                        @endif
                                         @if($product->release_date)
                                             <div><span class="font-bold text-white">Release Date:</span> <span class="text-[#A1A1AA]">{{ $product->release_date->format('F d, Y') }}</span></div>
                                         @endif
@@ -225,6 +236,36 @@
                                                         {{ $mode->name }}
                                                     </a>
                                                 @endforeach
+                                            </div>
+                                        @endif
+                                        @if($product->playerPerspectives && $product->playerPerspectives->count())
+                                            <div><span class="font-bold text-white">Player Perspectives:</span>
+                                                @foreach($product->playerPerspectives as $perspective)
+                                                    <span class="inline-block bg-gray-600/20 text-gray-200 px-3 py-1 rounded-full text-sm hover:bg-gray-600/40 transition-colors ml-1">
+                                                        {{ $perspective->name }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                        @if($product->esrbRating)
+                                            <div><span class="font-bold text-white">ESRB Rating:</span>
+                                                <span class="inline-block bg-blue-800/20 text-blue-300 px-3 py-1 rounded-full text-sm ml-1">
+                                                    {{ $product->esrbRating->name }}
+                                                </span>
+                                            </div>
+                                        @endif
+                                        @if($product->pegiRating)
+                                            <div><span class="font-bold text-white">PEGI Rating:</span>
+                                                <span class="inline-block bg-green-800/20 text-green-300 px-3 py-1 rounded-full text-sm ml-1">
+                                                    {{ $product->pegiRating->name }}
+                                                </span>
+                                            </div>
+                                        @endif
+                                        @if($product->official_website)
+                                            <div><span class="font-bold text-white">Official Website:</span>
+                                                <a href="{{ $product->official_website }}" target="_blank" rel="noopener" class="inline-block bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm hover:bg-blue-600/40 transition-colors ml-1">
+                                                    Visit Official Site
+                                                </a>
                                             </div>
                                         @endif
                                     </div>
