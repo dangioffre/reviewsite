@@ -241,24 +241,24 @@
                                         @if($product->playerPerspectives && $product->playerPerspectives->count())
                                             <div><span class="font-bold text-white">Player Perspectives:</span>
                                                 @foreach($product->playerPerspectives as $perspective)
-                                                    <span class="inline-block bg-gray-600/20 text-gray-200 px-3 py-1 rounded-full text-sm hover:bg-gray-600/40 transition-colors ml-1">
+                                                    <a href="{{ route('games.by-perspective', $perspective->slug) }}" class="inline-block bg-gray-600/20 text-gray-200 px-3 py-1 rounded-full text-sm hover:bg-gray-600/40 transition-colors ml-1">
                                                         {{ $perspective->name }}
-                                                    </span>
+                                                    </a>
                                                 @endforeach
                                             </div>
                                         @endif
                                         @if($product->esrbRating)
                                             <div><span class="font-bold text-white">ESRB Rating:</span>
-                                                <span class="inline-block bg-blue-800/20 text-blue-300 px-3 py-1 rounded-full text-sm ml-1">
+                                                <a href="{{ route('games.by-esrb', $product->esrbRating->slug) }}" class="inline-block bg-blue-800/20 text-blue-300 px-3 py-1 rounded-full text-sm hover:bg-blue-800/40 transition-colors ml-1">
                                                     {{ $product->esrbRating->name }}
-                                                </span>
+                                                </a>
                                             </div>
                                         @endif
                                         @if($product->pegiRating)
                                             <div><span class="font-bold text-white">PEGI Rating:</span>
-                                                <span class="inline-block bg-green-800/20 text-green-300 px-3 py-1 rounded-full text-sm ml-1">
+                                                <a href="{{ route('games.by-pegi', $product->pegiRating->slug) }}" class="inline-block bg-green-800/20 text-green-300 px-3 py-1 rounded-full text-sm hover:bg-green-800/40 transition-colors ml-1">
                                                     {{ $product->pegiRating->name }}
-                                                </span>
+                                                </a>
                                             </div>
                                         @endif
                                         @if($product->official_website)

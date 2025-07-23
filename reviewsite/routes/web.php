@@ -27,6 +27,9 @@ Route::get('/games/developer/{developer}', [GameController::class, 'byDeveloper'
 Route::get('/games/publisher/{publisher}', [GameController::class, 'byPublisher'])->name('games.by-publisher');
 Route::get('/games/theme/{theme}', [GameController::class, 'byTheme'])->name('games.by-theme');
 Route::get('/games/mode/{mode}', [GameController::class, 'byGameMode'])->name('games.by-mode');
+Route::get('/games/perspective/{perspective}', [GameController::class, 'byPlayerPerspective'])->name('games.by-perspective');
+Route::get('/games/esrb/{rating}', [GameController::class, 'byEsrbRating'])->name('games.by-esrb');
+Route::get('/games/pegi/{rating}', [GameController::class, 'byPegiRating'])->name('games.by-pegi');
 Route::get('/games/{product}/reviews/create', [ReviewController::class, 'create'])->name('games.reviews.create');
 Route::post('/games/{product}/reviews', [ReviewController::class, 'store'])->name('games.reviews.store');
 Route::get('/games/{product}/{review}', [ReviewController::class, 'show'])->name('games.reviews.show');

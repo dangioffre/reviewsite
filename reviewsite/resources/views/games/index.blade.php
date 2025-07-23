@@ -95,6 +95,56 @@
                                 @endforeach
                             </select>
 
+                            <!-- Player Perspective Filter -->
+                            <select name="perspective" class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white text-sm font-['Inter'] focus:border-[#2563EB] focus:ring-[#2563EB] min-w-[160px]">
+                                <option value="">All Perspectives</option>
+                                @foreach($playerPerspectives as $perspective)
+                                    <option value="{{ $perspective->slug }}" {{ request('perspective') == $perspective->slug ? 'selected' : '' }}>
+                                        {{ $perspective->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <!-- ESRB Rating Filter -->
+                            <select name="esrb_rating" class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white text-sm font-['Inter'] focus:border-[#2563EB] focus:ring-[#2563EB] min-w-[120px]">
+                                <option value="">All ESRB</option>
+                                @foreach($esrbRatings as $rating)
+                                    <option value="{{ $rating->slug }}" {{ request('esrb_rating') == $rating->slug ? 'selected' : '' }}>
+                                        {{ $rating->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <!-- PEGI Rating Filter -->
+                            <select name="pegi_rating" class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white text-sm font-['Inter'] focus:border-[#2563EB] focus:ring-[#2563EB] min-w-[120px]">
+                                <option value="">All PEGI</option>
+                                @foreach($pegiRatings as $rating)
+                                    <option value="{{ $rating->slug }}" {{ request('pegi_rating') == $rating->slug ? 'selected' : '' }}>
+                                        {{ $rating->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <!-- Game Mode Filter -->
+                            <select name="game_mode" class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white text-sm font-['Inter'] focus:border-[#2563EB] focus:ring-[#2563EB] min-w-[140px]">
+                                <option value="">All Game Modes</option>
+                                @foreach($gameModes as $mode)
+                                    <option value="{{ $mode->slug }}" {{ request('game_mode') == $mode->slug ? 'selected' : '' }}>
+                                        {{ $mode->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <!-- Theme Filter -->
+                            <select name="theme" class="bg-[#1A1A1B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white text-sm font-['Inter'] focus:border-[#2563EB] focus:ring-[#2563EB] min-w-[120px]">
+                                <option value="">All Themes</option>
+                                @foreach($themes as $theme)
+                                    <option value="{{ $theme->slug }}" {{ request('theme') == $theme->slug ? 'selected' : '' }}>
+                                        {{ $theme->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
                             <!-- Developer Search -->
                             <input 
                                 type="text" 
@@ -132,7 +182,7 @@
                             </svg>
                             Search
                         </button>
-                        @if(request()->hasAny(['search', 'sort', 'score_range', 'platform', 'genre', 'developer', 'publisher']))
+                        @if(request()->hasAny(['search', 'sort', 'score_range', 'platform', 'genre', 'perspective', 'esrb_rating', 'pegi_rating', 'game_mode', 'theme', 'developer', 'publisher']))
                             <a href="{{ route('games.index') }}" class="bg-[#27272A] text-white px-4 py-2.5 rounded-lg border border-[#E53E3E] hover:bg-red-900/50 transition-colors font-['Inter'] flex items-center">
                                 Clear Filters
                             </a>
@@ -166,7 +216,7 @@
             @endif
 
             <!-- Active Filters Display -->
-            @if(request()->hasAny(['search', 'sort', 'score_range', 'platform', 'genre', 'developer', 'publisher']))
+            @if(request()->hasAny(['search', 'sort', 'score_range', 'platform', 'genre', 'perspective', 'esrb_rating', 'pegi_rating', 'game_mode', 'theme', 'developer', 'publisher']))
                 <div class="mb-6 mt-4">
                     <div class="flex flex-wrap gap-2">
                         <span class="text-sm text-[#A1A1AA] font-['Inter'] mr-2">Active filters:</span>
@@ -198,6 +248,31 @@
                         @if(request('publisher'))
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-['Share_Tech_Mono'] bg-[#7C3AED] text-white">
                                 Publisher: {{ request('publisher') }}
+                            </span>
+                        @endif
+                        @if(request('perspective'))
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-['Share_Tech_Mono'] bg-[#059669] text-white">
+                                Perspective: {{ ucfirst(request('perspective')) }}
+                            </span>
+                        @endif
+                        @if(request('esrb_rating'))
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-['Share_Tech_Mono'] bg-[#2563EB] text-white">
+                                ESRB: {{ ucfirst(request('esrb_rating')) }}
+                            </span>
+                        @endif
+                        @if(request('pegi_rating'))
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-['Share_Tech_Mono'] bg-[#DC2626] text-white">
+                                PEGI: {{ ucfirst(request('pegi_rating')) }}
+                            </span>
+                        @endif
+                        @if(request('game_mode'))
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-['Share_Tech_Mono'] bg-[#8B5CF6] text-white">
+                                Game Mode: {{ ucfirst(request('game_mode')) }}
+                            </span>
+                        @endif
+                        @if(request('theme'))
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-['Share_Tech_Mono'] bg-[#F59E0B] text-white">
+                                Theme: {{ ucfirst(request('theme')) }}
                             </span>
                         @endif
 

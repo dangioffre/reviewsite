@@ -29,4 +29,9 @@ class PlayerPerspective extends Model
     {
         return $this->belongsToMany(Product::class, 'player_perspective_product');
     }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 } 

@@ -10,6 +10,8 @@ use App\Models\Theme;
 use App\Models\Developer;
 use App\Models\Publisher;
 use App\Models\GameMode;
+use App\Models\PlayerPerspective;
+use App\Models\AgeRating;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -62,6 +64,41 @@ class GameController extends Controller
             });
         }
 
+        // Player Perspective filter
+        if ($request->filled('perspective')) {
+            $query->whereHas('playerPerspectives', function ($q) use ($request) {
+                $q->where('slug', $request->perspective);
+            });
+        }
+
+        // ESRB Rating filter
+        if ($request->filled('esrb_rating')) {
+            $query->whereHas('esrbRating', function ($q) use ($request) {
+                $q->where('slug', $request->esrb_rating);
+            });
+        }
+
+        // PEGI Rating filter
+        if ($request->filled('pegi_rating')) {
+            $query->whereHas('pegiRating', function ($q) use ($request) {
+                $q->where('slug', $request->pegi_rating);
+            });
+        }
+
+        // Game Mode filter
+        if ($request->filled('game_mode')) {
+            $query->whereHas('gameModes', function ($q) use ($request) {
+                $q->where('slug', $request->game_mode);
+            });
+        }
+
+        // Theme filter
+        if ($request->filled('theme')) {
+            $query->whereHas('themes', function ($q) use ($request) {
+                $q->where('slug', $request->theme);
+            });
+        }
+
         // Sorting
         switch ($request->get('sort', 'latest')) {
             case 'oldest':
@@ -86,8 +123,13 @@ class GameController extends Controller
         $products = $query->paginate(12);
         $genres = Genre::active()->get();
         $platforms = Platform::active()->get();
+        $playerPerspectives = PlayerPerspective::orderBy('name')->get();
+        $esrbRatings = AgeRating::where('type', 'esrb')->orderBy('name')->get();
+        $pegiRatings = AgeRating::where('type', 'pegi')->orderBy('name')->get();
+        $gameModes = GameMode::orderBy('name')->get();
+        $themes = Theme::orderBy('name')->get();
 
-        return view('games.index', compact('products', 'genres', 'platforms'));
+        return view('games.index', compact('products', 'genres', 'platforms', 'playerPerspectives', 'esrbRatings', 'pegiRatings', 'gameModes', 'themes'));
     }
 
     public function show(Product $product)
@@ -249,10 +291,15 @@ class GameController extends Controller
 
         $genres = Genre::active()->get();
         $platforms = Platform::active()->get();
+        $playerPerspectives = PlayerPerspective::orderBy('name')->get();
+        $esrbRatings = AgeRating::where('type', 'esrb')->orderBy('name')->get();
+        $pegiRatings = AgeRating::where('type', 'pegi')->orderBy('name')->get();
+        $gameModes = GameMode::orderBy('name')->get();
+        $themes = Theme::orderBy('name')->get();
         $filterType = 'Genre';
         $filterValue = $genre->name;
 
-        return view('games.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
+        return view('games.index', compact('products', 'genres', 'platforms', 'playerPerspectives', 'esrbRatings', 'pegiRatings', 'gameModes', 'themes', 'filterType', 'filterValue'));
     }
 
     public function byPlatform(Platform $platform)
@@ -265,10 +312,15 @@ class GameController extends Controller
 
         $genres = Genre::active()->get();
         $platforms = Platform::active()->get();
+        $playerPerspectives = PlayerPerspective::orderBy('name')->get();
+        $esrbRatings = AgeRating::where('type', 'esrb')->orderBy('name')->get();
+        $pegiRatings = AgeRating::where('type', 'pegi')->orderBy('name')->get();
+        $gameModes = GameMode::orderBy('name')->get();
+        $themes = Theme::orderBy('name')->get();
         $filterType = 'Platform';
         $filterValue = $platform->name;
 
-        return view('games.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
+        return view('games.index', compact('products', 'genres', 'platforms', 'playerPerspectives', 'esrbRatings', 'pegiRatings', 'gameModes', 'themes', 'filterType', 'filterValue'));
     }
 
     public function byDeveloper(Developer $developer)
@@ -283,10 +335,15 @@ class GameController extends Controller
 
         $genres = Genre::active()->get();
         $platforms = Platform::active()->get();
+        $playerPerspectives = PlayerPerspective::orderBy('name')->get();
+        $esrbRatings = AgeRating::where('type', 'esrb')->orderBy('name')->get();
+        $pegiRatings = AgeRating::where('type', 'pegi')->orderBy('name')->get();
+        $gameModes = GameMode::orderBy('name')->get();
+        $themes = Theme::orderBy('name')->get();
         $filterType = 'Developer';
         $filterValue = $developer->name;
 
-        return view('games.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
+        return view('games.index', compact('products', 'genres', 'platforms', 'playerPerspectives', 'esrbRatings', 'pegiRatings', 'gameModes', 'themes', 'filterType', 'filterValue'));
     }
 
     public function byPublisher(Publisher $publisher)
@@ -301,10 +358,15 @@ class GameController extends Controller
 
         $genres = Genre::active()->get();
         $platforms = Platform::active()->get();
+        $playerPerspectives = PlayerPerspective::orderBy('name')->get();
+        $esrbRatings = AgeRating::where('type', 'esrb')->orderBy('name')->get();
+        $pegiRatings = AgeRating::where('type', 'pegi')->orderBy('name')->get();
+        $gameModes = GameMode::orderBy('name')->get();
+        $themes = Theme::orderBy('name')->get();
         $filterType = 'Publisher';
         $filterValue = $publisher->name;
 
-        return view('games.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
+        return view('games.index', compact('products', 'genres', 'platforms', 'playerPerspectives', 'esrbRatings', 'pegiRatings', 'gameModes', 'themes', 'filterType', 'filterValue'));
     }
 
     public function byTheme(Theme $theme)
@@ -319,10 +381,15 @@ class GameController extends Controller
 
         $genres = Genre::active()->get();
         $platforms = Platform::active()->get();
+        $playerPerspectives = PlayerPerspective::orderBy('name')->get();
+        $esrbRatings = AgeRating::where('type', 'esrb')->orderBy('name')->get();
+        $pegiRatings = AgeRating::where('type', 'pegi')->orderBy('name')->get();
+        $gameModes = GameMode::orderBy('name')->get();
+        $themes = Theme::orderBy('name')->get();
         $filterType = 'Theme';
         $filterValue = $theme->name;
 
-        return view('games.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
+        return view('games.index', compact('products', 'genres', 'platforms', 'playerPerspectives', 'esrbRatings', 'pegiRatings', 'gameModes', 'themes', 'filterType', 'filterValue'));
     }
 
     public function byGameMode(GameMode $mode)
@@ -337,9 +404,79 @@ class GameController extends Controller
 
         $genres = Genre::active()->get();
         $platforms = Platform::active()->get();
+        $playerPerspectives = PlayerPerspective::orderBy('name')->get();
+        $esrbRatings = AgeRating::where('type', 'esrb')->orderBy('name')->get();
+        $pegiRatings = AgeRating::where('type', 'pegi')->orderBy('name')->get();
+        $gameModes = GameMode::orderBy('name')->get();
+        $themes = Theme::orderBy('name')->get();
         $filterType = 'Game Mode';
         $filterValue = $mode->name;
 
-        return view('games.index', compact('products', 'genres', 'platforms', 'filterType', 'filterValue'));
+        return view('games.index', compact('products', 'genres', 'platforms', 'playerPerspectives', 'esrbRatings', 'pegiRatings', 'gameModes', 'themes', 'filterType', 'filterValue'));
+    }
+
+    public function byPlayerPerspective(PlayerPerspective $perspective)
+    {
+        $products = Product::with(['genre', 'platform', 'reviews'])
+            ->where('type', 'game')
+            ->whereHas('playerPerspectives', function($query) use ($perspective) {
+                $query->where('player_perspectives.id', $perspective->id);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        $genres = Genre::active()->get();
+        $platforms = Platform::active()->get();
+        $playerPerspectives = PlayerPerspective::orderBy('name')->get();
+        $esrbRatings = AgeRating::where('type', 'esrb')->orderBy('name')->get();
+        $pegiRatings = AgeRating::where('type', 'pegi')->orderBy('name')->get();
+        $gameModes = GameMode::orderBy('name')->get();
+        $themes = Theme::orderBy('name')->get();
+        $filterType = 'Player Perspective';
+        $filterValue = $perspective->name;
+
+        return view('games.index', compact('products', 'genres', 'platforms', 'playerPerspectives', 'esrbRatings', 'pegiRatings', 'gameModes', 'themes', 'filterType', 'filterValue'));
+    }
+
+    public function byEsrbRating(AgeRating $rating)
+    {
+        $products = Product::with(['genre', 'platform', 'reviews'])
+            ->where('type', 'game')
+            ->where('esrb_rating_id', $rating->id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        $genres = Genre::active()->get();
+        $platforms = Platform::active()->get();
+        $playerPerspectives = PlayerPerspective::orderBy('name')->get();
+        $esrbRatings = AgeRating::where('type', 'esrb')->orderBy('name')->get();
+        $pegiRatings = AgeRating::where('type', 'pegi')->orderBy('name')->get();
+        $gameModes = GameMode::orderBy('name')->get();
+        $themes = Theme::orderBy('name')->get();
+        $filterType = 'ESRB Rating';
+        $filterValue = $rating->name;
+
+        return view('games.index', compact('products', 'genres', 'platforms', 'playerPerspectives', 'esrbRatings', 'pegiRatings', 'gameModes', 'themes', 'filterType', 'filterValue'));
+    }
+
+    public function byPegiRating(AgeRating $rating)
+    {
+        $products = Product::with(['genre', 'platform', 'reviews'])
+            ->where('type', 'game')
+            ->where('pegi_rating_id', $rating->id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        $genres = Genre::active()->get();
+        $platforms = Platform::active()->get();
+        $playerPerspectives = PlayerPerspective::orderBy('name')->get();
+        $esrbRatings = AgeRating::where('type', 'esrb')->orderBy('name')->get();
+        $pegiRatings = AgeRating::where('type', 'pegi')->orderBy('name')->get();
+        $gameModes = GameMode::orderBy('name')->get();
+        $themes = Theme::orderBy('name')->get();
+        $filterType = 'PEGI Rating';
+        $filterValue = $rating->name;
+
+        return view('games.index', compact('products', 'genres', 'platforms', 'playerPerspectives', 'esrbRatings', 'pegiRatings', 'gameModes', 'themes', 'filterType', 'filterValue'));
     }
 } 
