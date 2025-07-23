@@ -1,3 +1,4 @@
+@php use Illuminate\Support\Str; use Illuminate\Support\Facades\Storage; @endphp
 <x-layouts.app>
     <style>
         /* Force pointer events to be enabled, overriding any global disabling styles. */
@@ -44,8 +45,21 @@
                             <!-- Game Poster -->
                             <div class="flex-shrink-0">
                                 <div class="bg-[#1A1A1B] rounded-xl overflow-hidden border border-[#3F3F46]/20 max-w-[264px] mx-auto lg:mx-0">
+                                    @php
+                                        // Main image logic: prefer uploaded file, then alternate URL, then placeholder
+                                        $mainImage = null;
+                                        if (!empty($product->image) && !Str::startsWith($product->image, ['http://', 'https://'])) {
+                                            $mainImage = Storage::url($product->image);
+                                        } elseif (!empty($product->image_url)) {
+                                            $mainImage = $product->image_url;
+                                        } elseif (!empty($product->image)) {
+                                            $mainImage = $product->image;
+                                        } else {
+                                            $mainImage = 'https://placehold.co/264x352/1A1A1B/A1A1AA?text=No+Image';
+                                        }
+                                    @endphp
                                     <img 
-                                        src="{{ $product->image ?? 'https://placehold.co/264x352/1A1A1B/A1A1AA?text=No+Image' }}" 
+                                        src="{{ $mainImage }}" 
                                         alt="{{ $product->name }}"
                                         class="w-full h-auto object-cover"
                                         style="aspect-ratio: 264/352;"
@@ -397,13 +411,43 @@
                             <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
                                 <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Media Gallery</h2>
                                 @php
-                                    $mainPhoto = $product->image ?? null;
-                                    $mainVideo = $product->video_url ?? null;
-                                    $photos = [];
+                                    // Main image logic: prefer uploaded file, then alternate URL, then placeholder
+                                    $mainImage = null;
+                                    if (!empty($product->image) && !Str::startsWith($product->image, ['http://', 'https://'])) {
+                                        $mainImage = Storage::url($product->image);
+                                    } elseif (!empty($product->image_url)) {
+                                        $mainImage = $product->image_url;
+                                    } elseif (!empty($product->image)) {
+                                        $mainImage = $product->image;
+                                    } else {
+                                        $mainImage = 'https://placehold.co/264x352/1A1A1B/A1A1AA?text=No+Image';
+                                    }
+                                    // Photos logic: support both upload and URL for each photo, and group by type
+                                    $photoTypes = [
+                                        'screenshot' => 'Screenshots',
+                                        'artwork' => 'Artwork',
+                                        'poster' => 'Posters',
+                                        'concept' => 'Concept Art',
+                                        'other' => 'Other',
+                                    ];
+                                    $photosByType = [];
                                     if (is_array($product->photos)) {
                                         foreach ($product->photos as $photo) {
-                                            if (!empty($photo['url'])) {
-                                                $photos[] = $photo;
+                                            if (!empty($photo['upload']) && !Str::startsWith($photo['upload'], ['http://', 'https://'])) {
+                                                $photoUrl = Storage::url($photo['upload']);
+                                            } elseif (!empty($photo['url'])) {
+                                                $photoUrl = $photo['url'];
+                                            } elseif (!empty($photo['upload'])) {
+                                                $photoUrl = $photo['upload'];
+                                            } else {
+                                                $photoUrl = null;
+                                            }
+                                            if ($photoUrl) {
+                                                $type = $photo['type'] ?? 'other';
+                                                if (!isset($photosByType[$type])) {
+                                                    $photosByType[$type] = [];
+                                                }
+                                                $photosByType[$type][] = array_merge($photo, ['_display_url' => $photoUrl]);
                                             }
                                         }
                                     }
@@ -417,14 +461,14 @@
                                     }
                                 @endphp
                                 {{-- Videos Section --}}
-                                @if($mainVideo || count($videos))
+                                @if($product->video_url || count($videos))
                                     <div class="mb-10">
                                         <h3 class="text-xl font-bold text-white mb-4 font-['Share_Tech_Mono']">Videos</h3>
                                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                                            @if($mainVideo)
+                                            @if($product->video_url)
                                                 <div class="rounded-xl overflow-hidden border border-[#3F3F46] bg-[#18181B] flex flex-col">
                                                     <div class="aspect-video w-full">
-                                                        <iframe src="{{ $mainVideo }}" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+                                                        <iframe src="{{ $product->video_url }}" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
                                                     </div>
                                                     <div class="p-2 text-[#A1A1AA] text-sm text-center font-['Inter']">Main Gameplay Video</div>
                                                 </div>
@@ -443,29 +487,38 @@
                                     </div>
                                 @endif
                                 {{-- Photos Section --}}
-                                @if($mainPhoto || count($photos))
+                                @if($mainImage || count($photosByType))
                                     <div x-data="{ showModal: false, modalImg: '', modalCaption: '' }">
                                         <h3 class="text-xl font-bold text-white mb-4 font-['Share_Tech_Mono']">Photos</h3>
-                                        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                                            @if($mainPhoto)
-                                                <div class="rounded-xl overflow-hidden border border-[#3F3F46] bg-[#18181B] flex flex-col cursor-pointer hover:shadow-lg transition-shadow" @click="showModal = true; modalImg = '{{ $mainPhoto }}'; modalCaption = 'Main Game Image';">
+                                        <div class="mb-6">
+                                            @if($mainImage)
+                                                <div class="rounded-xl overflow-hidden border border-[#3F3F46] bg-[#18181B] flex flex-col cursor-pointer hover:shadow-lg transition-shadow inline-block mr-4 mb-4" style="width: 220px;" @click="showModal = true; modalImg = '{{ $mainImage }}'; modalCaption = 'Main Game Image';">
                                                     <div class="w-full h-[110px] bg-black flex items-center justify-center">
-                                                        <img src="{{ $mainPhoto }}" alt="Main Game Image" class="object-cover w-full h-full">
+                                                        <img src="{{ $mainImage }}" alt="Main Game Image" class="object-cover w-full h-full">
                                                     </div>
                                                     <div class="p-1 text-[#A1A1AA] text-xs text-center font-['Inter']">Main Game Image</div>
                                                 </div>
                                             @endif
-                                            @foreach($photos as $photo)
-                                                <div class="rounded-xl overflow-hidden border border-[#3F3F46] bg-[#18181B] flex flex-col cursor-pointer hover:shadow-lg transition-shadow" @click="showModal = true; modalImg = '{{ $photo['url'] }}'; modalCaption = '{{ $photo['caption'] ?? '' }}';">
-                                                    <div class="w-full h-[110px] bg-black flex items-center justify-center">
-                                                        <img src="{{ $photo['url'] }}" alt="Screenshot" class="object-cover w-full h-full">
-                                                    </div>
-                                                    @if(!empty($photo['caption']))
-                                                        <div class="p-1 text-[#A1A1AA] text-xs text-center font-['Inter']">{{ $photo['caption'] }}</div>
-                                                    @endif
-                                                </div>
-                                            @endforeach
                                         </div>
+                                        @foreach($photoTypes as $typeKey => $typeLabel)
+                                            @if(!empty($photosByType[$typeKey]))
+                                                <div class="mb-8">
+                                                    <h4 class="text-lg font-semibold text-white mb-2 font-['Share_Tech_Mono']">{{ $typeLabel }}</h4>
+                                                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                                                        @foreach($photosByType[$typeKey] as $photo)
+                                                            <div class="rounded-xl overflow-hidden border border-[#3F3F46] bg-[#18181B] flex flex-col cursor-pointer hover:shadow-lg transition-shadow" @click="showModal = true; modalImg = '{{ $photo['_display_url'] }}'; modalCaption = '{{ $photo['caption'] ?? '' }}';">
+                                                                <div class="w-full h-[110px] bg-black flex items-center justify-center">
+                                                                    <img src="{{ $photo['_display_url'] }}" alt="Screenshot" class="object-cover w-full h-full">
+                                                                </div>
+                                                                @if(!empty($photo['caption']))
+                                                                    <div class="p-1 text-[#A1A1AA] text-xs text-center font-['Inter']">{{ $photo['caption'] }}</div>
+                                                                @endif
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @endforeach
                                         <!-- Lightbox Modal -->
                                         <div x-show="showModal" x-transition class="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4" style="display: none;">
                                             <div class="relative max-w-3xl w-full max-h-full flex flex-col items-center">
@@ -480,7 +533,7 @@
                                         </div>
                                     </div>
                                 @endif
-                                @if(!$mainPhoto && !count($photos) && !$mainVideo && !count($videos))
+                                @if(!$mainImage && !count($photosByType) && !$product->video_url && !count($videos))
                                     <p class="text-center text-gray-400">Media content coming soon.</p>
                                 @endif
                             </section>

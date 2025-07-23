@@ -213,13 +213,19 @@ class GameResource extends Resource
                                     ->description('Main promotional and display media')
                                     ->icon('heroicon-m-star')
                                     ->schema([
-                                        Forms\Components\TextInput::make('image')
+                                        Forms\Components\FileUpload::make('image')
                                             ->label('Main Game Image')
+                                            ->directory('uploads/games')
+                                            ->image()
+                                            ->imagePreviewHeight('180')
+                                            ->columnSpanFull()
+                                            ->helperText('Upload or select a main promotional image (recommended: 1920x1080, 16:9 aspect ratio)'),
+                                        Forms\Components\TextInput::make('image_url')
+                                            ->label('Alternate Image URL')
                                             ->url()
                                             ->placeholder('https://example.com/game-image.jpg')
-                                            ->helperText('Primary promotional image (recommended: 1920x1080, 16:9 aspect ratio)')
+                                            ->helperText('Or provide a URL for the main promotional image')
                                             ->columnSpanFull(),
-                                        
                                         Forms\Components\TextInput::make('video_url')
                                             ->label('Featured Video')
                                             ->url()
@@ -236,10 +242,14 @@ class GameResource extends Resource
                                         Forms\Components\Repeater::make('photos')
                                             ->label('Images')
                                             ->schema([
+                                                Forms\Components\FileUpload::make('upload')
+                                                    ->label('Upload Image')
+                                                    ->directory('uploads/games')
+                                                    ->image()
+                                                    ->imagePreviewHeight('120'),
                                                 Forms\Components\TextInput::make('url')
                                                     ->label('Image URL')
                                                     ->url()
-                                                    ->required()
                                                     ->placeholder('https://example.com/image.jpg'),
                                                 Forms\Components\TextInput::make('caption')
                                                     ->label('Caption')
