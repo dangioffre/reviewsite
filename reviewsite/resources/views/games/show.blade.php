@@ -181,21 +181,12 @@
                                                 </a>
                                             </div>
                                         @endif
-                                        @if($product->platform)
-                                            <div><span class="font-bold text-white">Primary Platform:</span>
-                                                <a href="{{ route('games.by-platform', $product->platform->slug) }}" class="inline-block bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm hover:bg-blue-600/40 transition-colors ml-1">
-                                                    {{ $product->platform->name }}
-                                                </a>
-                                            </div>
-                                        @endif
-                                        @if($product->platforms && $product->platforms->count() > 1)
-                                            <div><span class="font-bold text-white">Other Platforms:</span>
+                                        @if($product->platforms && $product->platforms->count())
+                                            <div><span class="font-bold text-white">Platforms:</span>
                                                 @foreach($product->platforms as $platform)
-                                                    @if(!$product->platform || $platform->id !== $product->platform->id)
-                                                        <a href="{{ route('games.by-platform', $platform->slug) }}" class="inline-block bg-blue-600/10 text-blue-300 px-3 py-1 rounded-full text-xs hover:bg-blue-600/20 transition-colors ml-1">
-                                                            {{ $platform->name }}
-                                                        </a>
-                                                    @endif
+                                                    <a href="{{ route('games.by-platform', $platform->slug) }}" class="inline-block bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm hover:bg-blue-600/40 transition-colors ml-1">
+                                                        {{ $platform->name }}
+                                                    </a>
                                                 @endforeach
                                             </div>
                                         @endif

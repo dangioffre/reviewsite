@@ -109,6 +109,14 @@ class Product extends Model
     }
 
     /**
+     * Many-to-many relationship with Platform.
+     */
+    public function platforms()
+    {
+        return $this->belongsToMany(Platform::class, 'platform_product');
+    }
+
+    /**
      * Many-to-many relationship with GameMode.
      */
     public function gameModes()

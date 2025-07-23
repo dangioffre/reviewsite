@@ -19,7 +19,7 @@ class GameController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with(['genre', 'platform', 'reviews'])
+        $query = Product::with(['genre', 'platforms', 'reviews'])
             ->where('type', 'game');
 
         // Search functionality
@@ -37,7 +37,7 @@ class GameController extends Controller
 
         // Platform filter
         if ($request->filled('platform')) {
-            $query->whereHas('platform', function ($q) use ($request) {
+            $query->whereHas('platforms', function ($q) use ($request) {
                 $q->where('slug', $request->platform);
             });
         }
@@ -134,7 +134,7 @@ class GameController extends Controller
 
     public function show(Product $product)
     {
-        $product->load(['genre', 'platform']);
+        $product->load(['genre', 'platforms']);
         
         // Separate staff, streamer, and user reviews using Eloquent queries for better performance
         $staffReviews = $product->reviews()
@@ -304,9 +304,11 @@ class GameController extends Controller
 
     public function byPlatform(Platform $platform)
     {
-        $products = Product::with(['genre', 'platform', 'reviews'])
+        $products = Product::with(['genre', 'platforms', 'reviews'])
             ->where('type', 'game')
-            ->where('platform_id', $platform->id)
+            ->whereHas('platforms', function($query) use ($platform) {
+                $query->where('platforms.id', $platform->id);
+            })
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
