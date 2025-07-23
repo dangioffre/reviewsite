@@ -35,6 +35,9 @@ class DatabaseSeeder extends Seeder
             StaffReviewSeeder::class,
             CommunityReviewSeeder::class,
             UserSeeder::class,
+            ListSeeder::class,
+            StreamerSeeder::class,
+            PodcastSeeder::class,
         ]);
     }
 }

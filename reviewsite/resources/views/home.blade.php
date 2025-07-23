@@ -144,11 +144,7 @@
                         @else
                             <span class="text-3xl font-bold text-[#A0A0A0]">{{ substr($game->name, 0, 1) }}</span>
                         @endif
-                        @if($game->is_featured)
-                            <div class="absolute top-3 left-3">
-                                <span class="bg-[#03A9F4] text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg">Featured</span>
-                            </div>
-                        @elseif($game->release_date && $game->release_date->gt(now()->subDays(7)))
+                        @if($game->release_date && $game->release_date->gt(now()->subDays(7)))
                             <div class="absolute top-3 left-3">
                                 <span class="bg-[#4CAF50] text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg">New</span>
                             </div>
@@ -177,7 +173,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between mb-12">
                 <div>
-                    <h2 class="text-3xl font-bold text-white mb-3 font-['Poppins']">Featured Creators</h2>
+                    <h2 class="text-3xl font-bold text-white mb-3 font-['Poppins']">Creators</h2>
                     <p class="text-[#A0A0A0]">Meet the talented creators joining our community</p>
                 </div>
                 <a href="{{ route('streamer.profiles.index') }}" class="inline-flex items-center gap-2 text-[#FFC107] hover:text-[#FFB300] font-medium transition-colors">
