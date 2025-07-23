@@ -713,4 +713,6 @@ Route::post('/tech/{product}/{review}/comments', [\App\Http\Controllers\ReviewCo
 Route::post('/review-comments/{comment}/like', [\App\Http\Controllers\ReviewCommentLikeController::class, 'toggle'])->name('review-comments.like');
 Route::post('/review-comments/{comment}/report', [\App\Http\Controllers\ReviewCommentReportController::class, 'store'])->name('review-comments.report');
 
+Route::get('/keywords/{slug}', [App\Http\Controllers\KeywordController::class, 'show'])->name('keywords.show');
+
 

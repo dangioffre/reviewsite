@@ -157,6 +157,14 @@ class Product extends Model
     }
 
     /**
+     * Many-to-many relationship with Keyword.
+     */
+    public function keywords()
+    {
+        return $this->belongsToMany(Keyword::class, 'keyword_product');
+    }
+
+    /**
      * Get the staff review for the product.
      */
     public function staffReview()

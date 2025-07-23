@@ -132,6 +132,20 @@ class GameResource extends Resource
                                             ->placeholder('Select themes')
                                             ->helperText('Select all themes that apply to this game'),
                                         
+                                        Forms\Components\Select::make('keyword_ids')
+                                            ->label('Keywords')
+                                            ->multiple()
+                                            ->relationship('keywords', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->createOptionForm([
+                                                Forms\Components\TextInput::make('name')
+                                                    ->label('Keyword Name')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                            ])
+                                            ->helperText('Add or select keywords to help categorize and describe this game'),
+                                        
                                         Forms\Components\Select::make('player_perspective_ids')
                                             ->label('Player Perspectives')
                                             ->multiple()
@@ -462,5 +476,11 @@ class GameResource extends Resource
             'create' => Pages\CreateGame::route('/create'),
             'edit' => Pages\EditGame::route('/{record}/edit'),
         ];
+    }
+
+    public static function canAccessResource(): bool
+    {
+        $user = auth()->user();
+        return $user && ($user->hasRole('Admin') || $user->hasRole('Moderator'));
     }
 }

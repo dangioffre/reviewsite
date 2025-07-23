@@ -54,4 +54,10 @@ return [
         'redirect' => env('KICK_REDIRECT_URI', env('APP_URL').'/auth/kick/callback'),
     ],
 
+    'openai' => [
+        'api_key' => env('OPENAI_API_KEY'),
+        'endpoint' => env('OPENAI_ENDPOINT', 'https://api.openai.com/v1/chat/completions'),
+        'model' => env('OPENAI_MODEL', 'gpt-4o-mini'),
+    ],
+
 ];

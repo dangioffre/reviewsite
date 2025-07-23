@@ -15,7 +15,7 @@ class StreamerRegistrationChart extends ChartWidget
     protected function getData(): array
     {
         $data = StreamerProfile::select(
-                DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
+                DB::raw("TO_CHAR(created_at, 'YYYY-MM') as month"),
                 DB::raw('COUNT(*) as count')
             )
             ->where('created_at', '>=', now()->subMonths(6))

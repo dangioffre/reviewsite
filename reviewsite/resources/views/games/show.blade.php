@@ -261,6 +261,16 @@
                                         @endif
                                     </div>
                                 </div>
+                                @if($product->keywords && $product->keywords->count())
+                                    <div class="mb-8">
+                                        <h3 class="text-xl font-bold text-white mb-2 font-['Share_Tech_Mono']">Keywords</h3>
+                                        <div class="flex flex-wrap gap-2">
+                                            @foreach($product->keywords->sortBy('name') as $keyword)
+                                                <a href="{{ route('keywords.show', $keyword->slug) }}" class="inline-block bg-[#2563EB]/20 text-[#2563EB] px-3 py-1 rounded-full text-sm font-semibold font-['Inter'] hover:bg-[#2563EB]/40 hover:text-white transition-colors">{{ $keyword->name }}</a>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
                                 @if($product->story)
                                 <div class="bg-[#18181B] rounded-xl p-6 border border-[#3F3F46]">
                                     <h3 class="text-xl font-bold text-white mb-2 font-['Share_Tech_Mono']">Game Story</h3>
