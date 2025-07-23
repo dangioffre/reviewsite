@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Intervention\Image\Facades\Image;
 
 class Product extends Model
 {
@@ -61,6 +62,45 @@ class Product extends Model
         static::updating(function ($product) {
             if ($product->isDirty('name') && empty($product->slug)) {
                 $product->slug = static::generateUniqueSlug($product->name);
+            }
+        });
+
+        // Image resizing/compression for main image and photos
+        static::saving(function ($product) {
+            // Main image (local upload only)
+            if ($product->isDirty('image') && $product->image && !Str::startsWith($product->image, ['http://', 'https://'])) {
+                $path = storage_path('app/public/' . $product->image);
+                if (file_exists($path)) {
+                    $img = Image::make($path)
+                        ->resize(1200, 800, function ($constraint) {
+                            $constraint->aspectRatio();
+                            $constraint->upsize();
+                        })
+                        ->encode('jpg', 80); // 80% quality
+                    $img->save($path);
+                }
+            }
+            // Photos (repeater uploads)
+            if (is_array($product->photos)) {
+                $changed = false;
+                foreach ($product->photos as &$photo) {
+                    if (!empty($photo['upload']) && !Str::startsWith($photo['upload'], ['http://', 'https://'])) {
+                        $photoPath = storage_path('app/public/' . $photo['upload']);
+                        if (file_exists($photoPath)) {
+                            $img = Image::make($photoPath)
+                                ->resize(1000, 700, function ($constraint) {
+                                    $constraint->aspectRatio();
+                                    $constraint->upsize();
+                                })
+                                ->encode('jpg', 80);
+                            $img->save($photoPath);
+                            $changed = true;
+                        }
+                    }
+                }
+                if ($changed) {
+                    $product->photos = $product->photos; // re-assign to trigger dirty
+                }
             }
         });
     }
