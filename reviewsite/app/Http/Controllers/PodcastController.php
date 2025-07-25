@@ -347,15 +347,74 @@ class PodcastController extends Controller
     /**
      * Display all podcasts (public index)
      */
-    public function index()
+    public function index(Request $request)
     {
-        $podcasts = Podcast::approved()
+        $query = Podcast::approved()
             ->with('owner', 'episodes')
-            ->withCount(['episodes', 'reviews'])
-            ->latest('approved_at')
-            ->paginate(12);
+            ->withCount(['episodes', 'reviews']);
 
-        return view('podcasts.index', compact('podcasts'));
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%')
+                  ->orWhereHas('owner', function ($ownerQuery) use ($search) {
+                      $ownerQuery->where('name', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereJsonContains('hosts', $search);
+            });
+        }
+
+        // Featured filter
+        if ($request->filled('featured')) {
+            $query->where('is_featured', $request->featured === 'true');
+        }
+
+        // Host filter
+        if ($request->filled('host')) {
+            $query->whereJsonContains('hosts', $request->host);
+        }
+
+        // Sorting
+        switch ($request->get('sort', 'newest')) {
+            case 'oldest':
+                $query->orderBy('approved_at', 'asc');
+                break;
+            case 'name_asc':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('name', 'desc');
+                break;
+            case 'episodes_high':
+                $query->orderBy('episodes_count', 'desc');
+                break;
+            case 'episodes_low':
+                $query->orderBy('episodes_count', 'asc');
+                break;
+            case 'reviews_high':
+                $query->orderBy('reviews_count', 'desc');
+                break;
+            case 'reviews_low':
+                $query->orderBy('reviews_count', 'asc');
+                break;
+            default:
+                $query->orderBy('approved_at', 'desc');
+        }
+
+        $podcasts = $query->paginate(12)->withQueryString();
+
+        // Get unique hosts for filter dropdown
+        $hosts = Podcast::approved()
+            ->whereNotNull('hosts')
+            ->pluck('hosts')
+            ->flatten()
+            ->unique()
+            ->sort()
+            ->values();
+
+        return view('podcasts.index', compact('podcasts', 'hosts'));
     }
 
     /**

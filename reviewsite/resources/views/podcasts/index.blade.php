@@ -20,7 +20,13 @@
                 <div class="flex items-center justify-center gap-8 text-zinc-400 mb-8">
                     <div class="flex items-center gap-2">
                         <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                        <span class="font-medium">{{ $podcasts->total() }} Podcasts</span>
+                        <span class="font-medium">
+                            @if(request()->hasAny(['search', 'sort', 'featured', 'host']))
+                                {{ $podcasts->total() }} Results
+                            @else
+                                {{ $podcasts->total() }} Podcasts
+                            @endif
+                        </span>
                     </div>
                     <div class="w-px h-6 bg-zinc-600"></div>
                     <div class="flex items-center gap-2">
@@ -46,8 +52,11 @@
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 mt-8">
+        
+        <!-- Filters Section -->
+        <x-podcast-filters :hosts="$hosts" />
 
-            @if($podcasts->count() > 0)
+        @if($podcasts->count() > 0)
                 <!-- Podcasts Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     @foreach($podcasts as $podcast)
@@ -133,18 +142,37 @@
                 <!-- No Podcasts -->
                 <div class="text-center py-16">
                     <div class="w-24 h-24 mx-auto mb-8 bg-[#3F3F46] rounded-full flex items-center justify-center">
-                        <svg class="w-12 h-12 text-[#A1A1AA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
-                        </svg>
+                        @if(request()->hasAny(['search', 'sort', 'featured', 'host']))
+                            <svg class="w-12 h-12 text-[#A1A1AA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        @else
+                            <svg class="w-12 h-12 text-[#A1A1AA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                            </svg>
+                        @endif
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-4 font-['Share_Tech_Mono']">No Podcasts Yet</h3>
-                    <p class="text-[#A1A1AA] mb-8 font-['Inter']">
-                        Be the first to submit a gaming podcast to our community!
-                    </p>
-                    <a href="{{ route('podcasts.create') }}" 
-                       class="bg-[#E53E3E] text-white font-bold py-3 px-8 rounded-lg font-['Inter'] hover:bg-[#DC2626] transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-110 inline-block">
-                        Submit Your Podcast
-                    </a>
+                    
+                    @if(request()->hasAny(['search', 'sort', 'featured', 'host']))
+                        <h3 class="text-2xl font-bold text-white mb-4 font-['Share_Tech_Mono']">No Results Found</h3>
+                        <p class="text-[#A1A1AA] mb-8 font-['Inter']">
+                            No podcasts match your current filters. Try adjusting your search criteria or 
+                            <a href="{{ route('podcasts.index') }}" class="text-[#E53E3E] hover:text-[#DC2626] underline">clear all filters</a>.
+                        </p>
+                        <a href="{{ route('podcasts.index') }}" 
+                           class="bg-gradient-to-r from-[#3F3F46] to-[#27272A] text-white font-bold py-3 px-8 rounded-lg font-['Inter'] hover:from-[#52525B] hover:to-[#3F3F46] transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-110 inline-block">
+                            Clear All Filters
+                        </a>
+                    @else
+                        <h3 class="text-2xl font-bold text-white mb-4 font-['Share_Tech_Mono']">No Podcasts Yet</h3>
+                        <p class="text-[#A1A1AA] mb-8 font-['Inter']">
+                            Be the first to submit a gaming podcast to our community!
+                        </p>
+                        <a href="{{ route('podcasts.create') }}" 
+                           class="bg-[#E53E3E] text-white font-bold py-3 px-8 rounded-lg font-['Inter'] hover:bg-[#DC2626] transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-110 inline-block">
+                            Submit Your Podcast
+                        </a>
+                    @endif
                 </div>
             @endif
         </div>
