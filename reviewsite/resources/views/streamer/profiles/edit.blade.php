@@ -1,112 +1,304 @@
 @extends('layouts.app')
 
+@push('styles')
+<style>
+    /* Enhanced styling for the streamer edit page - Brand Colors */
+    .edit-profile-container {
+        background: linear-gradient(135deg, #151515 0%, #1A1A1B 50%, #27272A 100%);
+        min-height: 100vh;
+    }
+    
+    .glass-card {
+        background: rgba(39, 39, 42, 0.8);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(63, 63, 70, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    .glass-card:hover {
+        border-color: rgba(229, 62, 62, 0.3);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    }
+    
+    .section-header {
+        background: linear-gradient(135deg, rgba(229, 62, 62, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+        border-left: 4px solid #E53E3E;
+    }
+    
+    .status-indicator {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .status-indicator::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+    
+    .action-button {
+        background: linear-gradient(135deg, #E53E3E 0%, #DC2626 100%);
+        border: 1px solid rgba(229, 62, 62, 0.3);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .action-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(229, 62, 62, 0.4);
+        border-color: rgba(229, 62, 62, 0.6);
+    }
+    
+    .action-button.secondary {
+        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+        border-color: rgba(37, 99, 235, 0.3);
+    }
+    
+    .action-button.secondary:hover {
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+        border-color: rgba(37, 99, 235, 0.6);
+    }
+    
+    .action-button.danger {
+        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+        border-color: rgba(239, 68, 68, 0.3);
+    }
+    
+    .action-button.danger:hover {
+        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        border-color: rgba(239, 68, 68, 0.6);
+    }
+    
+    .form-input {
+        background: rgba(26, 26, 27, 0.8);
+        border: 1px solid rgba(63, 63, 70, 0.5);
+        transition: all 0.3s ease;
+    }
+    
+    .form-input:focus {
+        background: rgba(26, 26, 27, 0.9);
+        border-color: #2563EB;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    .toggle-switch {
+        position: relative;
+        width: 3rem;
+        height: 1.5rem;
+        background: rgba(63, 63, 70, 0.5);
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .toggle-switch.active {
+        background: #10b981;
+    }
+    
+    .toggle-switch::after {
+        content: '';
+        position: absolute;
+        top: 0.125rem;
+        left: 0.125rem;
+        width: 1.25rem;
+        height: 1.25rem;
+        background: white;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+    
+    .toggle-switch.active::after {
+        transform: translateX(1.5rem);
+    }
+    
+    .pulse-dot {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    .floating-notification {
+        animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
-<div class="min-h-screen bg-[#151515] py-8">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Header -->
+<div class="edit-profile-container py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Enhanced Header -->
         <div class="mb-8">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                    <h1 class="text-4xl lg:text-6xl font-bold text-white mb-2 font-['Share_Tech_Mono'] leading-tight">
-                        Edit Profile
-                    </h1>
-                    <p class="text-[#A1A1AA] text-lg font-['Inter']">{{ $streamerProfile->channel_name }}</p>
-                </div>
-                <div class="flex flex-wrap gap-3">
-                    <a href="{{ route('streamer.profile.manage-vods', $streamerProfile) }}" 
-                       class="px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors font-['Inter'] flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
-                        Manage VODs
-                    </a>
-                    <a href="{{ route('streamer.profile.manage-showcase', $streamerProfile) }}" 
-                       class="px-4 py-2 bg-[#8B5CF6] text-white rounded-lg hover:bg-[#7C3AED] transition-colors font-['Inter'] flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
-                        </svg>
-                        Manage Games
-                    </a>
-                    <a href="#reviews-section" 
-                       class="px-4 py-2 bg-[#10B981] text-white rounded-lg hover:bg-[#059669] transition-colors font-['Inter'] flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-                        </svg>
-                        Manage Reviews
-                    </a>
-                    <a href="{{ route('streamer.profile.show', $streamerProfile) }}" 
-                       class="px-4 py-2 bg-[#3F3F46] text-white rounded-lg hover:bg-[#52525B] transition-colors font-['Inter'] flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                        </svg>
-                        View Profile
-                    </a>
-                    <form id="delete-profile-form" action="{{ route('streamer.profile.destroy', $streamerProfile) }}" method="POST" class="inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="button" 
-                                onclick="confirmDelete()"
-                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-['Inter'] flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            <div class="glass-card rounded-2xl p-6">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h1 class="text-4xl lg:text-5xl font-bold text-white font-['Share_Tech_Mono'] leading-tight">
+                                    Edit Profile
+                                </h1>
+                                <p class="text-blue-200 text-xl font-['Inter'] mt-2">{{ $streamerProfile->channel_name }}</p>
+                                <div class="flex items-center gap-2 text-blue-100 text-sm font-['Inter'] mt-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Manage your streaming profile, schedule, and content visibility
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Enhanced Action Buttons -->
+                    <div class="flex flex-wrap gap-3">
+                        <a href="{{ route('streamer.profile.manage-vods', $streamerProfile) }}" 
+                           class="action-button px-6 py-3 text-white rounded-xl font-medium font-['Inter'] flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                             </svg>
-                            Delete Profile
-                        </button>
-                    </form>
+                            Manage VODs
+                        </a>
+                        <a href="{{ route('streamer.profile.manage-showcase', $streamerProfile) }}" 
+                           class="action-button px-6 py-3 text-white rounded-xl font-medium font-['Inter'] flex items-center" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border-color: rgba(139, 92, 246, 0.3);">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                            </svg>
+                            Manage Games
+                        </a>
+                        <a href="#reviews-section" 
+                           class="action-button px-6 py-3 text-white rounded-xl font-medium font-['Inter'] flex items-center" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-color: rgba(16, 185, 129, 0.3);">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                            </svg>
+                            Manage Reviews
+                        </a>
+                        <a href="{{ route('streamer.profile.show', $streamerProfile) }}" 
+                           class="action-button secondary px-6 py-3 text-white rounded-xl font-medium font-['Inter'] flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                            View Profile
+                        </a>
+                        <form id="delete-profile-form" action="{{ route('streamer.profile.destroy', $streamerProfile) }}" method="POST" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="button" 
+                                    onclick="confirmDelete()"
+                                    class="action-button danger px-6 py-3 text-white rounded-xl font-medium font-['Inter'] flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                                Delete Profile
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="space-y-8">
+        <div class="space-y-6">
             <!-- Profile Form -->
-            <form method="POST" action="{{ route('streamer.profile.update', $streamerProfile) }}" class="space-y-8">
+            <form method="POST" action="{{ route('streamer.profile.update', $streamerProfile) }}" class="space-y-6">
                 @csrf
                 @method('PUT')
                 
-                <!-- Bio Section -->
-                <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] p-8">
-                    <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Profile Information</h2>
+                <!-- Enhanced Bio Section -->
+                <div class="glass-card rounded-2xl p-6">
+                    <div class="section-header rounded-t-xl p-4 -m-6 mb-4">
+                        <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono'] flex items-center gap-3">
+                            <svg class="w-6 h-6 text-[#E53E3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            Profile Information
+                        </h2>
+                    </div>
                     
                     <div>
-                        <label for="bio" class="block text-sm font-medium text-white mb-2 font-['Inter']">Bio/Description</label>
-                        <textarea name="bio" id="bio" rows="4" maxlength="1000" 
+                        <label for="bio" class="block text-sm font-medium text-white mb-3 font-['Inter']">Bio/Description</label>
+                        <textarea name="bio" id="bio" rows="5" maxlength="1000" 
                                   placeholder="Tell viewers about yourself and your content..."
-                                  class="w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-3 text-white placeholder-[#A1A1AA] focus:border-[#2563EB] focus:ring-[#2563EB] font-['Inter']">{{ old('bio', $streamerProfile->bio) }}</textarea>
-                        <p id="char-counter" class="text-xs text-[#A1A1AA] mt-1 font-['Inter']">{{ strlen($streamerProfile->bio ?? '') }}/1000 characters</p>
+                                  class="form-input w-full rounded-xl p-4 text-white placeholder-gray-400 font-['Inter'] resize-none">{{ old('bio', $streamerProfile->bio) }}</textarea>
+                        <div class="flex items-center justify-between mt-3">
+                            <p id="char-counter" class="text-sm text-gray-400 font-['Inter']">{{ strlen($streamerProfile->bio ?? '') }}/1000 characters</p>
+                            <div class="w-24 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-[#E53E3E] to-[#DC2626] rounded-full transition-all duration-300" 
+                                     style="width: {{ min(100, (strlen($streamerProfile->bio ?? '') / 1000) * 100) }}%"></div>
+                            </div>
+                        </div>
                         @error('bio')
-                            <p class="text-red-400 text-sm mt-1 font-['Inter']">{{ $message }}</p>
+                            <p class="text-red-400 text-sm mt-2 font-['Inter']">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
             
-            <!-- Live Status Control -->
-            <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] p-8">
-                <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Live Status Control</h2>
+            <!-- Enhanced Live Status Control -->
+            <div class="glass-card rounded-2xl p-6">
+                <div class="section-header rounded-t-xl p-4 -m-6 mb-4">
+                                            <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono'] flex items-center gap-3">
+                            <svg class="w-6 h-6 text-[#E53E3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Live Status Control
+                        </h2>
+                </div>
                 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div>
-                        <h3 class="text-lg font-bold text-white mb-4 font-['Inter']">Current Status</h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-bold text-white font-['Inter'] flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Current Status
+                        </h3>
                         <div class="space-y-4">
                             @if($streamerProfile->isLive())
-                                <div class="flex items-center">
-                                    <span class="px-4 py-2 bg-red-500 text-white rounded-lg font-bold font-['Inter'] animate-pulse">
-                                        <div class="w-2 h-2 bg-white rounded-full inline-block mr-2 animate-ping"></div>
+                                <div class="status-indicator">
+                                    <span class="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-bold font-['Inter'] flex items-center">
+                                        <div class="w-3 h-3 bg-white rounded-full mr-3 pulse-dot"></div>
                                         LIVE NOW
                                     </span>
                                 </div>
                             @else
                                 <div class="flex items-center">
-                                    <span class="px-4 py-2 bg-[#3F3F46] text-[#A1A1AA] rounded-lg font-bold font-['Inter']">
-                                        <div class="w-2 h-2 bg-[#A1A1AA] rounded-full inline-block mr-2"></div>
+                                    <span class="px-6 py-3 bg-gray-700 text-gray-300 rounded-xl font-bold font-['Inter'] flex items-center">
+                                        <div class="w-3 h-3 bg-gray-400 rounded-full mr-3"></div>
                                         OFFLINE
                                     </span>
                                 </div>
                             @endif
                             
                             @if($streamerProfile->manual_live_override !== null)
-                                <div class="flex items-center text-blue-400 font-['Inter']">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="flex items-center text-blue-400 font-['Inter'] bg-blue-500/10 rounded-lg p-3">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                                     </svg>
                                     Manual override active
@@ -114,37 +306,47 @@
                             @endif
                             
                             @if($streamerProfile->live_status_checked_at)
-                                <div class="text-[#A1A1AA] text-sm font-['Inter']">
-                                    Last checked: {{ $streamerProfile->live_status_checked_at->diffForHumans() }}
+                                <div class="text-gray-400 text-sm font-['Inter'] bg-gray-800/50 rounded-lg p-3">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Last checked: {{ $streamerProfile->live_status_checked_at->diffForHumans() }}
+                                    </div>
                                 </div>
                             @endif
                         </div>
                     </div>
                     
-                    <div>
-                        <h3 class="text-lg font-bold text-white mb-4 font-['Inter']">Manual Override</h3>
-                        <p class="text-[#A1A1AA] text-sm mb-4 font-['Inter']">
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-bold text-white font-['Inter'] flex items-center gap-2">
+                            <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                            Manual Override
+                        </h3>
+                        <p class="text-gray-300 text-sm font-['Inter'] bg-gray-800/50 rounded-lg p-4">
                             Use manual override when automatic detection isn't working correctly.
                         </p>
                         <div class="flex flex-wrap gap-3">
                             <button type="button" id="setLiveBtn" 
-                                    class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-['Inter'] flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    class="action-button px-6 py-3 text-white rounded-xl font-medium font-['Inter'] flex items-center" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-color: rgba(16, 185, 129, 0.3);">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                                 Set Live
                             </button>
                             <button type="button" id="setOfflineBtn" 
-                                    class="px-4 py-2 bg-[#3F3F46] text-white rounded-lg hover:bg-[#52525B] transition-colors font-['Inter'] flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    class="action-button secondary px-6 py-3 text-white rounded-xl font-medium font-['Inter'] flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9l6 6m0-6l-6 6"></path>
                                 </svg>
                                 Set Offline
                             </button>
                             <button type="button" id="clearOverrideBtn" 
-                                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-['Inter'] flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    class="action-button px-6 py-3 text-white rounded-xl font-medium font-['Inter'] flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                 </svg>
                                 Auto Detect
@@ -155,18 +357,25 @@
             </div>
             
             <!-- Streaming Schedule -->
-            <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] p-8">
-                <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Streaming Schedule</h2>
+            <div class="glass-card rounded-2xl p-6">
+                <div class="section-header rounded-t-xl p-4 -m-6 mb-4">
+                                            <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono'] flex items-center gap-3">
+                            <svg class="w-6 h-6 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Streaming Schedule
+                        </h2>
+                </div>
                 
-                <div id="schedules-container" class="space-y-6">
+                <div id="schedules-container" class="space-y-4">
                     @foreach($streamerProfile->schedules as $index => $schedule)
-                        <div class="schedule-entry bg-[#1A1A1B] rounded-xl border border-[#3F3F46] p-6">
+                        <div class="schedule-entry bg-gray-800/50 rounded-xl border border-gray-700/50 p-4 backdrop-blur-sm">
                             <input type="hidden" name="schedules[{{ $index }}][id]" value="{{ $schedule->id }}">
                             
                             <div class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
                                 <div>
                                     <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Day</label>
-                                    <select name="schedules[{{ $index }}][day_of_week]" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 font-['Inter']">
+                                    <select name="schedules[{{ $index }}][day_of_week]" class="form-input w-full rounded-xl text-white p-3 font-['Inter']">
                                         <option value="0" {{ $schedule->day_of_week == 0 ? 'selected' : '' }}>Sunday</option>
                                         <option value="1" {{ $schedule->day_of_week == 1 ? 'selected' : '' }}>Monday</option>
                                         <option value="2" {{ $schedule->day_of_week == 2 ? 'selected' : '' }}>Tuesday</option>
@@ -180,17 +389,17 @@
                                     <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Start</label>
                                     <input type="time" name="schedules[{{ $index }}][start_time]" 
                                            value="{{ $schedule->start_time->format('H:i') }}"
-                                           class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 font-['Inter']">
+                                           class="form-input w-full rounded-xl text-white p-3 font-['Inter']">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-white mb-2 font-['Inter']">End</label>
                                     <input type="time" name="schedules[{{ $index }}][end_time]" 
                                            value="{{ $schedule->end_time->format('H:i') }}"
-                                           class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 font-['Inter']">
+                                           class="form-input w-full rounded-xl text-white p-3 font-['Inter']">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Timezone</label>
-                                    <select name="schedules[{{ $index }}][timezone]" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 font-['Inter']">
+                                    <select name="schedules[{{ $index }}][timezone]" class="form-input w-full rounded-xl text-white p-3 font-['Inter']">
                                         <option value="America/New_York" {{ $schedule->timezone == 'America/New_York' ? 'selected' : '' }}>Eastern</option>
                                         <option value="America/Chicago" {{ $schedule->timezone == 'America/Chicago' ? 'selected' : '' }}>Central</option>
                                         <option value="America/Denver" {{ $schedule->timezone == 'America/Denver' ? 'selected' : '' }}>Mountain</option>
@@ -201,10 +410,13 @@
                                     <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Notes</label>
                                     <input type="text" name="schedules[{{ $index }}][notes]" 
                                            value="{{ $schedule->notes }}" maxlength="255" placeholder="Optional"
-                                           class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 placeholder-[#A1A1AA] font-['Inter']">
+                                           class="form-input w-full rounded-xl text-white p-3 placeholder-gray-400 font-['Inter']">
                                 </div>
                                 <div class="flex items-end">
-                                    <button type="button" class="remove-schedule w-full px-3 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors font-['Inter']">
+                                    <button type="button" class="remove-schedule w-full px-4 py-3 bg-red-500/20 text-red-400 rounded-xl hover:bg-red-500/30 transition-colors font-['Inter'] flex items-center justify-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
                                         Remove
                                     </button>
                                 </div>
@@ -213,18 +425,28 @@
                     @endforeach
                 </div>
                 
-                <button type="button" id="add-schedule" class="mt-4 px-4 py-2 bg-[#2563EB]/20 text-[#2563EB] rounded-lg hover:bg-[#2563EB]/30 transition-colors font-['Inter']">
+                <button type="button" id="add-schedule" class="mt-6 px-6 py-3 bg-blue-500/20 text-blue-400 rounded-xl hover:bg-blue-500/30 transition-colors font-['Inter'] flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
                     + Add Schedule
                 </button>
             </div>
             
             <!-- Social Links -->
-            <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] p-8">
-                <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Social Links</h2>
+            <div class="glass-card rounded-2xl p-6">
+                <div class="section-header rounded-t-xl p-4 -m-6 mb-4">
+                    <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono'] flex items-center gap-3">
+                        <svg class="w-6 h-6 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                        </svg>
+                        Social Links
+                    </h2>
+                </div>
                 
-                <div id="social-links-container" class="space-y-6">
+                <div id="social-links-container" class="space-y-4">
                     @foreach($streamerProfile->socialLinks as $index => $link)
-                        <div class="social-link-entry bg-[#1A1A1B] rounded-xl border border-[#3F3F46] p-6">
+                        <div class="social-link-entry bg-gray-800/50 rounded-xl border border-gray-700/50 p-4 backdrop-blur-sm">
                             <input type="hidden" name="social_links[{{ $index }}][id]" value="{{ $link->id }}">
                             
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -232,16 +454,19 @@
                                     <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Platform</label>
                                     <input type="text" name="social_links[{{ $index }}][platform]" 
                                            value="{{ $link->platform }}" maxlength="50" placeholder="twitter"
-                                           class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 placeholder-[#A1A1AA] font-['Inter']">
+                                           class="form-input w-full rounded-xl text-white p-3 placeholder-gray-400 font-['Inter']">
                                 </div>
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-white mb-2 font-['Inter']">URL</label>
                                     <input type="url" name="social_links[{{ $index }}][url]" 
                                            value="{{ $link->url }}" maxlength="500" placeholder="https://..."
-                                           class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 placeholder-[#A1A1AA] font-['Inter']">
+                                           class="form-input w-full rounded-xl text-white p-3 placeholder-gray-400 font-['Inter']">
                                 </div>
                                 <div class="flex items-end">
-                                    <button type="button" class="remove-social-link w-full px-3 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors font-['Inter']">
+                                    <button type="button" class="remove-social-link w-full px-4 py-3 bg-red-500/20 text-red-400 rounded-xl hover:bg-red-500/30 transition-colors font-['Inter'] flex items-center justify-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
                                         Remove
                                     </button>
                                 </div>
@@ -250,26 +475,37 @@
                     @endforeach
                 </div>
                 
-                <button type="button" id="add-social-link" class="mt-4 px-4 py-2 bg-[#2563EB]/20 text-[#2563EB] rounded-lg hover:bg-[#2563EB]/30 transition-colors font-['Inter']">
+                <button type="button" id="add-social-link" class="mt-6 px-6 py-3 bg-blue-500/20 text-blue-400 rounded-xl hover:bg-blue-500/30 transition-colors font-['Inter'] flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
                     + Add Social Link
                 </button>
             </div>
             
             <!-- Reviews Management -->
-            <div id="reviews-section" class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] p-8">
+            <div id="reviews-section" class="glass-card rounded-2xl p-6">
+                <div class="section-header rounded-t-xl p-4 -m-6 mb-4">
+                    <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono'] flex items-center gap-3">
+                        <svg class="w-6 h-6 text-[#E53E3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                        </svg>
+                        Your Reviews
+                    </h2>
+                </div>
+                
                 <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono']">Your Reviews</h2>
                     <div class="flex gap-2">
                         <a href="{{ route('games.index') }}" 
-                           class="px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors font-['Inter'] flex items-center text-sm">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           class="action-button px-6 py-3 text-white rounded-xl font-medium font-['Inter'] flex items-center" style="background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%); border-color: rgba(37, 99, 235, 0.3);">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
                             Review Games
                         </a>
                         <a href="{{ route('tech.index') }}" 
-                           class="px-4 py-2 bg-[#8B5CF6] text-white rounded-lg hover:bg-[#7C3AED] transition-colors font-['Inter'] flex items-center text-sm">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           class="action-button px-6 py-3 text-white rounded-xl font-medium font-['Inter'] flex items-center" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); border-color: rgba(139, 92, 246, 0.3);">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
                             Review Tech
@@ -278,12 +514,12 @@
                 </div>
                 
                 @if($streamerProfile->reviews->count() > 0)
-                    <div class="space-y-4">
+                    <div class="space-y-6">
                         @foreach($streamerProfile->reviews->take(10) as $review)
-                            <div class="bg-[#1A1A1B] rounded-xl border border-[#3F3F46] p-6">
+                            <div class="bg-gray-800/50 rounded-xl border border-gray-700/50 p-6 backdrop-blur-sm">
                                 <div class="flex items-start justify-between">
                                     <div class="flex-1">
-                                        <div class="flex items-center gap-3 mb-2">
+                                        <div class="flex items-center gap-3 mb-3">
                                             <h3 class="text-lg font-bold text-white font-['Inter']">{{ $review->title }}</h3>
                                             <div class="flex items-center">
                                                 @for($i = 1; $i <= 10; $i++)
@@ -291,26 +527,26 @@
                                                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                                     </svg>
                                                 @endfor
-                                                <span class="ml-2 text-sm text-[#A1A1AA] font-['Inter']">{{ $review->rating }}/10</span>
+                                                <span class="ml-2 text-sm text-gray-400 font-['Inter']">{{ $review->rating }}/10</span>
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-4 mb-3">
-                                            <span class="text-[#2563EB] font-medium font-['Inter']">{{ $review->product->name }}</span>
-                                            <span class="text-[#A1A1AA] text-sm font-['Inter']">{{ $review->product->type === 'game' ? 'Game' : 'Tech' }}</span>
-                                            <span class="text-[#A1A1AA] text-sm font-['Inter']">{{ $review->created_at->format('M j, Y') }}</span>
+                                            <span class="text-blue-400 font-medium font-['Inter']">{{ $review->product->name }}</span>
+                                            <span class="text-gray-400 text-sm font-['Inter']">{{ $review->product->type === 'game' ? 'Game' : 'Tech' }}</span>
+                                            <span class="text-gray-400 text-sm font-['Inter']">{{ $review->created_at->format('M j, Y') }}</span>
                                             @if($review->is_published)
-                                                <span class="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs font-['Inter']">Published</span>
+                                                <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-['Inter']">Published</span>
                                             @else
-                                                <span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs font-['Inter']">Draft</span>
+                                                <span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-['Inter']">Draft</span>
                                             @endif
                                         </div>
-                                        <p class="text-[#A1A1AA] text-sm font-['Inter'] line-clamp-2">{{ Str::limit($review->content, 150) }}</p>
+                                        <p class="text-gray-300 text-sm font-['Inter'] line-clamp-2">{{ Str::limit($review->content, 150) }}</p>
                                         
                                         <!-- Visibility Controls -->
-                                        <div class="mt-4 pt-4 border-t border-[#3F3F46]">
+                                        <div class="mt-4 pt-4 border-t border-gray-700/50">
                                             <div class="flex items-center justify-between">
                                                 <span class="text-sm font-medium text-white font-['Inter']">Visibility Settings</span>
-                                                <div class="flex items-center gap-4">
+                                                <div class="flex items-center gap-6">
                                                     @if($review->streamer_profile_id)
                                                         <label class="flex items-center cursor-pointer">
                                                             <input type="checkbox" 
@@ -318,11 +554,10 @@
                                                                    data-review-id="{{ $review->id }}"
                                                                    data-type="streamer"
                                                                    {{ $review->show_on_streamer_profile ? 'checked' : '' }}>
-                                                            <div class="relative">
-                                                                <div class="block bg-gray-600 w-10 h-6 rounded-full"></div>
-                                                                <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition {{ $review->show_on_streamer_profile ? 'transform translate-x-4 bg-green-400' : '' }}"></div>
+                                                            <div class="toggle-switch {{ $review->show_on_streamer_profile ? 'active' : '' }}">
+                                                                <div class="dot"></div>
                                                             </div>
-                                                            <span class="ml-2 text-sm text-[#A1A1AA] font-['Inter']">Show on Streamer Profile</span>
+                                                            <span class="ml-3 text-sm text-gray-300 font-['Inter']">Show on Streamer Profile</span>
                                                         </label>
                                                     @endif
                                                     
@@ -333,24 +568,30 @@
                                                                    data-review-id="{{ $review->id }}"
                                                                    data-type="podcast"
                                                                    {{ $review->show_on_podcast ? 'checked' : '' }}>
-                                                            <div class="relative">
-                                                                <div class="block bg-gray-600 w-10 h-6 rounded-full"></div>
-                                                                <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition {{ $review->show_on_podcast ? 'transform translate-x-4 bg-green-400' : '' }}"></div>
+                                                            <div class="toggle-switch {{ $review->show_on_podcast ? 'active' : '' }}">
+                                                                <div class="dot"></div>
                                                             </div>
-                                                            <span class="ml-2 text-sm text-[#A1A1AA] font-['Inter']">Show on Podcast</span>
+                                                            <span class="ml-3 text-sm text-gray-300 font-['Inter']">Show on Podcast</span>
                                                         </label>
                                                     @endif
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-2 ml-4">
+                                    <div class="flex items-center gap-3 ml-6">
                                         <a href="{{ $review->product->type === 'game' ? route('games.reviews.show', [$review->product, $review]) : route('tech.reviews.show', [$review->product, $review]) }}" 
-                                           class="px-3 py-1 bg-[#3F3F46] text-white rounded hover:bg-[#52525B] transition-colors text-sm font-['Inter']">
+                                           class="action-button secondary px-4 py-2 text-white rounded-lg font-medium font-['Inter'] flex items-center text-sm">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
                                             View
                                         </a>
                                         <a href="{{ $review->product->type === 'game' ? route('games.reviews.edit', [$review->product, $review]) : route('tech.reviews.edit', [$review->product, $review]) }}" 
-                                           class="px-3 py-1 bg-[#2563EB] text-white rounded hover:bg-[#1D4ED8] transition-colors text-sm font-['Inter']">
+                                           class="action-button px-4 py-2 text-white rounded-lg font-medium font-['Inter'] flex items-center text-sm">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                            </svg>
                                             Edit
                                         </a>
                                     </div>
@@ -359,28 +600,30 @@
                         @endforeach
                         
                         @if($streamerProfile->reviews->count() > 10)
-                            <div class="text-center">
-                                <p class="text-[#A1A1AA] font-['Inter']">Showing 10 of {{ $streamerProfile->reviews->count() }} reviews</p>
+                            <div class="text-center py-4">
+                                <p class="text-gray-400 font-['Inter']">Showing 10 of {{ $streamerProfile->reviews->count() }} reviews</p>
                             </div>
                         @endif
                     </div>
                 @else
-                    <div class="text-center py-12">
-                        <svg class="w-16 h-16 text-[#3F3F46] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-                        </svg>
-                        <h3 class="text-xl font-bold text-white mb-2 font-['Inter']">No Reviews Yet</h3>
-                        <p class="text-[#A1A1AA] mb-6 font-['Inter']">Start building your credibility by reviewing games and tech products as a streamer.</p>
+                    <div class="text-center py-16">
+                        <div class="w-20 h-20 bg-gray-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-3 font-['Inter']">No Reviews Yet</h3>
+                        <p class="text-gray-400 mb-8 font-['Inter'] max-w-md mx-auto">Start building your credibility by reviewing games and tech products as a streamer.</p>
                         <div class="flex justify-center gap-4">
                             <a href="{{ route('games.index') }}" 
-                               class="px-6 py-3 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors font-['Inter'] flex items-center">
+                               class="action-button px-6 py-3 text-white rounded-xl font-medium font-['Inter'] flex items-center" style="background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%); border-color: rgba(37, 99, 235, 0.3);">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
                                 Write Your First Game Review
                             </a>
                             <a href="{{ route('tech.index') }}" 
-                               class="px-6 py-3 bg-[#8B5CF6] text-white rounded-lg hover:bg-[#7C3AED] transition-colors font-['Inter'] flex items-center">
+                               class="action-button px-6 py-3 text-white rounded-xl font-medium font-['Inter'] flex items-center" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); border-color: rgba(139, 92, 246, 0.3);">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
@@ -392,13 +635,13 @@
             </div>
             
             <!-- Form Actions -->
-            <div class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl shadow-2xl border border-[#3F3F46] p-8">
+            <div class="glass-card rounded-2xl p-6">
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <button type="submit" class="px-8 py-3 bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white font-bold rounded-lg hover:from-[#1D4ED8] hover:to-[#2563EB] transition-all duration-300 font-['Inter']">
+                    <button type="submit" class="action-button px-8 py-3 text-white font-bold rounded-xl hover:from-[#1D4ED8] hover:to-[#2563EB] transition-all duration-300 font-['Inter']">
                         Update Profile
                     </button>
                     <a href="{{ route('streamer.profile.show', $streamerProfile) }}" 
-                       class="px-8 py-3 bg-[#3F3F46] text-white rounded-lg hover:bg-[#52525B] transition-colors text-center font-['Inter']">
+                       class="action-button secondary px-8 py-3 text-white rounded-xl font-medium font-['Inter']">
                         Cancel
                     </a>
                 </div>
@@ -454,6 +697,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const setOfflineBtn = document.getElementById('setOfflineBtn');
     const clearOverrideBtn = document.getElementById('clearOverrideBtn');
     const profileId = {{ $streamerProfile->id }};
+    
+    // Character counter for bio
+    const bioTextarea = document.getElementById('bio');
+    const charCounter = document.getElementById('char-counter');
+    const progressBar = charCounter.nextElementSibling.querySelector('div');
+    
+    if (bioTextarea && charCounter) {
+        bioTextarea.addEventListener('input', function() {
+            const length = this.value.length;
+            const maxLength = 1000;
+            const percentage = Math.min(100, (length / maxLength) * 100);
+            
+            charCounter.textContent = `${length}/${maxLength} characters`;
+            progressBar.style.width = `${percentage}%`;
+            
+            // Change color based on usage
+            if (percentage >= 90) {
+                progressBar.className = 'h-full bg-gradient-to-r from-[#EF4444] to-[#DC2626] rounded-full transition-all duration-300';
+            } else if (percentage >= 75) {
+                progressBar.className = 'h-full bg-gradient-to-r from-[#F59E0B] to-[#D97706] rounded-full transition-all duration-300';
+            } else {
+                progressBar.className = 'h-full bg-gradient-to-r from-[#E53E3E] to-[#DC2626] rounded-full transition-all duration-300';
+            }
+        });
+    }
     
 
     // Set Live Status
@@ -567,7 +835,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showNotification(message, type) {
         const notification = document.createElement('div');
-        notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-2xl border max-w-sm transform transition-all duration-300 translate-x-full opacity-0 ${
+        notification.className = `fixed top-4 right-4 z-50 p-6 rounded-xl shadow-2xl border max-w-sm transform transition-all duration-300 translate-x-full opacity-0 floating-notification backdrop-blur-sm ${
             type === 'success' 
                 ? 'bg-green-500/20 border-green-500/30 text-green-100' 
                 : 'bg-red-500/20 border-red-500/30 text-red-100'
@@ -575,18 +843,24 @@ document.addEventListener('DOMContentLoaded', function() {
         
         notification.innerHTML = `
             <div class="flex items-center">
-                <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    ${type === 'success' 
-                        ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>'
-                        : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>'
-                    }
-                </svg>
-                <span class="font-['Inter']">${message}</span>
-                <button type="button" class="ml-4 text-current hover:opacity-75" onclick="this.parentElement.parentElement.remove()">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                <div class="flex-shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        ${type === 'success' 
+                            ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>'
+                            : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>'
+                        }
                     </svg>
-                </button>
+                </div>
+                <div class="ml-3">
+                    <p class="font-['Inter'] font-medium">${message}</p>
+                </div>
+                <div class="ml-auto pl-3">
+                    <button type="button" class="text-current hover:opacity-75 transition-opacity" onclick="this.parentElement.parentElement.parentElement.remove()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
         `;
         
@@ -623,12 +897,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             const newSchedule = document.createElement('div');
-            newSchedule.className = 'schedule-entry bg-[#1A1A1B] rounded-xl border border-[#3F3F46] p-6';
+            newSchedule.className = 'schedule-entry bg-gray-800/50 rounded-xl border border-gray-700/50 p-6 backdrop-blur-sm';
             newSchedule.innerHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
                     <div>
                         <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Day</label>
-                        <select name="schedules[${scheduleIndex}][day_of_week]" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 font-['Inter']">
+                        <select name="schedules[${scheduleIndex}][day_of_week]" class="form-input w-full rounded-xl text-white p-3 font-['Inter']">
                             <option value="">Select Day</option>
                             <option value="0">Sunday</option>
                             <option value="1">Monday</option>
@@ -641,15 +915,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Start</label>
-                        <input type="time" name="schedules[${scheduleIndex}][start_time]" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 font-['Inter']">
+                        <input type="time" name="schedules[${scheduleIndex}][start_time]" class="form-input w-full rounded-xl text-white p-3 font-['Inter']">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-white mb-2 font-['Inter']">End</label>
-                        <input type="time" name="schedules[${scheduleIndex}][end_time]" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 font-['Inter']">
+                        <input type="time" name="schedules[${scheduleIndex}][end_time]" class="form-input w-full rounded-xl text-white p-3 font-['Inter']">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Timezone</label>
-                        <select name="schedules[${scheduleIndex}][timezone]" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 font-['Inter']">
+                        <select name="schedules[${scheduleIndex}][timezone]" class="form-input w-full rounded-xl text-white p-3 font-['Inter']">
                             <option value="America/New_York">Eastern</option>
                             <option value="America/Chicago">Central</option>
                             <option value="America/Denver">Mountain</option>
@@ -658,10 +932,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Notes</label>
-                        <input type="text" name="schedules[${scheduleIndex}][notes]" maxlength="255" placeholder="Optional" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 placeholder-[#A1A1AA] font-['Inter']">
+                        <input type="text" name="schedules[${scheduleIndex}][notes]" maxlength="255" placeholder="Optional" class="form-input w-full rounded-xl text-white p-3 placeholder-gray-400 font-['Inter']">
                     </div>
                     <div class="flex items-end">
-                        <button type="button" class="remove-schedule w-full px-3 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors font-['Inter']">Remove</button>
+                        <button type="button" class="remove-schedule w-full px-4 py-3 bg-red-500/20 text-red-400 rounded-xl hover:bg-red-500/30 transition-colors font-['Inter'] flex items-center justify-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Remove
+                        </button>
                     </div>
                 </div>
             `;
@@ -690,19 +969,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             const newLink = document.createElement('div');
-            newLink.className = 'social-link-entry bg-[#1A1A1B] rounded-xl border border-[#3F3F46] p-6';
+            newLink.className = 'social-link-entry bg-gray-800/50 rounded-xl border border-gray-700/50 p-6 backdrop-blur-sm';
             newLink.innerHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-white mb-2 font-['Inter']">Platform</label>
-                        <input type="text" name="social_links[${socialLinkIndex}][platform]" maxlength="50" placeholder="twitter" class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 placeholder-[#A1A1AA] font-['Inter']">
+                        <input type="text" name="social_links[${socialLinkIndex}][platform]" maxlength="50" placeholder="twitter" class="form-input w-full rounded-xl text-white p-3 placeholder-gray-400 font-['Inter']">
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-white mb-2 font-['Inter']">URL</label>
-                        <input type="url" name="social_links[${socialLinkIndex}][url]" maxlength="500" placeholder="https://..." class="w-full rounded-lg border-[#3F3F46] bg-[#27272A] text-white p-2 placeholder-[#A1A1AA] font-['Inter']">
+                        <input type="url" name="social_links[${socialLinkIndex}][url]" maxlength="500" placeholder="https://..." class="form-input w-full rounded-xl text-white p-3 placeholder-gray-400 font-['Inter']">
                     </div>
                     <div class="flex items-end">
-                        <button type="button" class="remove-social-link w-full px-3 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors font-['Inter']">Remove</button>
+                        <button type="button" class="remove-social-link w-full px-4 py-3 bg-red-500/20 text-red-400 rounded-xl hover:bg-red-500/30 transition-colors font-['Inter'] flex items-center justify-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Remove
+                        </button>
                     </div>
                 </div>
             `;
