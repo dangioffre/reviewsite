@@ -105,6 +105,12 @@ Route::middleware('auth')->group(function () {
     Route::put('/podcasts/{podcast}/team/{teamMember}/permissions', [App\Http\Controllers\PodcastTeamController::class, 'updatePermissions'])->name('podcasts.team.permissions');
     Route::post('/podcasts/{podcast}/team/leave', [App\Http\Controllers\PodcastTeamController::class, 'leaveTeam'])->name('podcasts.team.leave');
     Route::get('/my-podcast-invitations', [App\Http\Controllers\PodcastTeamController::class, 'myInvitations'])->name('podcasts.invitations');
+    
+    // Episode Review Management Routes
+    Route::get('/podcasts/{podcast}/episodes', [App\Http\Controllers\EpisodeController::class, 'index'])->name('podcasts.episodes.index');
+    Route::get('/api/podcasts/{podcast}/episodes/{episode}/available-reviews', [App\Http\Controllers\EpisodeController::class, 'getAvailableReviews'])->name('api.episodes.available-reviews');
+    Route::get('/api/podcasts/{podcast}/episodes/{episode}/attached-reviews', [App\Http\Controllers\EpisodeController::class, 'getAttachedReviews'])->name('api.episodes.attached-reviews');
+    Route::post('/api/podcasts/{podcast}/episodes/{episode}/bulk-review-action', [App\Http\Controllers\EpisodeController::class, 'bulkReviewAction'])->name('api.episodes.bulk-review-action');
 });
 
 // Streamer OAuth Routes
