@@ -152,22 +152,22 @@
 <div class="edit-profile-container py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Enhanced Header -->
-        <div class="mb-8">
+        <div class="mb-6">
             <div class="glass-card rounded-2xl p-6">
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-                    <div class="space-y-4">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                    <div class="space-y-3">
                         <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl">
-                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="w-12 h-12 bg-gradient-to-br from-[#E53E3E] to-[#DC2626] rounded-2xl flex items-center justify-center shadow-2xl">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                 </svg>
                             </div>
                             <div>
-                                <h1 class="text-4xl lg:text-5xl font-bold text-white font-['Share_Tech_Mono'] leading-tight">
+                                <h1 class="text-3xl lg:text-4xl font-bold text-white font-['Share_Tech_Mono'] leading-tight">
                                     Edit Profile
                                 </h1>
-                                <p class="text-blue-200 text-xl font-['Inter'] mt-2">{{ $streamerProfile->channel_name }}</p>
-                                <div class="flex items-center gap-2 text-blue-100 text-sm font-['Inter'] mt-2">
+                                <p class="text-[#A1A1AA] text-lg font-['Inter'] mt-1">{{ $streamerProfile->channel_name }}</p>
+                                <div class="flex items-center gap-2 text-[#A1A1AA] text-sm font-['Inter'] mt-1">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
@@ -176,54 +176,12 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Enhanced Action Buttons -->
-                    <div class="flex flex-wrap gap-3">
-                        <a href="{{ route('streamer.profile.manage-vods', $streamerProfile) }}" 
-                           class="action-button px-6 py-3 text-white rounded-xl font-medium font-['Inter'] flex items-center">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                            </svg>
-                            Manage VODs
-                        </a>
-                        <a href="{{ route('streamer.profile.manage-showcase', $streamerProfile) }}" 
-                           class="action-button px-6 py-3 text-white rounded-xl font-medium font-['Inter'] flex items-center" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border-color: rgba(139, 92, 246, 0.3);">
-                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
-                            </svg>
-                            Manage Games
-                        </a>
-                        <a href="#reviews-section" 
-                           class="action-button px-6 py-3 text-white rounded-xl font-medium font-['Inter'] flex items-center" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-color: rgba(16, 185, 129, 0.3);">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-                            </svg>
-                            Manage Reviews
-                        </a>
-                        <a href="{{ route('streamer.profile.show', $streamerProfile) }}" 
-                           class="action-button secondary px-6 py-3 text-white rounded-xl font-medium font-['Inter'] flex items-center">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                            </svg>
-                            View Profile
-                        </a>
-                        <form id="delete-profile-form" action="{{ route('streamer.profile.destroy', $streamerProfile) }}" method="POST" class="inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" 
-                                    onclick="confirmDelete()"
-                                    class="action-button danger px-6 py-3 text-white rounded-xl font-medium font-['Inter'] flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                </svg>
-                                Delete Profile
-                            </button>
-                        </form>
-                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Management Navigation -->
+        @include('components.streamer.management-nav', ['streamerProfile' => $streamerProfile])
 
         <div class="space-y-6">
             <!-- Profile Form -->
