@@ -11,42 +11,6 @@
         <div class="flex items-center space-x-2">
             <!-- User Name -->
             <span class="text-sm font-medium text-white">{{ $review->user->name }}</span>
-
-            <!-- Podcast Identity -->
-            @if($review->isPodcastReview())
-                <span class="text-sm text-gray-400">reviewed as</span>
-                <div class="flex items-center space-x-2">
-                    @if($review->podcast->logo_url)
-                        <img src="{{ $review->podcast->logo_url }}" 
-                             alt="{{ $review->podcast->name }}"
-                             class="w-6 h-6 rounded object-cover">
-                    @else
-                        <div class="w-6 h-6 bg-blue-600 rounded flex items-center justify-center">
-                            <span class="text-white font-medium text-xs">{{ substr($review->podcast->name, 0, 1) }}</span>
-                        </div>
-                    @endif
-                    <span class="text-sm font-medium text-blue-400">{{ $review->podcast->name }}</span>
-                </div>
-            @endif
-
-            <!-- Streamer Identity -->
-            @if($review->isStreamerReview())
-                <span class="text-sm text-gray-400">reviewed as</span>
-                <div class="flex items-center space-x-2">
-                    @if($review->streamerProfile->profile_photo_url)
-                        <img src="{{ $review->streamerProfile->profile_photo_url }}" 
-                             alt="{{ $review->streamerProfile->channel_name }}"
-                             class="w-6 h-6 rounded object-cover">
-                    @else
-                        <div class="w-6 h-6 bg-purple-600 rounded flex items-center justify-center">
-                            <span class="text-white font-medium text-xs">{{ substr($review->streamerProfile->channel_name, 0, 1) }}</span>
-                        </div>
-                    @endif
-                    <span class="text-sm font-medium text-purple-400">{{ $review->streamerProfile->channel_name }}</span>
-                    <span class="text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded">{{ ucfirst($review->streamerProfile->platform) }}</span>
-                    <x-verification-badge :profile="$review->streamerProfile" size="xs" />
-                </div>
-            @endif
         </div>
 
         <!-- Episode Info (if available and requested) -->
@@ -57,38 +21,5 @@
                 <span class="text-xs text-gray-400">{{ $review->episode->title }}</span>
             </div>
         @endif
-
-        <!-- Review Type Badge -->
-        <div class="mt-1 flex items-center space-x-2">
-            @if($review->isStreamerReview())
-                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                    </svg>
-                    Streamer Review
-                </span>
-            @elseif($review->isPodcastReview())
-                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
-                    </svg>
-                    Podcast Review
-                </span>
-            @elseif($review->is_staff_review)
-                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Staff Review
-                </span>
-            @else
-                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
-                    User Review
-                </span>
-            @endif
-        </div>
     </div>
 </div> 
