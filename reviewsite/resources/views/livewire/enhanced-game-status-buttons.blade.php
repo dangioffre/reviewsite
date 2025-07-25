@@ -256,7 +256,7 @@
                     <div class="grid grid-cols-1 gap-2">
                         @foreach($this->getCompletionStatuses() as $key => $status)
                             @if($key !== 'not_started')
-                                <button wire:click="quickSetStatus('{{ $key }}')" 
+                                <button wire:click="openDetailModalWithStatus('{{ $key }}')" 
                                         class="flex items-center p-3 rounded-xl transition-all duration-200 hover:scale-105"
                                         style="background-color: {{ $status['color'] }}15; border: 1px solid {{ $status['color'] }}40; color: {{ $status['color'] }};">
                                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -328,4 +328,22 @@
         animation: fade-in-out 3s both;
     }
     </style>
+
+    <!-- Timestamp and Edit Details on same line -->
+    <div class="flex items-center justify-between text-xs text-[#71717A] pt-3 border-t border-[#3F3F46] mt-2">
+        <span class="font-medium">
+            {{ $timestamp ?? '' }}
+        </span>
+        <button wire:click="openDetailModal" class="text-blue-400 hover:text-blue-300 transition-colors font-medium text-xs px-4 py-2 rounded">
+            Edit Details
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('openDetailModal', function(event) {
+            if (event.detail.productId === {{ $product->id }}) {
+                @this.openDetailModal();
+            }
+        });
+    </script>
 </div>

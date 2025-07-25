@@ -12,6 +12,7 @@ class EnhancedGameStatusButtons extends Component
     public $product;
     public $userStatus;
     public $stats = [];
+    public $timestamp;
     
     // Modal states
     public $showDetailModal = false;
@@ -39,9 +40,10 @@ class EnhancedGameStatusButtons extends Component
     public $want = false;
     public $played = false;
 
-    public function mount($product)
+    public function mount($product, $timestamp = null)
     {
         $this->product = $product;
+        $this->timestamp = $timestamp;
         $this->loadUserStatus();
         $this->loadStats();
     }
@@ -136,6 +138,21 @@ class EnhancedGameStatusButtons extends Component
         $this->showPlayedModal = true;
     }
 
+    public function openDetailModalWithStatus($statusKey)
+    {
+        if (!Auth::check()) {
+            $this->dispatch('show-login');
+            return;
+        }
+        
+        // Pre-populate the completion status
+        $this->completion_status = $statusKey;
+        
+        // Close the played modal and open the detail modal
+        $this->showPlayedModal = false;
+        $this->showDetailModal = true;
+    }
+
     public function saveDetailedStatus()
     {
         $this->validate([
@@ -190,6 +207,12 @@ class EnhancedGameStatusButtons extends Component
         $this->showPlayedModal = false;
         
         session()->flash('message', 'Game status updated with detailed information!');
+    }
+
+    // Alias for Livewire form compatibility
+    public function saveDetails()
+    {
+        return $this->saveDetailedStatus();
     }
 
     public function quickSetStatus($statusKey)
