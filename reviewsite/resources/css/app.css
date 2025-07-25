@@ -17,3 +17,60 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
 }
+
+/* Theme: Dark */
+.theme-dark {
+    --bg-main: #18181b;
+    --bg-secondary: #27272a;
+    --text-main: #f4f4f5;
+    --accent: #2563eb;
+    --card-bg: #23232b;
+    background-color: var(--bg-main) !important;
+    color: var(--text-main) !important;
+}
+.theme-dark .card, .theme-dark .draggable-section {
+    background: var(--card-bg);
+    color: var(--text-main);
+}
+.theme-dark a, .theme-dark .accent {
+    color: var(--accent);
+}
+
+/* Theme: Light */
+.theme-light {
+    --bg-main: #f4f4f5;
+    --bg-secondary: #e5e7eb;
+    --text-main: #18181b;
+    --accent: #2563eb;
+    --card-bg: #fff;
+    background-color: var(--bg-main) !important;
+    color: var(--text-main) !important;
+}
+.theme-light .card, .theme-light .draggable-section {
+    background: var(--card-bg);
+    color: var(--text-main);
+}
+.theme-light a, .theme-light .accent {
+    color: var(--accent);
+}
+
+/* Theme: Neon */
+.theme-neon {
+    --bg-main: #0f0c29;
+    --bg-secondary: #302b63;
+    --text-main: #39ff14;
+    --accent: #ff00cc;
+    --card-bg: #23232b;
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 100%) !important;
+    color: var(--text-main) !important;
+}
+.theme-neon .card, .theme-neon .draggable-section {
+    background: var(--card-bg);
+    color: var(--text-main);
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 8px var(--accent), 0 0 24px #39ff14;
+}
+.theme-neon a, .theme-neon .accent {
+    color: var(--accent);
+    text-shadow: 0 0 4px #ff00cc, 0 0 8px #39ff14;
+}

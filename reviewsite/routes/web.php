@@ -10,6 +10,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PodcastController;
+use App\Http\Controllers\Api\StreamerPageLayoutController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -714,5 +715,10 @@ Route::post('/review-comments/{comment}/like', [\App\Http\Controllers\ReviewComm
 Route::post('/review-comments/{comment}/report', [\App\Http\Controllers\ReviewCommentReportController::class, 'store'])->name('review-comments.report');
 
 Route::get('/keywords/{slug}', [App\Http\Controllers\KeywordController::class, 'show'])->name('keywords.show');
+
+Route::middleware('auth')->group(function () {
+    Route::post('/api/streamer-layout/get', [StreamerPageLayoutController::class, 'get']);
+    Route::post('/api/streamer-layout/save', [StreamerPageLayoutController::class, 'save']);
+});
 
 
