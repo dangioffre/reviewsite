@@ -250,8 +250,8 @@
                                 <div>
                                     <input 
                                         type="text" 
-                                        name="platform_links[{{ $i }}][platform]"
-                                        value="{{ isset($podcast->platform_links[$i]) ? $podcast->platform_links[$i]['platform'] : '' }}"
+                                        name="links[{{ $i }}][platform]"
+                                        value="{{ isset($podcast->links[$i]) ? $podcast->links[$i]['platform'] : '' }}"
                                         class="w-full px-3 py-2 bg-[#27272A] border border-[#3F3F46] rounded-lg text-white placeholder-[#A1A1AA] focus:border-[#E53E3E] focus:ring-1 focus:ring-[#E53E3E] focus:outline-none"
                                         placeholder="Platform (e.g., Spotify)"
                                     >
@@ -259,8 +259,8 @@
                                 <div class="flex items-center space-x-2">
                                     <input 
                                         type="url" 
-                                        name="platform_links[{{ $i }}][url]"
-                                        value="{{ isset($podcast->platform_links[$i]) ? $podcast->platform_links[$i]['url'] : '' }}"
+                                        name="links[{{ $i }}][url]"
+                                        value="{{ isset($podcast->links[$i]) ? $podcast->links[$i]['url'] : '' }}"
                                         class="flex-1 px-3 py-2 bg-[#27272A] border border-[#3F3F46] rounded-lg text-white placeholder-[#A1A1AA] focus:border-[#E53E3E] focus:ring-1 focus:ring-[#E53E3E] focus:outline-none"
                                         placeholder="https://..."
                                     >
@@ -406,8 +406,8 @@ function closePermissionsModal() {
 }
 
 function clearPlatformLink(index) {
-    const platformInput = document.querySelector(`input[name="platform_links[${index}][platform]"]`);
-    const urlInput = document.querySelector(`input[name="platform_links[${index}][url]"]`);
+    const platformInput = document.querySelector(`input[name="links[${index}][platform]"]`);
+    const urlInput = document.querySelector(`input[name="links[${index}][url]"]`);
     
     platformInput.value = '';
     urlInput.value = '';
