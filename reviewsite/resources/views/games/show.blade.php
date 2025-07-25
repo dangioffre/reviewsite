@@ -122,7 +122,7 @@
 
                             <!-- Status Buttons (Own, Want, Play) -->
                             <div class="flex flex-wrap gap-3 justify-center w-full mb-6">
-                                <livewire:enhanced-game-status-buttons :product="$product" />
+                                <livewire:game-status-buttons :product="$product" />
                             </div>
 
                             <!-- Action Buttons -->

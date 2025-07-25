@@ -329,7 +329,7 @@
     }
     </style>
 
-    <!-- Timestamp and Edit Details on same line -->
+    <!-- Timestamp and Edit Details on same line (only in collections) -->
     <div class="flex items-center justify-between text-xs text-[#71717A] pt-3 border-t border-[#3F3F46] mt-2">
         <span class="font-medium">
             {{ $timestamp ?? '' }}
