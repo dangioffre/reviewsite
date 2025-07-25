@@ -145,6 +145,26 @@
                                         Write a review
                                     </button>
                                 @endauth
+                                
+                                <!-- Admin Edit Button -->
+                                @if(auth()->check())
+                                    <!-- Debug info (remove this later) -->
+                                    <div class="text-xs text-gray-400 mb-2">
+                                        Debug: Logged in as {{ auth()->user()->name }} 
+                                        (is_admin: {{ auth()->user()->is_admin ? 'true' : 'false' }}, 
+                                        roles: {{ auth()->user()->getRoleNames()->implode(', ') }})
+                                    </div>
+                                @endif
+                                
+                                @if(auth()->check() && (auth()->user()->is_admin || auth()->user()->hasRole('admin') || auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Moderator')))
+                                    <a href="{{ route('filament.admin.resources.games.edit', $product) }}" 
+                                       class="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white py-3 px-4 rounded-lg font-semibold text-base transition-colors duration-200 flex items-center justify-center gap-2 shadow-sm font-['Inter']">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                        Edit Game (Admin)
+                                    </a>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -173,6 +193,14 @@
                                     class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none">
                                 Media
                             </button>
+                            @if($product->affiliate_links && count($product->affiliate_links) > 0)
+                                <button @click="activeTab = 'buy'"
+                                        :class="{ 'border-red-500 text-red-400': activeTab === 'buy', 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500': activeTab !== 'buy' }"
+                                        class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none">
+                                    Buy Now
+                                    <span class="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-green-100 bg-green-600 rounded-full">{{ count($product->affiliate_links) }}</span>
+                                </button>
+                            @endif
                         </nav>
                     </div>
 
@@ -538,6 +566,149 @@
                                 @endif
                             </section>
                         </div>
+
+                        <!-- Buy Now Tab -->
+                        <div x-show="activeTab === 'buy'" style="display: none;" class="prose prose-invert max-w-none">
+                            <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                                <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Buy {{ $product->name }}</h2>
+                                
+                                @if($product->affiliate_links && count($product->affiliate_links) > 0)
+                                    @php
+                                        // Group affiliate links by type
+                                        $mainGameLinks = collect($product->affiliate_links)->where('type', 'main_game')->where('is_active', true);
+                                        $dlcLinks = collect($product->affiliate_links)->whereIn('type', ['dlc', 'season_pass', 'collectors_edition', 'digital_deluxe'])->where('is_active', true);
+                                        $otherLinks = collect($product->affiliate_links)->whereNotIn('type', ['main_game', 'dlc', 'season_pass', 'collectors_edition', 'digital_deluxe'])->where('is_active', true);
+                                    @endphp
+
+                                    <!-- Main Game Section -->
+                                    @if($mainGameLinks->count() > 0)
+                                        <div class="mb-8">
+                                            <h3 class="text-xl font-bold text-white mb-4 font-['Share_Tech_Mono'] flex items-center gap-2">
+                                                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                                </svg>
+                                                Main Game
+                                            </h3>
+                                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                @foreach($mainGameLinks as $link)
+                                                    <div class="bg-[#18181B] rounded-xl p-4 border border-[#3F3F46] hover:border-[#E53E3E] transition-all duration-200">
+                                                        <div class="flex items-center justify-between mb-3">
+                                                            <h4 class="text-lg font-semibold text-white font-['Inter']">{{ $link['title'] }}</h4>
+                                                            @if(!empty($link['price']))
+                                                                <span class="text-green-400 font-bold text-lg">{{ $link['price'] }}</span>
+                                                            @endif
+                                                        </div>
+                                                        @if(!empty($link['platform']))
+                                                            <div class="mb-3">
+                                                                <span class="inline-block bg-blue-600/20 text-blue-400 px-2 py-1 rounded-full text-sm font-['Inter']">
+                                                                    {{ $link['platform'] }}
+                                                                </span>
+                                                            </div>
+                                                        @endif
+                                                        <a href="{{ $link['url'] }}" target="_blank" rel="noopener noreferrer" 
+                                                           class="w-full bg-[#E53E3E] hover:bg-[#DC2626] text-white py-3 px-4 rounded-lg font-semibold text-center transition-colors duration-200 flex items-center justify-center gap-2 font-['Inter']">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                                            </svg>
+                                                            Buy Now
+                                                        </a>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <!-- DLC Section -->
+                                    @if($dlcLinks->count() > 0)
+                                        <div class="mb-8">
+                                            <h3 class="text-xl font-bold text-white mb-4 font-['Share_Tech_Mono'] flex items-center gap-2">
+                                                <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                                </svg>
+                                                DLC & Extras
+                                            </h3>
+                                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                @foreach($dlcLinks as $link)
+                                                    <div class="bg-[#18181B] rounded-xl p-4 border border-[#3F3F46] hover:border-purple-500 transition-all duration-200">
+                                                        <div class="flex items-center justify-between mb-3">
+                                                            <h4 class="text-lg font-semibold text-white font-['Inter']">{{ $link['title'] }}</h4>
+                                                            @if(!empty($link['price']))
+                                                                <span class="text-green-400 font-bold text-lg">{{ $link['price'] }}</span>
+                                                            @endif
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <span class="inline-block bg-purple-600/20 text-purple-400 px-2 py-1 rounded-full text-sm font-['Inter']">
+                                                                {{ ucfirst(str_replace('_', ' ', $link['type'])) }}
+                                                            </span>
+                                                            @if(!empty($link['platform']))
+                                                                <span class="inline-block bg-blue-600/20 text-blue-400 px-2 py-1 rounded-full text-sm font-['Inter'] ml-1">
+                                                                    {{ $link['platform'] }}
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                        <a href="{{ $link['url'] }}" target="_blank" rel="noopener noreferrer" 
+                                                           class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg font-semibold text-center transition-colors duration-200 flex items-center justify-center gap-2 font-['Inter']">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                                            </svg>
+                                                            Buy Now
+                                                        </a>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <!-- Other Links Section -->
+                                    @if($otherLinks->count() > 0)
+                                        <div class="mb-8">
+                                            <h3 class="text-xl font-bold text-white mb-4 font-['Share_Tech_Mono'] flex items-center gap-2">
+                                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                                Other Options
+                                            </h3>
+                                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                @foreach($otherLinks as $link)
+                                                    <div class="bg-[#18181B] rounded-xl p-4 border border-[#3F3F46] hover:border-gray-500 transition-all duration-200">
+                                                        <div class="flex items-center justify-between mb-3">
+                                                            <h4 class="text-lg font-semibold text-white font-['Inter']">{{ $link['title'] }}</h4>
+                                                            @if(!empty($link['price']))
+                                                                <span class="text-green-400 font-bold text-lg">{{ $link['price'] }}</span>
+                                                            @endif
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <span class="inline-block bg-gray-600/20 text-gray-400 px-2 py-1 rounded-full text-sm font-['Inter']">
+                                                                {{ ucfirst(str_replace('_', ' ', $link['type'])) }}
+                                                            </span>
+                                                            @if(!empty($link['platform']))
+                                                                <span class="inline-block bg-blue-600/20 text-blue-400 px-2 py-1 rounded-full text-sm font-['Inter'] ml-1">
+                                                                    {{ $link['platform'] }}
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                        <a href="{{ $link['url'] }}" target="_blank" rel="noopener noreferrer" 
+                                                           class="w-full bg-gray-600 hover:bg-gray-700 text-white py-3 px-4 rounded-lg font-semibold text-center transition-colors duration-200 flex items-center justify-center gap-2 font-['Inter']">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                                            </svg>
+                                                            Buy Now
+                                                        </a>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+                                @else
+                                    <div class="text-center py-12">
+                                        <div class="text-6xl mb-4">🛒</div>
+                                        <h3 class="text-xl font-bold text-white mb-2">No Purchase Links Available</h3>
+                                        <p class="text-[#A1A1AA]">Purchase links for this game will be added soon.</p>
+                                    </div>
+                                @endif
+                            </section>
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>

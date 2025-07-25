@@ -25,6 +25,7 @@ class Product extends Model
         'esrb_rating_id',
         'pegi_rating_id',
         'official_website',
+        'affiliate_links',
         'type',
         'is_featured',
         'genre_id',
@@ -35,6 +36,7 @@ class Product extends Model
         'release_date' => 'date',
         'photos' => 'array',
         'videos' => 'array',
+        'affiliate_links' => 'array',
         'is_featured' => 'boolean',
     ];
 

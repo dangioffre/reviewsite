@@ -361,6 +361,109 @@ class GameResource extends Resource
                                             ->columnSpanFull(),
                                     ]),
                             ]),
+
+                        Forms\Components\Tabs\Tab::make('Affiliate Links')
+                            ->icon('heroicon-m-shopping-cart')
+                            ->schema([
+                                // Affiliate Links Management
+                                Forms\Components\Section::make('Purchase Links')
+                                    ->description('Add affiliate links for purchasing the game and DLC on various platforms')
+                                    ->icon('heroicon-m-currency-dollar')
+                                    ->schema([
+                                        Forms\Components\Repeater::make('affiliate_links')
+                                            ->label('Affiliate Links')
+                                            ->schema([
+                                                Forms\Components\TextInput::make('title')
+                                                    ->label('Link Title')
+                                                    ->required()
+                                                    ->maxLength(255)
+                                                    ->placeholder('e.g., Buy on Steam, Amazon, etc.')
+                                                    ->helperText('Display name for this affiliate link'),
+                                                
+                                                Forms\Components\TextInput::make('url')
+                                                    ->label('Affiliate URL')
+                                                    ->url()
+                                                    ->required()
+                                                    ->placeholder('https://store.steampowered.com/app/...')
+                                                    ->helperText('The affiliate link URL'),
+                                                
+                                                Forms\Components\Select::make('type')
+                                                    ->label('Link Type')
+                                                    ->options([
+                                                        'main_game' => 'Main Game',
+                                                        'dlc' => 'DLC/Expansion',
+                                                        'season_pass' => 'Season Pass',
+                                                        'collectors_edition' => 'Collector\'s Edition',
+                                                        'digital_deluxe' => 'Digital Deluxe',
+                                                        'physical' => 'Physical Copy',
+                                                        'other' => 'Other',
+                                                    ])
+                                                    ->default('main_game')
+                                                    ->required()
+                                                    ->helperText('Category for this affiliate link'),
+                                                
+                                                Forms\Components\TextInput::make('price')
+                                                    ->label('Price (Optional)')
+                                                    ->maxLength(50)
+                                                    ->placeholder('$59.99, €49.99, etc.')
+                                                    ->helperText('Current price (will be displayed if provided)'),
+                                                
+                                                Forms\Components\TextInput::make('platform')
+                                                    ->label('Platform (Optional)')
+                                                    ->maxLength(100)
+                                                    ->placeholder('PC, PS5, Xbox, Switch')
+                                                    ->helperText('Specific platform for this link'),
+                                                
+                                                Forms\Components\Toggle::make('is_active')
+                                                    ->label('Active')
+                                                    ->default(true)
+                                                    ->helperText('Whether this link should be displayed'),
+                                            ])
+                                            ->columns(3)
+                                            ->defaultItems(0)
+                                            ->addActionLabel('Add Affiliate Link')
+                                            ->reorderable()
+                                            ->collapsible()
+                                            ->itemLabel(fn (array $state): ?string => $state['title'] ?? 'New Affiliate Link')
+                                            ->helperText('Add affiliate links for purchasing the game and DLC on various platforms')
+                                            ->columnSpanFull(),
+                                    ]),
+
+                                // Affiliate Links Help
+                                Forms\Components\Section::make('Affiliate Links Guide')
+                                    ->description('Tips for creating effective affiliate links')
+                                    ->icon('heroicon-m-question-mark-circle')
+                                    ->schema([
+                                        Forms\Components\Placeholder::make('affiliate_help')
+                                            ->content('
+                                                <div class="space-y-4">
+                                                    <div>
+                                                        <h4 class="font-semibold text-gray-900 dark:text-white">Link Types:</h4>
+                                                        <ul class="list-disc list-inside text-sm text-gray-600 dark:text-gray-400 mt-2">
+                                                            <li><strong>Main Game:</strong> Primary game purchase links (Steam, PlayStation Store, etc.)</li>
+                                                            <li><strong>DLC/Expansion:</strong> Downloadable content and expansion packs</li>
+                                                            <li><strong>Season Pass:</strong> Season passes and content bundles</li>
+                                                            <li><strong>Collector\'s Edition:</strong> Special collector\'s editions and physical copies</li>
+                                                            <li><strong>Digital Deluxe:</strong> Digital deluxe editions with bonus content</li>
+                                                            <li><strong>Physical Copy:</strong> Physical retail copies</li>
+                                                        </ul>
+                                                    </div>
+                                                    <div>
+                                                        <h4 class="font-semibold text-gray-900 dark:text-white">Best Practices:</h4>
+                                                        <ul class="list-disc list-inside text-sm text-gray-600 dark:text-gray-400 mt-2">
+                                                            <li>Use descriptive titles (e.g., "Buy on Steam" instead of just "Steam")</li>
+                                                            <li>Include current prices when available</li>
+                                                            <li>Specify the platform for each link</li>
+                                                            <li>Keep links active and up-to-date</li>
+                                                            <li>Use proper affiliate tracking URLs</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            ')
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->collapsed(),
+                            ]),
                     ])
                     ->columnSpanFull(),
                 
