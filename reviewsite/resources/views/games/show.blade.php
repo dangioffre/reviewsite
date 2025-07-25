@@ -184,9 +184,6 @@
                                     :class="{ 'border-red-500 text-red-400': activeTab === 'reviews', 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500': activeTab !== 'reviews' }"
                                     class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none">
                                 Reviews
-                                @if(($reviewCount = $staffReviews->count() + $streamerReviews->count() + $userReviews->count()) > 0)
-                                    <span class="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">{{ $reviewCount }}</span>
-                                @endif
                             </button>
                             <button @click="activeTab = 'media'"
                                     :class="{ 'border-red-500 text-red-400': activeTab === 'media', 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500': activeTab !== 'media' }"
