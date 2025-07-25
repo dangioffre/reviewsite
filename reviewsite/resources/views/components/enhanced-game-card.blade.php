@@ -172,15 +172,20 @@
     @endif
 
     <!-- Action Footer with Better Spacing -->
-    <div class="px-4 py-3 border-t border-[#3F3F46] bg-[#18181B]/50">
+    <div class="px-4 py-4 border-t border-[#3F3F46] bg-gradient-to-br from-[#18181B] to-[#27272A]">
         <!-- Enhanced Status Buttons with Better Spacing -->
-        <div class="compact-status-buttons mb-3">
+        <div class="mb-4">
             <livewire:enhanced-game-status-buttons :product="$gameStatus->product" :key="'collection-'.$gameStatus->id" />
         </div>
         
-        <!-- Timestamp at Bottom -->
-        <div class="text-center">
-            <span class="text-xs text-[#71717A] font-medium">{{ $gameStatus->updated_at->diffForHumans() }}</span>
+        <!-- Bottom Info Bar -->
+        <div class="flex items-center justify-between text-xs text-[#71717A] pt-2 border-t border-[#3F3F46]/50">
+            <span class="font-medium">{{ $gameStatus->updated_at->diffForHumans() }}</span>
+            @if($gameStatus->completion_status)
+                <button wire:click="openDetailModal" class="text-blue-400 hover:text-blue-300 transition-colors font-medium">
+                    Edit Details
+                </button>
+            @endif
         </div>
     </div>
 </div>

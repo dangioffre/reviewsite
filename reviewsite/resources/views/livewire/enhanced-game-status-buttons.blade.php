@@ -68,14 +68,7 @@
         </div>
     @endif
 
-    <!-- Edit Details Button (when user has status) -->
-    @if($userStatus && $userStatus->completion_status)
-        <div class="text-center mb-4">
-            <button wire:click="openDetailModal" class="text-xs text-blue-400 hover:text-blue-300 transition-colors">
-                Edit Details
-            </button>
-        </div>
-    @endif
+
 
     <!-- Quick Status Buttons (when played but no detailed status) -->
     @if($played && (!$userStatus || !$userStatus->completion_status))
