@@ -719,6 +719,7 @@ Route::get('/keywords/{slug}', [App\Http\Controllers\KeywordController::class, '
 Route::middleware('auth')->group(function () {
     Route::post('/api/streamer-layout/get', [StreamerPageLayoutController::class, 'get']);
     Route::post('/api/streamer-layout/save', [StreamerPageLayoutController::class, 'save']);
+    Route::patch('/api/reviews/{review}/visibility', [App\Http\Controllers\Api\ReviewVisibilityController::class, 'updateVisibility']);
 });
 
 

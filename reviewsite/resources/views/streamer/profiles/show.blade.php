@@ -8,32 +8,64 @@
         border-bottom: 1px solid #292929 !important;
     }
     
-    /* Normal mode styling - ensure sections display properly with spacing */
+    /* Modern section styling */
     .draggable-section {
-        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, rgba(39, 39, 42, 0.8) 0%, rgba(24, 24, 27, 0.9) 100%);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(63, 63, 70, 0.3);
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        overflow: hidden;
+        box-shadow: 
+            0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06),
+            0 0 0 1px rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .draggable-section:hover {
+        transform: translateY(-2px);
+        box-shadow: 
+            0 10px 15px -3px rgba(0, 0, 0, 0.2),
+            0 4px 6px -2px rgba(0, 0, 0, 0.1),
+            0 0 0 1px rgba(255, 255, 255, 0.1);
+        border-color: rgba(99, 102, 241, 0.3);
     }
     
     .draggable-section:last-child {
         margin-bottom: 0;
     }
     
-    /* Simple drag and drop styling */
+    /* Add subtle glow effect */
+    .draggable-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        pointer-events: none;
+    }
+    
+    /* Customize mode styling */
     .draggable-section.customize-mode {
-        border: 2px dashed #6366f1;
-        background: rgba(99, 102, 241, 0.05);
+        border: 2px dashed #6366f1 !important;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(79, 70, 229, 0.05) 100%) !important;
         cursor: move;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
         position: relative;
         transition: all 0.2s ease;
     }
     
     .draggable-section.customize-mode:hover {
-        border-color: #4f46e5;
-        background: rgba(79, 70, 229, 0.1);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        border-color: #4f46e5 !important;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(79, 70, 229, 0.1) 100%) !important;
+        transform: translateY(-4px);
+        box-shadow: 
+            0 20px 25px -5px rgba(99, 102, 241, 0.2),
+            0 10px 10px -5px rgba(99, 102, 241, 0.1),
+            0 0 0 1px rgba(99, 102, 241, 0.2);
     }
     
     /* SortableJS classes */
@@ -88,12 +120,33 @@
     
     /* Container styling in customize mode */
     #customizable-sections.customize-active {
-        background: rgba(0, 0, 0, 0.02);
-        border-radius: 0.5rem;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(79, 70, 229, 0.02) 100%);
+        border-radius: 20px;
         padding: 2rem;
-        border: 1px dashed #374151;
+        border: 1px dashed rgba(99, 102, 241, 0.3);
         position: relative;
         min-height: 400px;
+        backdrop-filter: blur(5px);
+    }
+    
+    /* Add animated border gradient */
+    #customizable-sections.customize-active::before {
+        content: '';
+        position: absolute;
+        top: -1px;
+        left: -1px;
+        right: -1px;
+        bottom: -1px;
+        background: linear-gradient(45deg, #6366f1, #8b5cf6, #06b6d4, #6366f1);
+        border-radius: 20px;
+        opacity: 0.3;
+        z-index: -1;
+        animation: borderGlow 3s ease-in-out infinite alternate;
+    }
+    
+    @keyframes borderGlow {
+        0% { opacity: 0.2; }
+        100% { opacity: 0.4; }
     }
     
     /* Clean container styling */
@@ -231,52 +284,65 @@
         color: #00ff88 !important;
     }
     
-    /* Improve button contrast and readability */
+    /* Modern button styling within sections */
     .draggable-section button,
     .draggable-section .btn,
     .draggable-section a[class*="bg-"] {
         color: white !important;
         font-weight: 500 !important;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease !important;
+        backdrop-filter: blur(10px) !important;
     }
     
-    /* Specific button styling fixes */
+    /* Enhanced button hover effects */
+    .draggable-section button:hover,
+    .draggable-section .btn:hover,
+    .draggable-section a[class*="bg-"]:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    /* Specific button styling improvements */
     .draggable-section .bg-blue-600,
-    .draggable-section .bg-blue-700,
+    .draggable-section .bg-blue-700 {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+        border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    }
+    
     .draggable-section .bg-purple-600,
-    .draggable-section .bg-purple-700,
+    .draggable-section .bg-purple-700 {
+        background: linear-gradient(135deg, #9333ea, #7c3aed) !important;
+        border: 1px solid rgba(147, 51, 234, 0.3) !important;
+    }
+    
     .draggable-section .bg-red-600,
-    .draggable-section .bg-red-700,
+    .draggable-section .bg-red-700 {
+        background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+        border: 1px solid rgba(220, 38, 38, 0.3) !important;
+    }
+    
     .draggable-section .bg-green-600,
     .draggable-section .bg-green-700 {
-        color: white !important;
+        background: linear-gradient(135deg, #16a34a, #15803d) !important;
+        border: 1px solid rgba(22, 163, 74, 0.3) !important;
     }
     
-    /* Fix gray buttons that might have poor contrast */
+    /* Improved gray buttons */
     .draggable-section .bg-gray-600,
     .draggable-section .bg-gray-700,
     .draggable-section .bg-gray-800 {
+        background: linear-gradient(135deg, #4b5563, #374151) !important;
+        border: 1px solid rgba(75, 85, 99, 0.3) !important;
         color: white !important;
-        background-color: #374151 !important;
     }
     
-    .draggable-section .bg-gray-600:hover,
-    .draggable-section .bg-gray-700:hover,
-    .draggable-section .bg-gray-800:hover {
-        background-color: #1f2937 !important;
-    }
-    
-    /* Ensure all buttons in sections have good contrast */
-    .draggable-section button {
-        color: white !important;
-        font-weight: 500 !important;
-    }
-    
-    /* Fix any buttons that might be hard to read */
+    /* Better text contrast */
     .draggable-section .text-gray-400,
     .draggable-section .text-gray-500,
     .draggable-section .text-gray-600 {
-        color: #d1d5db !important;
+        color: #e5e7eb !important;
     }
     
     /* Ensure proper spacing for all sections */
@@ -325,12 +391,26 @@
         user: @json(auth()->user())
     };
 </script>
-<div class="min-h-screen py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        @if(auth()->check() && auth()->id() === $streamerProfile->user_id)
-            <button id="customize-layout-btn" class="mb-6 px-4 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-lg transition-colors">Customize Layout</button>
-        @endif
-        <div class="space-y-6" id="customizable-sections">
+<div class="min-h-screen bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800">
+    <!-- Header Section -->
+    <div class="bg-zinc-900/50 backdrop-blur-sm border-b border-zinc-700/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            @if(auth()->check() && auth()->id() === $streamerProfile->user_id)
+                <div class="flex justify-end">
+                    <button id="customize-layout-btn" class="inline-flex items-center px-4 py-2 bg-zinc-700/80 hover:bg-zinc-600 text-white rounded-lg transition-all duration-200 backdrop-blur-sm border border-zinc-600/50 hover:border-zinc-500/50 shadow-lg hover:shadow-xl">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+                        </svg>
+                        Customize Layout
+                    </button>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="space-y-8" id="customizable-sections">
             @foreach ($layout as $section)
                 <div class="draggable-section" data-section="{{ $section }}" id="section-{{ $section }}">
                     @switch($section)

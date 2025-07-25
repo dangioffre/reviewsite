@@ -105,72 +105,13 @@
                         </div>
                     </div>
 
-                    <!-- Identity Selection -->
-                    @if($availablePodcasts->count() > 0 || $availableStreamerProfiles->count() > 0)
+                    <!-- Auto-Association Info -->
                     <div class="mt-6 p-4 border-t border-[#3F3F46]">
-                        <h3 class="text-lg font-semibold text-white mb-4 font-['Share_Tech_Mono']">Review Identity</h3>
-                        
-                        <!-- Podcast Selection -->
-                        @if($availablePodcasts->count() > 0)
-                        <div class="mb-4">
-                            <label for="podcast_id" class="block text-sm font-medium text-white mb-2 font-['Inter']">
-                                Review as Podcast (Optional)
-                            </label>
-                            <select id="podcast_id" 
-                                    name="podcast_id" 
-                                    class="w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-3 text-white focus:border-[#E53E3E] focus:ring-[#E53E3E] transition font-['Inter']">
-                                <option value="">Select a podcast (optional)</option>
-                                @foreach($availablePodcasts as $podcast)
-                                    <option value="{{ $podcast->id }}" {{ (old('podcast_id') ?: $review->podcast_id) == $podcast->id ? 'selected' : '' }}>
-                                        {{ $podcast->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <p class="mt-1 text-xs text-[#A1A1AA] font-['Inter']">
-                                Choose a podcast to post this review as. Your name will still be shown as the author.
-                            </p>
-                            @error('podcast_id')
-                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        @endif
-
-                        <!-- Streamer Profile Selection -->
-                        @if($availableStreamerProfiles->count() > 0)
-                        <div class="mb-4">
-                            <label for="streamer_profile_id" class="block text-sm font-medium text-white mb-2 font-['Inter']">
-                                Review as Streamer (Optional)
-                            </label>
-                            <select id="streamer_profile_id" 
-                                    name="streamer_profile_id" 
-                                    class="w-full rounded-lg border-[#3F3F46] bg-[#1A1A1B] p-3 text-white focus:border-[#E53E3E] focus:ring-[#E53E3E] transition font-['Inter']">
-                                <option value="">Select a streamer profile (optional)</option>
-                                @foreach($availableStreamerProfiles as $profile)
-                                    <option value="{{ $profile->id }}" {{ (old('streamer_profile_id') ?: $review->streamer_profile_id) == $profile->id ? 'selected' : '' }}>
-                                        {{ $profile->channel_name }} ({{ ucfirst($profile->platform) }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            <p class="mt-1 text-xs text-[#A1A1AA] font-['Inter']">
-                                Choose a streamer profile to post this review as. Your review will show as "{{ Auth::user()->name }} (StreamerChannel)".
-                            </p>
-                            @error('streamer_profile_id')
-                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        @endif
-
-                        @if($availablePodcasts->count() == 0 && $availableStreamerProfiles->count() == 0)
+                        <h3 class="text-lg font-semibold text-white mb-2 font-['Share_Tech_Mono']">Review Visibility</h3>
                         <p class="text-sm text-[#A1A1AA] font-['Inter']">
-                            This review will be posted as {{ Auth::user()->name }} (Personal Review).
+                            This review will automatically appear on all your associated profiles for maximum visibility.
                         </p>
-                        @else
-                        <p class="text-sm text-[#A1A1AA] font-['Inter']">
-                            Leave both options unselected to post as {{ Auth::user()->name }} (Personal Review).
-                        </p>
-                        @endif
                     </div>
-                    @endif
                 </div>
 
                 <!-- Review Content -->

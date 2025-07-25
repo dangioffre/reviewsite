@@ -167,6 +167,7 @@ class PodcastController extends Controller
             ->join('episodes', 'episode_review_attachments.episode_id', '=', 'episodes.id')
             ->where('episodes.podcast_id', $podcast->id)
             ->where('reviews.is_published', true)
+            ->where('reviews.show_on_podcast', true) // Only show reviews that are set to be visible on podcast
             ->whereHas('product') // Ensure the review has a valid product
             ->with('user', 'product')
             ->orderBy('episode_review_attachments.created_at', 'desc')
@@ -178,6 +179,7 @@ class PodcastController extends Controller
             ->join('episodes', 'episode_review_attachments.episode_id', '=', 'episodes.id')
             ->where('episodes.podcast_id', $podcast->id)
             ->where('reviews.is_published', true)
+            ->where('reviews.show_on_podcast', true) // Only count reviews that are set to be visible on podcast
             ->count();
 
         return view('podcasts.show', compact('podcast', 'episodes', 'totalEpisodes', 'totalReviews', 'recentAttachedReviews'));

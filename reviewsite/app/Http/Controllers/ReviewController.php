@@ -56,8 +56,7 @@ class ReviewController extends Controller
             if ($existingReview->title === 'Quick Rating' && $existingReview->content === 'User rating via star system') {
                 // Pre-populate the form with existing rating
                 $hardware = Product::whereIn('type', ['hardware', 'accessory'])->get();
-                $availablePodcasts = $this->getAvailablePodcasts();
-                return view('reviews.create', compact('product', 'hardware', 'existingReview', 'availablePodcasts'));
+                return view('reviews.create', compact('product', 'hardware', 'existingReview'));
             } else {
                 // If it's already a full review, redirect to edit
                 $editRoute = $product->type === 'game' ? 'games.reviews.edit' : 'tech.reviews.edit';
@@ -67,10 +66,8 @@ class ReviewController extends Controller
         }
         
         $hardware = Product::whereIn('type', ['hardware', 'accessory'])->get();
-        $availablePodcasts = $this->getAvailablePodcasts();
-        $availableStreamerProfiles = $this->getAvailableStreamerProfiles();
         
-        return view('reviews.create', compact('product', 'hardware', 'availablePodcasts', 'availableStreamerProfiles'));
+        return view('reviews.create', compact('product', 'hardware'));
     }
 
     /**
@@ -94,34 +91,9 @@ class ReviewController extends Controller
             'positive_points' => 'nullable|string',
             'negative_points' => 'nullable|string',
             'platform_played_on' => 'nullable|string',
-            'podcast_id' => 'nullable|exists:podcasts,id',
-            'streamer_profile_id' => 'nullable|exists:streamer_profiles,id',
         ]);
 
-        // Validate podcast permission if podcast_id is provided
-        if ($request->podcast_id) {
-            $podcast = Podcast::find($request->podcast_id);
-            if (!$podcast || !$podcast->userCanPostAsThisPodcast(Auth::user())) {
-                return back()->withErrors([
-                    'podcast_id' => 'You do not have permission to post reviews as this podcast.'
-                ])->withInput();
-            }
-        }
-
-        // Validate streamer profile permission if streamer_profile_id is provided
-        if ($request->streamer_profile_id) {
-            $streamerProfile = Auth::user()->streamerProfile()
-                ->where('id', $request->streamer_profile_id)
-                ->where('is_approved', true)
-                ->where('is_verified', true)
-                ->first();
-            
-            if (!$streamerProfile) {
-                return back()->withErrors([
-                    'streamer_profile_id' => 'You do not have permission to post reviews as this streamer profile.'
-                ])->withInput();
-            }
-        }
+        // No need for manual validation since we're automatically associating with user's profiles
 
         if ($existingReview && $existingReview->title === 'Quick Rating' && $existingReview->content === 'User rating via star system') {
             // Update the existing quick rating to a full review
@@ -131,10 +103,29 @@ class ReviewController extends Controller
             $existingReview->positive_points = $request->positive_points ? array_filter(explode("\n", $request->positive_points)) : [];
             $existingReview->negative_points = $request->negative_points ? array_filter(explode("\n", $request->negative_points)) : [];
             $existingReview->platform_played_on = $request->platform_played_on;
-            $existingReview->podcast_id = $request->podcast_id;
-            $existingReview->streamer_profile_id = $request->streamer_profile_id;
             $existingReview->is_staff_review = Auth::user()->is_admin;
             $existingReview->is_published = true;
+            
+            // Automatically associate with all user's profiles if not already set
+            if (!$existingReview->streamer_profile_id) {
+                $streamerProfile = Auth::user()->streamerProfile()
+                    ->where('is_approved', true)
+                    ->where('is_verified', true)
+                    ->first();
+                if ($streamerProfile) {
+                    $existingReview->streamer_profile_id = $streamerProfile->id;
+                }
+            }
+            
+            if (!$existingReview->podcast_id) {
+                $primaryPodcast = Podcast::where('status', 'approved')
+                    ->where('owner_id', Auth::id())
+                    ->first();
+                if ($primaryPodcast) {
+                    $existingReview->podcast_id = $primaryPodcast->id;
+                }
+            }
+            
             $existingReview->save();
             
             $showRoute = $product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show';
@@ -148,7 +139,7 @@ class ReviewController extends Controller
                 ->with('error', 'You already have a review for this product.');
         }
 
-        // Create new review
+        // Create new review - automatically associate with all user's profiles
         $review = new Review();
         $review->product_id = $product->id;
         $review->user_id = Auth::id();
@@ -158,10 +149,27 @@ class ReviewController extends Controller
         $review->positive_points = $request->positive_points ? array_filter(explode("\n", $request->positive_points)) : [];
         $review->negative_points = $request->negative_points ? array_filter(explode("\n", $request->negative_points)) : [];
         $review->platform_played_on = $request->platform_played_on;
-        $review->podcast_id = $request->podcast_id;
-        $review->streamer_profile_id = $request->streamer_profile_id;
         $review->is_staff_review = Auth::user()->is_admin;
         $review->is_published = true;
+        
+        // Automatically associate with user's streamer profile if they have one
+        $streamerProfile = Auth::user()->streamerProfile()
+            ->where('is_approved', true)
+            ->where('is_verified', true)
+            ->first();
+        if ($streamerProfile) {
+            $review->streamer_profile_id = $streamerProfile->id;
+        }
+        
+        // Automatically associate with user's primary podcast if they own one
+        // This gives maximum visibility by default
+        $primaryPodcast = Podcast::where('status', 'approved')
+            ->where('owner_id', Auth::id())
+            ->first();
+        if ($primaryPodcast) {
+            $review->podcast_id = $primaryPodcast->id;
+        }
+        
         $review->save();
 
         $showRoute = $product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show';
@@ -186,10 +194,8 @@ class ReviewController extends Controller
         }
         
         $hardware = Product::whereIn('type', ['hardware', 'accessory'])->get();
-        $availablePodcasts = $this->getAvailablePodcasts();
-        $availableStreamerProfiles = $this->getAvailableStreamerProfiles();
         
-        return view('reviews.edit', compact('review', 'product', 'hardware', 'availablePodcasts', 'availableStreamerProfiles'));
+        return view('reviews.edit', compact('review', 'product', 'hardware'));
     }
 
     /**
@@ -214,34 +220,9 @@ class ReviewController extends Controller
             'positive_points' => 'nullable|string',
             'negative_points' => 'nullable|string',
             'platform_played_on' => 'nullable|string',
-            'podcast_id' => 'nullable|exists:podcasts,id',
-            'streamer_profile_id' => 'nullable|exists:streamer_profiles,id',
         ]);
 
-        // Validate podcast permission if podcast_id is provided
-        if ($request->podcast_id) {
-            $podcast = Podcast::find($request->podcast_id);
-            if (!$podcast || !$podcast->userCanPostAsThisPodcast(Auth::user())) {
-                return back()->withErrors([
-                    'podcast_id' => 'You do not have permission to post reviews as this podcast.'
-                ])->withInput();
-            }
-        }
-
-        // Validate streamer profile permission if streamer_profile_id is provided
-        if ($request->streamer_profile_id) {
-            $streamerProfile = Auth::user()->streamerProfile()
-                ->where('id', $request->streamer_profile_id)
-                ->where('is_approved', true)
-                ->where('is_verified', true)
-                ->first();
-            
-            if (!$streamerProfile) {
-                return back()->withErrors([
-                    'streamer_profile_id' => 'You do not have permission to post reviews as this streamer profile.'
-                ])->withInput();
-            }
-        }
+        // No need for manual validation since we're automatically associating with user's profiles
 
         $review->title = $request->title;
         $review->content = $request->content;
@@ -249,8 +230,28 @@ class ReviewController extends Controller
         $review->positive_points = $request->positive_points ? array_filter(explode("\n", $request->positive_points)) : [];
         $review->negative_points = $request->negative_points ? array_filter(explode("\n", $request->negative_points)) : [];
         $review->platform_played_on = $request->platform_played_on;
-        $review->podcast_id = $request->podcast_id;
-        $review->streamer_profile_id = $request->streamer_profile_id;
+        
+        // Automatically associate with user's streamer profile if they have one and it's not already set
+        if (!$review->streamer_profile_id) {
+            $streamerProfile = Auth::user()->streamerProfile()
+                ->where('is_approved', true)
+                ->where('is_verified', true)
+                ->first();
+            if ($streamerProfile) {
+                $review->streamer_profile_id = $streamerProfile->id;
+            }
+        }
+        
+        // Automatically associate with user's primary podcast if they own one and it's not already set
+        if (!$review->podcast_id) {
+            $primaryPodcast = Podcast::where('status', 'approved')
+                ->where('owner_id', Auth::id())
+                ->first();
+            if ($primaryPodcast) {
+                $review->podcast_id = $primaryPodcast->id;
+            }
+        }
+        
         $review->save();
 
         $showRoute = $product->type === 'game' ? 'games.reviews.show' : 'tech.reviews.show';

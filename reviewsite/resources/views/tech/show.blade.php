@@ -204,6 +204,91 @@
                     </section>
                     @endif
 
+                    <!-- Streamer Reviews Section -->
+                    @if($streamerReviews->count() > 0)
+                    <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                        <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Streamer Reviews</h2>
+                        
+                        <div class="space-y-6">
+                            @foreach($streamerReviews as $review)
+                                <div class="bg-[#1A1A1B] rounded-xl p-6 border border-[#3F3F46]">
+                                    <div class="flex items-start justify-between mb-4">
+                                        <div class="flex items-center">
+                                            <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center mr-4">
+                                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h3 class="text-lg font-bold text-white font-['Inter']">{{ $review->title }}</h3>
+                                                <div class="flex items-center gap-2 mt-1">
+                                                    <span class="text-purple-400 font-medium font-['Inter']">{{ $review->user->name }}</span>
+                                                    <span class="text-[#A1A1AA] text-sm">•</span>
+                                                    <span class="text-purple-300 text-sm font-['Inter']">{{ $review->streamerProfile->channel_name }}</span>
+                                                    <span class="text-[#A1A1AA] text-sm">•</span>
+                                                    <span class="text-[#A1A1AA] text-sm font-['Inter']">{{ $review->created_at->format('M j, Y') }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            @for($i = 1; $i <= 10; $i++)
+                                                <svg class="w-4 h-4 {{ $i <= $review->rating ? 'text-yellow-400' : 'text-gray-600' }}" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                                </svg>
+                                            @endfor
+                                            <span class="ml-2 text-lg font-bold text-white font-['Inter']">{{ $review->rating }}/10</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-[#A1A1AA] leading-relaxed font-['Inter'] mb-4">{{ $review->content }}</p>
+                                    
+                                    @if($review->positive_points_list || $review->negative_points_list)
+                                        <div class="grid md:grid-cols-2 gap-4 mt-4">
+                                            @if($review->positive_points_list)
+                                                <div>
+                                                    <h4 class="text-green-400 font-semibold mb-2 font-['Inter']">What's Great</h4>
+                                                    <ul class="space-y-1">
+                                                        @foreach($review->positive_points_list as $point)
+                                                            <li class="text-[#A1A1AA] text-sm font-['Inter'] flex items-start">
+                                                                <span class="text-green-400 mr-2">+</span>
+                                                                {{ $point }}
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            @endif
+                                            
+                                            @if($review->negative_points_list)
+                                                <div>
+                                                    <h4 class="text-red-400 font-semibold mb-2 font-['Inter']">Areas for Improvement</h4>
+                                                    <ul class="space-y-1">
+                                                        @foreach($review->negative_points_list as $point)
+                                                            <li class="text-[#A1A1AA] text-sm font-['Inter'] flex items-start">
+                                                                <span class="text-red-400 mr-2">-</span>
+                                                                {{ $point }}
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endif
+                                    
+                                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-[#3F3F46]">
+                                        <a href="{{ route('tech.reviews.show', [$product, $review]) }}" 
+                                           class="text-purple-400 hover:text-purple-300 font-medium font-['Inter'] transition-colors">
+                                            Read Full Review →
+                                        </a>
+                                        <a href="{{ route('streamer.profile.show', $review->streamerProfile) }}" 
+                                           class="text-purple-300 hover:text-purple-200 text-sm font-['Inter'] transition-colors">
+                                            View Streamer Profile
+                                        </a>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </section>
+                    @endif
+
                     <!-- User Reviews Section -->
                     <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
                         <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Community Reviews</h2>

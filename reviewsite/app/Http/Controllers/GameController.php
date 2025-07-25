@@ -147,6 +147,7 @@ class GameController extends Controller
             ->where('is_staff_review', false)
             ->where('is_published', true)
             ->whereNotNull('streamer_profile_id')
+            ->where('show_on_streamer_profile', true) // Only show reviews that are set to be visible on streamer profile
             ->with(['user', 'streamerProfile'])
             ->orderByDesc('created_at')
             ->get();

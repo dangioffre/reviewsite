@@ -25,6 +25,8 @@ class Review extends Model
         'platform_played_on',
         'is_staff_review',
         'is_published',
+        'show_on_streamer_profile',
+        'show_on_podcast',
     ];
 
     protected $casts = [
@@ -32,6 +34,8 @@ class Review extends Model
         'is_published' => 'boolean',
         'positive_points' => 'array',
         'negative_points' => 'array',
+        'show_on_streamer_profile' => 'boolean',
+        'show_on_podcast' => 'boolean',
     ];
 
     protected static function boot()
@@ -142,6 +146,18 @@ class Review extends Model
     public function scopeNotStreamer($query)
     {
         return $query->whereNull('streamer_profile_id');
+    }
+
+    public function scopeVisibleOnStreamerProfile($query)
+    {
+        return $query->whereNotNull('streamer_profile_id')
+                    ->where('show_on_streamer_profile', true);
+    }
+
+    public function scopeVisibleOnPodcast($query)
+    {
+        return $query->whereNotNull('podcast_id')
+                    ->where('show_on_podcast', true);
     }
 
     public function getRouteKeyName()

@@ -95,9 +95,22 @@ class TechController extends Controller
             ->with('user')
             ->get();
             
+        // Separate streamer reviews that are visible on streamer profiles
+        $streamerReviews = $product->reviews()
+            ->where('is_staff_review', false)
+            ->where('is_published', true)
+            ->whereNotNull('streamer_profile_id')
+            ->where('show_on_streamer_profile', true)
+            ->with(['user', 'streamerProfile'])
+            ->orderByDesc('created_at')
+            ->get();
+            
+        // Get user reviews (personal reviews, not associated with streamer or podcast profiles)
         $userReviews = $product->reviews()
             ->where('is_staff_review', false)
             ->where('is_published', true)
+            ->whereNull('streamer_profile_id')
+            ->whereNull('podcast_id')
             ->with('user')
             ->orderByDesc('created_at')
             ->get();
@@ -114,7 +127,7 @@ class TechController extends Controller
                 ->value('rating');
         }
         
-        return view('tech.show', compact('product', 'staffReviews', 'userReviews', 'averageUserRating', 'userRating'));
+        return view('tech.show', compact('product', 'staffReviews', 'streamerReviews', 'userReviews', 'averageUserRating', 'userRating'));
     }
 
     public function rate(Request $request, Product $product)

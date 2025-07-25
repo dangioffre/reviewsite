@@ -1,6 +1,10 @@
 @props(['streamerProfile'])
 
-@if($streamerProfile->reviews->count() > 0)
+@php
+    $visibleReviews = $streamerProfile->reviews->where('show_on_streamer_profile', true);
+@endphp
+
+@if($visibleReviews->count() > 0)
 <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-2xl shadow-xl border border-zinc-700 p-6">
     <div class="flex items-center justify-between mb-6">
         <div class="flex items-center">
@@ -11,15 +15,15 @@
             </div>
             <h3 class="text-xl font-bold text-white">Recent Reviews</h3>
         </div>
-        @if($streamerProfile->reviews->count() > 5)
+        @if($visibleReviews->count() > 5)
             <button class="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">
-                View More ({{ $streamerProfile->reviews->count() }})
+                View More ({{ $visibleReviews->count() }})
             </button>
         @endif
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-        @foreach($streamerProfile->reviews->take(5) as $review)
+        @foreach($visibleReviews->take(5) as $review)
             <a href="{{ $review->product->type === 'game' ? route('games.reviews.show', [$review->product, $review]) : route('tech.reviews.show', [$review->product, $review]) }}" class="bg-zinc-800/50 rounded-lg border border-zinc-600 p-3 hover:border-blue-500 hover:bg-zinc-800/70 transition-all group cursor-pointer block">
                 <!-- Product & Rating Header -->
                 <div class="mb-3">
@@ -67,10 +71,10 @@
         @endforeach
     </div>
     
-    @if($streamerProfile->reviews->count() > 5)
+    @if($visibleReviews->count() > 5)
         <div class="text-center mt-6">
             <button class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-semibold shadow-lg">
-                View More Reviews ({{ $streamerProfile->reviews->count() - 5 }} more)
+                View More Reviews ({{ $visibleReviews->count() - 5 }} more)
             </button>
         </div>
     @endif
