@@ -147,15 +147,6 @@
                                 @endauth
                                 
                                 <!-- Admin Edit Button -->
-                                @if(auth()->check())
-                                    <!-- Debug info (remove this later) -->
-                                    <div class="text-xs text-gray-400 mb-2">
-                                        Debug: Logged in as {{ auth()->user()->name }} 
-                                        (is_admin: {{ auth()->user()->is_admin ? 'true' : 'false' }}, 
-                                        roles: {{ auth()->user()->getRoleNames()->implode(', ') }})
-                                    </div>
-                                @endif
-                                
                                 @if(auth()->check() && (auth()->user()->is_admin || auth()->user()->hasRole('admin') || auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Moderator')))
                                     <a href="{{ route('filament.admin.resources.games.edit', $product) }}" 
                                        class="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white py-3 px-4 rounded-lg font-semibold text-base transition-colors duration-200 flex items-center justify-center gap-2 shadow-sm font-['Inter']">
