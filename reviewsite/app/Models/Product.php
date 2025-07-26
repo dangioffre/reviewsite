@@ -30,6 +30,8 @@ class Product extends Model
         'is_featured',
         'genre_id',
         'platform_id',
+        'genre_ids',
+        'platform_ids',
     ];
 
     protected $casts = [
@@ -84,8 +86,10 @@ class Product extends Model
             }
             // Photos (repeater uploads)
             if (is_array($product->photos)) {
+                $photos = $product->photos;
                 $changed = false;
-                foreach ($product->photos as &$photo) {
+                
+                foreach ($photos as $key => $photo) {
                     if (!empty($photo['upload']) && !Str::startsWith($photo['upload'], ['http://', 'https://'])) {
                         $photoPath = storage_path('app/public/' . $photo['upload']);
                         if (file_exists($photoPath)) {
@@ -100,8 +104,9 @@ class Product extends Model
                         }
                     }
                 }
+                
                 if ($changed) {
-                    $product->photos = $product->photos; // re-assign to trigger dirty
+                    $product->photos = $photos; // re-assign the modified array
                 }
             }
         });
@@ -143,6 +148,14 @@ class Product extends Model
     public function genre()
     {
         return $this->belongsTo(Genre::class);
+    }
+
+    /**
+     * Many-to-many relationship with Genre.
+     */
+    public function genres()
+    {
+        return $this->belongsToMany(Genre::class, 'genre_product');
     }
 
     public function platform()

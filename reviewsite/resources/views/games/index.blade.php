@@ -324,12 +324,6 @@
                                                 
                                                 <!-- Enhanced Tags -->
                                                 <div class="flex flex-wrap items-center gap-2">
-                                                    <span class="inline-flex items-center bg-gradient-to-r from-[#E53E3E] to-[#DC2626] text-white text-xs font-bold px-4 py-2 rounded-full uppercase tracking-wider font-['Share_Tech_Mono'] shadow-lg">
-                                                        <svg class="w-3 h-3 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
-                                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                                        </svg>
-                                                        {{ $product->type }}
-                                                    </span>
                                                     @if($product->platform)
                                                         <span class="inline-flex items-center text-white text-xs font-bold px-4 py-2 rounded-full uppercase tracking-wider font-['Share_Tech_Mono'] shadow-lg border border-white/20" style="background: linear-gradient(135deg, {{ $product->platform->color }}, {{ $product->platform->color }}dd);">
                                                             <svg class="w-3 h-3 mr-1.5" fill="currentColor" viewBox="0 0 20 20">

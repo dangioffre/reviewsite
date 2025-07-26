@@ -214,20 +214,40 @@
                                 <div class="bg-[#18181B] rounded-xl p-4 lg:p-6 border border-[#3F3F46] mb-6 lg:mb-8">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-x-12 lg:gap-y-4">
                                         <div><span class="font-bold text-white">Name:</span> <span class="text-[#A1A1AA]">{{ $product->name }}</span></div>
-                                        @if($product->genre)
-                                            <div><span class="font-bold text-white">Primary Genre:</span>
-                                                <a href="{{ route('games.by-genre', $product->genre->slug) }}" class="inline-block bg-green-600/20 text-green-400 px-3 py-1 rounded-full text-sm hover:bg-green-600/40 transition-colors ml-1">
-                                                    {{ $product->genre->name }}
-                                                </a>
+                                        @if($product->genre || ($product->genres && $product->genres->count()))
+                                            <div><span class="font-bold text-white">Genres:</span>
+                                                @if($product->genre)
+                                                    <a href="{{ route('games.by-genre', $product->genre->slug) }}" class="inline-block bg-green-600/20 text-green-400 px-3 py-1 rounded-full text-sm hover:bg-green-600/40 transition-colors ml-1">
+                                                        {{ $product->genre->name }}
+                                                    </a>
+                                                @endif
+                                                @if($product->genres && $product->genres->count())
+                                                    @foreach($product->genres as $additionalGenre)
+                                                        @if(!$product->genre || $additionalGenre->id !== $product->genre->id)
+                                                            <a href="{{ route('games.by-genre', $additionalGenre->slug) }}" class="inline-block bg-green-600/20 text-green-400 px-3 py-1 rounded-full text-sm hover:bg-green-600/40 transition-colors ml-1">
+                                                                {{ $additionalGenre->name }}
+                                                            </a>
+                                                        @endif
+                                                    @endforeach
+                                                @endif
                                             </div>
                                         @endif
-                                        @if($product->platforms && $product->platforms->count())
+                                        @if($product->platform || ($product->platforms && $product->platforms->count()))
                                             <div><span class="font-bold text-white">Platforms:</span>
-                                                @foreach($product->platforms as $platform)
-                                                    <a href="{{ route('games.by-platform', $platform->slug) }}" class="inline-block bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm hover:bg-blue-600/40 transition-colors ml-1">
-                                                        {{ $platform->name }}
+                                                @if($product->platform)
+                                                    <a href="{{ route('games.by-platform', $product->platform->slug) }}" class="inline-block bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm hover:bg-blue-600/40 transition-colors ml-1">
+                                                        {{ $product->platform->name }}
                                                     </a>
-                                                @endforeach
+                                                @endif
+                                                @if($product->platforms && $product->platforms->count())
+                                                    @foreach($product->platforms as $additionalPlatform)
+                                                        @if(!$product->platform || $additionalPlatform->id !== $product->platform->id)
+                                                            <a href="{{ route('games.by-platform', $additionalPlatform->slug) }}" class="inline-block bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm hover:bg-blue-600/40 transition-colors ml-1">
+                                                                {{ $additionalPlatform->name }}
+                                                            </a>
+                                                        @endif
+                                                    @endforeach
+                                                @endif
                                             </div>
                                         @endif
                                         @if($product->release_date)

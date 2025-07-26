@@ -67,6 +67,15 @@ class GameResource extends Resource
                                             ->placeholder('Select release date')
                                             ->helperText('When the game was or will be released'),
                                         
+                                        Forms\Components\Select::make('platform_id')
+                                            ->label('Primary Platform')
+                                            ->relationship('platform', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->placeholder('Select primary platform')
+                                            ->helperText('The main platform this game is primarily associated with')
+                                            ->required(),
+                                        
                                         Forms\Components\Toggle::make('is_featured')
                                             ->label('Featured Game')
                                             ->helperText('Featured games appear prominently on the homepage')
@@ -91,14 +100,32 @@ class GameResource extends Resource
                                             ->placeholder('Select primary genre')
                                             ->helperText('The main genre that best describes this game'),
                                         
+                                        Forms\Components\Select::make('platform_id')
+                                            ->label('Primary Platform')
+                                            ->relationship('platform', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->placeholder('Select primary platform')
+                                            ->helperText('The main platform this game is primarily associated with')
+                                            ->required(),
+                                        
+                                        Forms\Components\Select::make('genre_ids')
+                                            ->label('Additional Genres')
+                                            ->multiple()
+                                            ->relationship('genres', 'name', fn ($query) => $query->where('type', 'game'))
+                                            ->searchable()
+                                            ->preload()
+                                            ->placeholder('Select additional genres')
+                                            ->helperText('Select all other genres that apply to this game'),
+                                        
                                         Forms\Components\Select::make('platform_ids')
-                                            ->label('Platforms')
+                                            ->label('Additional Platforms')
                                             ->multiple()
                                             ->relationship('platforms', 'name')
                                             ->searchable()
                                             ->preload()
-                                            ->placeholder('Select platforms')
-                                            ->helperText('Select all platforms this game is available on'),
+                                            ->placeholder('Select additional platforms')
+                                            ->helperText('Select all other platforms this game is available on'),
                                         
                                         Forms\Components\Select::make('esrb_rating_id')
                                             ->label('ESRB Rating')
