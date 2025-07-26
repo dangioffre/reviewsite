@@ -21,7 +21,7 @@
                     Find amazing content creators across Twitch, YouTube, and Kick. Connect with streamers who share your gaming passion.
                 </p>
                 
-                <div class="flex items-center justify-center gap-8 text-zinc-400">
+                <div class="flex items-center justify-center gap-8 text-zinc-400 mb-8">
                     <div class="flex items-center gap-2">
                         <div class="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
                         <span class="font-medium">{{ $profiles->total() }} Streamers</span>
@@ -37,6 +37,35 @@
                         <span class="font-medium">All Platforms</span>
                     </div>
                 </div>
+
+                @auth
+                    @if(auth()->user()->streamerProfile)
+                        <a href="{{ route('streamer.profile.show', auth()->user()->streamerProfile) }}" 
+                           class="bg-gradient-to-r from-purple-600 to-red-600 hover:from-purple-700 hover:to-red-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-['Inter'] flex items-center justify-center gap-2 inline-flex">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            View My Streamer Page
+                        </a>
+                    @else
+                        <a href="{{ route('streamer.profiles.create') }}" 
+                           class="bg-gradient-to-r from-purple-600 to-red-600 hover:from-purple-700 hover:to-red-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-['Inter'] flex items-center justify-center gap-2 inline-flex">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            </svg>
+                            Create Streamer Page
+                        </a>
+                    @endif
+                @else
+                    <a href="{{ route('streamer.profiles.create') }}" 
+                       class="bg-gradient-to-r from-purple-600 to-red-600 hover:from-purple-700 hover:to-red-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-['Inter'] flex items-center justify-center gap-2 inline-flex">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        Create Streamer Page
+                    </a>
+                @endauth
             </div>
         </div>
     </div>
