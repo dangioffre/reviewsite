@@ -5,6 +5,15 @@
         body, .tab-button {
             pointer-events: auto !important;
         }
+        
+        /* Hide scrollbar for tab navigation */
+        .scrollbar-hide {
+            -ms-overflow-style: none;  /* Internet Explorer 10+ */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;  /* Safari and Chrome */
+        }
     </style>
     <div class="min-h-screen bg-[#151515]">
         <!-- Game Header Section -->
@@ -37,14 +46,15 @@
                     </h1>
                 </div>
 
-                <!-- Clean Media Section -->
-                <div class="grid lg:grid-cols-12 gap-3 items-start mb-12">
-                    <!-- Left Side: Photo and Video -->
-                    <div class="lg:col-span-9">
-                        <div class="flex flex-col lg:flex-row gap-2 items-start">
+                <!-- Responsive Media and Ratings Layout -->
+                <div class="grid lg:grid-cols-12 gap-8 mb-8 lg:mb-12">
+                    <!-- Left Column: Media Content -->
+                    <div class="lg:col-span-8">
+                        <!-- Game Poster and Video Row -->
+                        <div class="flex flex-col lg:flex-row gap-6 items-start">
                             <!-- Game Poster -->
-                            <div class="flex-shrink-0">
-                                <div class="bg-[#1A1A1B] rounded-xl overflow-hidden border border-[#3F3F46]/20 max-w-[264px] mx-auto lg:mx-0">
+                            <div class="flex-shrink-0 flex justify-center w-full lg:w-auto lg:justify-start">
+                                <div class="bg-[#1A1A1B] rounded-xl overflow-hidden border border-[#3F3F46]/20 shadow-xl">
                                     @php
                                         // Main image logic: prefer uploaded file, then alternate URL, then placeholder
                                         $mainImage = null;
@@ -61,14 +71,14 @@
                                     <img 
                                         src="{{ $mainImage }}" 
                                         alt="{{ $product->name }}"
-                                        class="w-full h-auto object-cover"
+                                        class="w-64 h-auto object-cover"
                                         style="aspect-ratio: 264/352;"
                                     >
                                 </div>
                             </div>
                             
-                            <!-- YouTube Video -->
-                            <div class="flex-1">
+                            <!-- Video Section -->
+                            <div class="flex-1 w-full">
                                 @if($product->video_url)
                                     <div class="bg-gradient-to-br from-[#232326] to-[#18181B] rounded-2xl overflow-hidden border-4 border-[#2563EB]/30 shadow-2xl aspect-video">
                                         <iframe 
@@ -92,9 +102,9 @@
                         </div>
                     </div>
                     
-                    <!-- Right Side: Ratings Section -->
-                    <div class="lg:col-span-3">
-                        <div class="bg-[#18181B] border border-[#292929] rounded-2xl p-8 shadow-xl flex flex-col items-center max-w-xs mx-auto">
+                    <!-- Right Column: Ratings and Actions -->
+                    <div class="lg:col-span-4">
+                        <div class="bg-[#18181B] border border-[#292929] rounded-2xl p-6 shadow-xl">
                             <!-- Ratings Row -->
                             <div class="flex items-center justify-center gap-4 w-full mb-6">
                                 @if($product->staff_rating)
@@ -165,26 +175,26 @@
                 <div x-data="{ activeTab: 'about' }" class="w-full">
                     <!-- Tab Navigation -->
                     <div class="border-b border-gray-700 mb-6">
-                        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                        <nav class="-mb-px flex space-x-4 lg:space-x-8 overflow-x-auto scrollbar-hide" aria-label="Tabs">
                             <button @click="activeTab = 'about'"
                                     :class="{ 'border-red-500 text-red-400': activeTab === 'about', 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500': activeTab !== 'about' }"
-                                    class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none">
+                                    class="tab-button whitespace-nowrap py-3 lg:py-4 px-2 lg:px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none flex-shrink-0">
                                 About
                             </button>
                             <button @click="activeTab = 'reviews'"
                                     :class="{ 'border-red-500 text-red-400': activeTab === 'reviews', 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500': activeTab !== 'reviews' }"
-                                    class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none">
+                                    class="tab-button whitespace-nowrap py-3 lg:py-4 px-2 lg:px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none flex-shrink-0">
                                 Reviews
                             </button>
                             <button @click="activeTab = 'media'"
                                     :class="{ 'border-red-500 text-red-400': activeTab === 'media', 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500': activeTab !== 'media' }"
-                                    class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none">
+                                    class="tab-button whitespace-nowrap py-3 lg:py-4 px-2 lg:px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none flex-shrink-0">
                                 Media
                             </button>
                             @if($product->affiliate_links && count($product->affiliate_links) > 0)
                                 <button @click="activeTab = 'buy'"
                                         :class="{ 'border-red-500 text-red-400': activeTab === 'buy', 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500': activeTab !== 'buy' }"
-                                        class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none">
+                                        class="tab-button whitespace-nowrap py-3 lg:py-4 px-2 lg:px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none flex-shrink-0">
                                     Buy Now
                                     <span class="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-green-100 bg-green-600 rounded-full">{{ count($product->affiliate_links) }}</span>
                                 </button>
@@ -195,14 +205,14 @@
                     <!-- Tab Content -->
                     <div class="tab-content">
                         <div x-show="activeTab === 'about'" class="prose prose-invert max-w-none">
-                            <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl mb-8">
+                            <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-6 lg:p-8 border border-[#3F3F46] shadow-2xl mb-6 lg:mb-8">
                                 <h2 class="text-3xl font-bold text-white mb-6 font-['Share_Tech_Mono']">About {{ $product->name }}</h2>
                                 <div class="mb-8">
                                     <h3 class="text-xl font-bold text-white mb-2 font-['Share_Tech_Mono']">Description</h3>
                                     <p class="text-[#A1A1AA] text-lg leading-relaxed font-['Inter']">{{ $product->description ?? 'No description available for this game.' }}</p>
                                 </div>
-                                <div class="bg-[#18181B] rounded-xl p-6 border border-[#3F3F46] mb-8">
-                                    <div class="grid md:grid-cols-2 gap-x-12 gap-y-4">
+                                <div class="bg-[#18181B] rounded-xl p-4 lg:p-6 border border-[#3F3F46] mb-6 lg:mb-8">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-x-12 lg:gap-y-4">
                                         <div><span class="font-bold text-white">Name:</span> <span class="text-[#A1A1AA]">{{ $product->name }}</span></div>
                                         @if($product->genre)
                                             <div><span class="font-bold text-white">Primary Genre:</span>
@@ -424,7 +434,7 @@
                             </div>
                         </div>
                         <div x-show="activeTab === 'media'" style="display: none;" class="prose prose-invert max-w-none">
-                            <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                            <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-6 lg:p-8 border border-[#3F3F46] shadow-2xl">
                                 <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Media Gallery</h2>
                                 @php
                                     // Main image logic: prefer uploaded file, then alternate URL, then placeholder
@@ -480,7 +490,7 @@
                                 @if($product->video_url || count($videos))
                                     <div class="mb-10">
                                         <h3 class="text-xl font-bold text-white mb-4 font-['Share_Tech_Mono']">Videos</h3>
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                             @if($product->video_url)
                                                 <div class="rounded-xl overflow-hidden border border-[#3F3F46] bg-[#18181B] flex flex-col">
                                                     <div class="aspect-video w-full">
@@ -557,7 +567,7 @@
 
                         <!-- Buy Now Tab -->
                         <div x-show="activeTab === 'buy'" style="display: none;" class="prose prose-invert max-w-none">
-                            <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-8 border border-[#3F3F46] shadow-2xl">
+                            <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-6 lg:p-8 border border-[#3F3F46] shadow-2xl">
                                 <h2 class="text-2xl font-bold text-white mb-6 font-['Share_Tech_Mono']">Buy {{ $product->name }}</h2>
                                 
                                 @if($product->affiliate_links && count($product->affiliate_links) > 0)
@@ -577,7 +587,7 @@
                                                 </svg>
                                                 Main Game
                                             </h3>
-                                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                                 @foreach($mainGameLinks as $link)
                                                     <div class="bg-[#18181B] rounded-xl p-4 border border-[#3F3F46] hover:border-[#E53E3E] transition-all duration-200">
                                                         <div class="flex items-center justify-between mb-3">
@@ -615,7 +625,7 @@
                                                 </svg>
                                                 DLC & Extras
                                             </h3>
-                                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                                 @foreach($dlcLinks as $link)
                                                     <div class="bg-[#18181B] rounded-xl p-4 border border-[#3F3F46] hover:border-purple-500 transition-all duration-200">
                                                         <div class="flex items-center justify-between mb-3">
@@ -656,7 +666,7 @@
                                                 </svg>
                                                 Other Options
                                             </h3>
-                                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                                 @foreach($otherLinks as $link)
                                                     <div class="bg-[#18181B] rounded-xl p-4 border border-[#3F3F46] hover:border-gray-500 transition-all duration-200">
                                                         <div class="flex items-center justify-between mb-3">
