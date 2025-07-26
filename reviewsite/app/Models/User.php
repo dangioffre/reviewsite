@@ -137,4 +137,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(ReviewComment::class);
     }
+
+    public function gameTips()
+    {
+        return $this->hasMany(GameTip::class);
+    }
 }

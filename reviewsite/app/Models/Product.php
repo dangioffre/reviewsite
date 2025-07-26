@@ -290,4 +290,9 @@ class Product extends Model
     {
         return $this->belongsTo(AgeRating::class, 'pegi_rating_id')->where('type', 'pegi');
     }
+
+    public function gameTips()
+    {
+        return $this->hasMany(GameTip::class);
+    }
 }

@@ -12,6 +12,8 @@ use App\Models\Publisher;
 use App\Models\GameMode;
 use App\Models\PlayerPerspective;
 use App\Models\AgeRating;
+use App\Models\GameTip;
+use App\Models\GameTipCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -174,7 +176,19 @@ class GameController extends Controller
             \Log::info('User rating for product ' . $product->id . ': ' . $userRating);
         }
         
-        return view('games.show', compact('product', 'staffReviews', 'streamerReviews', 'userReviews', 'averageUserRating', 'userRating'));
+        // Load approved tips for this game
+        $tips = $product->gameTips()
+            ->with(['user', 'category'])
+            ->approved()
+            ->orderBy('likes_count', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        // Load tip categories for the submission form
+        $tipCategories = GameTipCategory::all();
+
+        return view('games.show', compact('product', 'staffReviews', 'streamerReviews', 'userReviews', 'averageUserRating', 'userRating', 'tips', 'tipCategories'));
     }
 
     public function rate(Request $request, Product $product)

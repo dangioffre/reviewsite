@@ -191,6 +191,11 @@
                                     class="tab-button whitespace-nowrap py-3 lg:py-4 px-2 lg:px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none flex-shrink-0">
                                 Media
                             </button>
+                            <button @click="activeTab = 'tips'"
+                                    :class="{ 'border-red-500 text-red-400': activeTab === 'tips', 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500': activeTab !== 'tips' }"
+                                    class="tab-button whitespace-nowrap py-3 lg:py-4 px-2 lg:px-1 border-b-2 font-medium text-sm transition-colors duration-200 focus:outline-none flex-shrink-0">
+                                Tips & Tricks
+                            </button>
                             @if($product->affiliate_links && count($product->affiliate_links) > 0)
                                 <button @click="activeTab = 'buy'"
                                         :class="{ 'border-red-500 text-red-400': activeTab === 'buy', 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500': activeTab !== 'buy' }"
@@ -726,6 +731,163 @@
                                 @endif
                             </section>
                         </div>
+
+                        <!-- Tips & Tricks Tab -->
+                        <div x-show="activeTab === 'tips'" style="display: none;" class="prose prose-invert max-w-none">
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                <!-- Tips List -->
+                                <div class="lg:col-span-2">
+                                    <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-6 lg:p-8 border border-[#3F3F46] shadow-2xl mb-6">
+                                        <div class="flex items-center justify-between mb-6">
+                                            <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono']">Community Tips</h2>
+                                            <a href="{{ route('games.tips.index', $product) }}" 
+                                               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors font-semibold">
+                                                View All Tips
+                                            </a>
+                                        </div>
+                                        
+                                        @if($tips->count() > 0)
+                                            <div class="space-y-6">
+                                                @foreach($tips as $tip)
+                                                    <div class="bg-[#18181B] rounded-xl p-6 border-l-4 border-blue-500">
+                                                        <div class="flex items-start justify-between mb-4">
+                                                            <div>
+                                                                <h3 class="text-xl font-semibold mb-2 text-white">{{ $tip->title }}</h3>
+                                                                <div class="flex items-center space-x-4 text-sm text-[#A1A1AA]">
+                                                                    <span>By {{ $tip->user->name }}</span>
+                                                                    <span>{{ $tip->created_at->diffForHumans() }}</span>
+                                                                    <span class="bg-blue-600/20 text-blue-400 px-2 py-1 rounded">{{ $tip->category->name }}</span>
+                                                                </div>
+                                                            </div>
+                                                                                                            <div class="flex items-center space-x-2">
+                                                    <livewire:game-tip-like :tip="$tip" :wire:key="'tip-like-' . $tip->id" />
+                                                </div>
+                                                        </div>
+
+                                                        @if($tip->tags)
+                                                            <div class="flex flex-wrap gap-2 mb-4">
+                                                                @foreach($tip->tags as $tag)
+                                                                    <span class="bg-yellow-600/20 text-yellow-400 px-2 py-1 rounded text-xs">{{ $tag }}</span>
+                                                                @endforeach
+                                                            </div>
+                                                        @endif
+
+                                                        <div class="flex items-center justify-between pt-4 border-t border-[#3F3F46]">
+                                                            <div class="flex items-center space-x-4 text-sm text-[#A1A1AA]">
+                                                                <span>{{ $tip->comments_count }} comments</span>
+                                                            </div>
+                                                            <a href="{{ route('games.tips.show', [$product, $tip]) }}" class="text-blue-400 hover:text-blue-300 transition-colors text-sm">
+                                                                View Details →
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div class="text-center py-12">
+                                                <div class="text-6xl mb-4">💡</div>
+                                                <h3 class="text-xl font-semibold mb-2 text-white">No tips yet!</h3>
+                                                <p class="text-[#A1A1AA]">Be the first to share a helpful tip for this game.</p>
+                                            </div>
+                                        @endif
+                                    </section>
+                                </div>
+
+                                <!-- Submit Tip Form -->
+                                <div class="lg:col-span-1">
+                                    <section class="bg-gradient-to-br from-[#27272A] to-[#1A1A1B] rounded-2xl p-6 lg:p-8 border border-[#3F3F46] shadow-2xl sticky top-8">
+                                        <h2 class="text-2xl font-bold text-white font-['Share_Tech_Mono'] mb-6">Submit a Tip</h2>
+                                        
+                                        @if(session('success'))
+                                            <div class="bg-green-600/20 border border-green-600 text-green-400 px-4 py-3 rounded mb-4">
+                                                {{ session('success') }}
+                                            </div>
+                                        @endif
+
+                                        <form action="{{ route('games.tips.store', $product) }}" method="POST">
+                                            @csrf
+                                            
+                                            <div class="space-y-4">
+                                                <div>
+                                                    <label for="title" class="block text-sm font-medium mb-2 text-white">Tip Title</label>
+                                                    <input type="text" id="title" name="title" required 
+                                                           class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                           placeholder="Enter a descriptive title">
+                                                    @error('title')
+                                                        <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                                                    @enderror
+                                                </div>
+
+                                                <div>
+                                                    <label for="game_tip_category_id" class="block text-sm font-medium mb-2 text-white">Category</label>
+                                                    <select id="game_tip_category_id" name="game_tip_category_id" required 
+                                                            class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                                        <option value="">Select a category</option>
+                                                        @foreach($tipCategories as $category)
+                                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    @error('game_tip_category_id')
+                                                        <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                                                    @enderror
+                                                </div>
+
+                                                <div>
+                                                    <label for="content" class="block text-sm font-medium mb-2 text-white">Content (Markdown supported)</label>
+                                                    <textarea id="content" name="content" rows="6" required 
+                                                              class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                              placeholder="Write your tip here... You can use Markdown formatting including **bold**, *italic*, and [spoiler] tags."></textarea>
+                                                    @error('content')
+                                                        <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                                                    @enderror
+                                                </div>
+
+                                                <div>
+                                                    <label for="youtube_link" class="block text-sm font-medium mb-2 text-white">YouTube Video Link (Optional)</label>
+                                                    <input type="url" id="youtube_link" name="youtube_link" 
+                                                           class="w-full bg-[#18181B] border border-[#3F3F46] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                           placeholder="https://www.youtube.com/watch?v=...">
+                                                    @error('youtube_link')
+                                                        <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                                                    @enderror
+                                                </div>
+
+                                                <div>
+                                                    <label class="block text-sm font-medium mb-2 text-white">Tags (Optional)</label>
+                                                    <div class="grid grid-cols-2 gap-2">
+                                                        @foreach(['Spoiler', 'Patch Dependent', 'Outdated', 'Beginner', 'Advanced', 'Exploit'] as $tag)
+                                                            <label class="flex items-center space-x-2">
+                                                                <input type="checkbox" name="tags[]" value="{{ $tag }}" 
+                                                                       class="rounded border-[#3F3F46] bg-[#18181B] text-blue-600 focus:ring-blue-500">
+                                                                <span class="text-sm text-[#A1A1AA]">{{ $tag }}</span>
+                                                            </label>
+                                                        @endforeach
+                                                    </div>
+                                                    @error('tags')
+                                                        <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                                                    @enderror
+                                                </div>
+
+                                                <button type="submit" 
+                                                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors">
+                                                    Submit Tip
+                                                </button>
+                                            </div>
+                                        </form>
+
+                                        <div class="mt-6 p-4 bg-blue-600/20 border border-blue-600 rounded-lg">
+                                            <h3 class="font-semibold text-blue-400 mb-2">💡 Tip Guidelines</h3>
+                                            <ul class="text-sm text-[#A1A1AA] space-y-1">
+                                                <li>• Be specific and helpful</li>
+                                                <li>• Use Markdown for formatting</li>
+                                                <li>• Add [spoiler] tags for story content</li>
+                                                <li>• All tips are reviewed before approval</li>
+                                            </ul>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     </div>
                 </div>
@@ -769,5 +931,54 @@
             </div>
         </div>
     </div>
+
+    <script>
+    function toggleSpoiler(spoilerId) {
+        const content = document.getElementById(spoilerId);
+        const button = content.previousElementSibling;
+        const showText = button.querySelector('.spoiler-text');
+        const hideText = button.querySelector('.spoiler-text-hidden');
+        
+        if (content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            showText.classList.add('hidden');
+            hideText.classList.remove('hidden');
+        } else {
+            content.classList.add('hidden');
+            showText.classList.remove('hidden');
+            hideText.classList.add('hidden');
+        }
+    }
+
+    function likeTip(tipId) {
+        fetch(`/games/tips/${tipId}/like`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            const likeBtn = document.querySelector(`[data-tip-id="${tipId}"]`);
+            const likesCount = likeBtn.querySelector('.likes-count');
+            
+            likesCount.textContent = data.likes_count;
+            
+            if (data.liked) {
+                likeBtn.classList.add('text-red-500');
+                likeBtn.classList.remove('text-[#A1A1AA]');
+            } else {
+                likeBtn.classList.remove('text-red-500');
+                likeBtn.classList.add('text-[#A1A1AA]');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+
+    </script>
 
 </x-layouts.app> 

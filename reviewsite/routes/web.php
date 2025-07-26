@@ -10,6 +10,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PodcastController;
+use App\Http\Controllers\GameTipController;
 use App\Http\Controllers\Api\StreamerPageLayoutController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -38,6 +39,13 @@ Route::get('/games/{product}/{review}/edit', [ReviewController::class, 'edit'])-
 Route::put('/games/{product}/{review}', [ReviewController::class, 'update'])->name('games.reviews.update');
 Route::delete('/games/{product}/{review}', [ReviewController::class, 'destroy'])->name('games.reviews.destroy');
 Route::post('/games/{product}/{review}/like', [ReviewController::class, 'toggleLike'])->name('games.reviews.like');
+
+// Game Tips & Tricks Routes
+Route::get('/games/{product}/tips', [GameTipController::class, 'index'])->name('games.tips.index');
+Route::post('/games/{product}/tips', [GameTipController::class, 'store'])->name('games.tips.store');
+
+Route::post('/games/tips/{tip}/comment', [GameTipController::class, 'comment'])->name('games.tips.comment');
+Route::get('/games/{product}/tips/{tip}', [GameTipController::class, 'show'])->name('games.tips.show');
 
 // Game Review Reports
 Route::get('/games/{product}/{review}/report', [ReportController::class, 'show'])->name('games.reviews.report.show');
